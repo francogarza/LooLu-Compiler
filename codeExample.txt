@@ -1,0 +1,41 @@
+LooLu miPrograma;
+
+clases:
+  Clase Empleado {
+    vars:
+      var entero : edad;
+  	  var char : nombre[30];
+  	  var flotante: sueldo;
+
+    funcs:
+      func disminuirEdad( x : entero) entero {
+        retorna( edad - x );
+      }
+  }
+
+vars:
+  var entero : a;
+  var flotante : disminucionSueldo;
+  var bool : b, c, d;
+  var Empleado : empleadoUno;
+
+funcs:
+  func incrementaSueldo(emp: Empleado, porcentaje: float) void {
+  	emp.sueldo = emp.sueldo * porcentaje;
+  }
+
+Loo() {
+  lectura(a,b,c);
+
+  disminucionSueldo = empleadoUno.disminuirEdad(10);
+  imprime(disminucionSueldo);
+
+  incrementaSueldo(empleadoUno, 0.2);
+  imprime(empleadoUno.sueldo);
+
+  mientras (empleado.edad > 5) {
+		empleado.edad = empleado.edad - 1;
+  }
+
+} Lu;
+
