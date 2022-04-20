@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------
 # parser.py
 #
-# Parser para lenguaje LittleDuck2020
+# Parser para lenguaje LooLu
 # -----------------------------------------------------------------------------
 import sys
 import ply.yacc as yacc
@@ -12,7 +12,7 @@ from lexer import tokens
 
 # Estructura general del programa
 def p_program(p):
-    '''program : PROGRAM ID SEMICOLON program_vars block'''
+    '''program : LOOLU ID SEMICOLON CLASES COLON program_classes VARS COLON program_vars FUNCS COLON program_funcs LOO LEFTPAREN RIGHTPAREN block LU SEMICOLON'''
     p[0] = "COMPILED"
 
 # Sección de declaración de variables
@@ -111,8 +111,9 @@ def p_var_cte(p):
                | CTEI
                | CTEF'''
 
+# <VARS>
 def p_vars(p):
-    '''vars : VAR var_id COLON type SEMICOLON vars_block'''
+    '''vars : VAR types COLON var_id SEMICOLON vars_block'''
 
 def p_var_id(p):
     '''var_id : ID var_id_2'''
@@ -121,14 +122,25 @@ def p_var_id_2(p):
     '''var_id_2 : COMMA ID var_id_2
                 | empty'''
 
-# Definición de los tipos de variables del lenguaje
-def p_type(p):
-    '''type : INT
-            | FLOAT'''
+# TYPES
+def p_types(p):
+    '''types : type_simple
+             | type_compound'''
+
+# <TYPE_SIMPLE>
+def p_type_simple(p):
+    '''type_simple : INT
+                   | FLOAT
+                   | CHAR
+                   | BOOL'''
+
+# <TYPE_COMPOUND>
+def p_type_compound(p):
+    '''type_compound : ID'''
 
 # Definición de declaración de variables
 def p_vars_block(p):
-    '''vars_block : var_id COLON type SEMICOLON vars_block
+    '''vars_block : VAR types COLON var_id SEMICOLON vars_block
                   | empty'''
 
 
