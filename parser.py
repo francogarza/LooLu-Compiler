@@ -8,17 +8,100 @@ import ply.yacc as yacc
 
 from lexer import tokens
 
-# Delcaración de las reglas gramaticales
+# Delcaration of Grammar Rules
 
-# Estructura general del programa
+# -----------------------------------------------------------------------------
+#   General Structure of a LooLu Program
+# -----------------------------------------------------------------------------
 def p_program(p):
     '''program : LOOLU ID SEMICOLON CLASES COLON program_classes VARS COLON program_vars FUNCS COLON program_funcs LOO LEFTPAREN RIGHTPAREN block LU SEMICOLON'''
     p[0] = "COMPILED"
 
-# Sección de declaración de variables
+
+# -----------------------------------------------------------------------------
+#   Initialization of program classes, vars, funcs.
+# -----------------------------------------------------------------------------
+# Class Declaration Section
+def p_program_classes(p):
+    '''program_classes : classes
+               | empty'''
+
+# Variable Declaration Section
 def p_program_vars(p):
     '''program_vars : vars
                | empty'''
+
+# Function Declaration Section
+def p_program_funcs(p):
+    '''program_funcs : funcs
+               | empty'''
+
+
+# -----------------------------------------------------------------------------
+#   Class definition
+# -----------------------------------------------------------------------------
+# <CLASSES>
+def p_classes(p):
+    '''classes : CLASE ID LEFTBRACKET VARS COLON program_vars FUNCS COLON program_funcs RIGHTBRACKET classes_block'''
+
+
+# -----------------------------------------------------------------------------
+#   Vars definition
+# -----------------------------------------------------------------------------
+# <VARS>
+def p_vars(p):
+    '''vars : VAR types COLON var_id SEMICOLON vars_block'''
+
+def p_var_id(p):
+    '''var_id : ID var_id_2'''
+
+def p_var_id_2(p):
+    '''var_id_2 : COMMA ID var_id_2
+                | empty'''
+
+
+# -----------------------------------------------------------------------------
+#   Funcs definition    IN PROGRESS
+# -----------------------------------------------------------------------------
+# <FUNCS>
+def p_funcs(p):####
+    '''funcs : FUNC ID LEFTPAREN PARAMETERS RIGHTPAREN type_simple LEFTBRACKET block RIGHTBRACKET funcs_block'''
+
+
+# -----------------------------------------------------------------------------
+#   Blocks this allow to recursively create N classe, vars, funcs. IN PROGRESS
+# -----------------------------------------------------------------------------
+def p_classes_block(p):
+    '''vars_block : CLASE ID LEFTBRACKET VARS COLON program_vars FUNCS COLON program_funcs RIGHTBRACKET classes_block
+                  | empty'''
+
+def p_vars_block(p):
+    '''vars_block : VAR types COLON var_id SEMICOLON vars_block
+                  | empty'''
+
+def p_funcs_block(p):####
+    '''funcs_block : FUNC ID LEFTPAREN PARAMETERS RIGHTPAREN type_simple LEFTBRACKET block RIGHTBRACKET funcs_block
+                  | empty'''
+
+
+# -----------------------------------------------------------------------------
+#   Types definition
+# -----------------------------------------------------------------------------
+# TYPES
+def p_types(p):
+    '''types : type_simple
+             | type_compound'''
+
+# <TYPE_SIMPLE>
+def p_type_simple(p):
+    '''type_simple : INT
+                   | FLOAT
+                   | CHAR
+                   | BOOL'''
+
+# <TYPE_COMPOUND>
+def p_type_compound(p):
+    '''type_compound : ID'''
 
 # Definición de un bloque
 def p_block(p):
@@ -110,39 +193,6 @@ def p_var_cte(p):
     '''var_cte : ID
                | CTEI
                | CTEF'''
-
-# <VARS>
-def p_vars(p):
-    '''vars : VAR types COLON var_id SEMICOLON vars_block'''
-
-def p_var_id(p):
-    '''var_id : ID var_id_2'''
-
-def p_var_id_2(p):
-    '''var_id_2 : COMMA ID var_id_2
-                | empty'''
-
-# TYPES
-def p_types(p):
-    '''types : type_simple
-             | type_compound'''
-
-# <TYPE_SIMPLE>
-def p_type_simple(p):
-    '''type_simple : INT
-                   | FLOAT
-                   | CHAR
-                   | BOOL'''
-
-# <TYPE_COMPOUND>
-def p_type_compound(p):
-    '''type_compound : ID'''
-
-# Definición de declaración de variables
-def p_vars_block(p):
-    '''vars_block : VAR types COLON var_id SEMICOLON vars_block
-                  | empty'''
-
 
 # Definición del mensaje que se emitira en el error de sintaxis
 def p_error(p):
