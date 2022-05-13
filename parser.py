@@ -14,7 +14,7 @@ from lexer import tokens
 #   General Structure of a LooLu Program
 # -----------------------------------------------------------------------------
 def p_LOOLU(p):
-    '''loolu : LOOLU ID SEMICOLON CLASS COLON program_classes VARS COLON program_vars FUNCS COLON program_funcs LOO LEFTPAREN RIGHTPAREN block LU SEMICOLON'''
+    '''loolu : LOOLU ID SEMICOLON CLASSES COLON program_classes VARS COLON program_vars FUNCS COLON program_funcs LOO LEFTPAREN RIGHTPAREN block LU SEMICOLON'''
     p[0] = "COMPILED"
 
 
@@ -154,9 +154,7 @@ def p_expression(p):
 
 # Definición de los operadores de comparación
 def p_comparation(p):
-    '''comparation : GREATER comparation_exp
-                   | LESS comparation_exp
-                   | NOTEQUAL comparation_exp
+    '''comparation : RELOPER comparation_exp
                    | empty'''
 
 # Expresión de comparación
@@ -169,8 +167,7 @@ def p_exp(p):
 
 # Definición de los operadores de suma y resta
 def p_operator(p):
-    '''operator : PLUS term operator
-                | MINUS term operator
+    '''operator : OPERTYPE1 term operator
                 | empty'''
 
 # Definición de un termino
@@ -179,50 +176,32 @@ def p_term(p):
 
 # Definición de los operadores de multiplicación y división
 def p_term_operator(p):
-    '''term_operator : TIMES factor term_operator
-                     | DIVIDE factor term_operator
+    '''term_operator : OPERTYPE2 factor term_operator
                      | empty'''
 
 # Definición de un factor
 def p_factor(p):
     '''factor : LEFTPAREN expression RIGHTPAREN
-              | sign var_cte'''
-
-# Definición de signo de un termino
-def p_sing(p):
-    '''sign : PLUS
-            | MINUS
-            | empty'''
+              | var_cte'''
 
 # Definición de la declaración de variables
 def p_var_cte(p):
     '''var_cte : ID
-               | CTEI
-               | CTEF'''
+               | CTEINT
+               | CTEFLOAT'''
 
-# Definición del mensaje que se emitira en el error de sintaxis
-def p_error(p):
-    print("ERROR in iput syntax - {} ".format(p))
+# # Definición del mensaje que se emitira en el error de sintaxis
+# def p_error(p):
+#     print("ERROR in iput syntax - {} ".format(p))
 
 # Definición del epsilon/nulo/vacío
 def p_empty(p):
     '''empty :'''
     pass
 
+def p_error(t):
+    print("Syntax error (parser):", t.lexer.token(), t.value)
+    raise Exception("Syntax error")
+
 yacc.yacc()
 
-# Main program del parser
-if __name__ == '__main__':
-
-    if len(sys.argv) > 1:
-        file = sys.argv[1]
-        try:
-            f = open(file, 'r')
-            data = f.read()
-            f.close()
-            if yacc.parse(data) == "COMPILED":
-                print("INPUT COMPILED")
-        except EOFError:
-            print(EOFError)
-    else:
-        print("File not FOUND")

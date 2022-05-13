@@ -1,6 +1,6 @@
 LooLu miPrograma;
 
-clases:
+classes:
 
 vars:
 

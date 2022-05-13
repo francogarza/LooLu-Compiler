@@ -5,10 +5,6 @@ lex.lex()
 print("Lexer generated")
 
 
-def p_error(t):
-    print("Syntax error (parser):", t.lexer.token(), t.value)
-    raise Exception("Syntax error")
-
 # Build Yacc
 parser = yacc.yacc()
 print("Yacc has been generated!")
