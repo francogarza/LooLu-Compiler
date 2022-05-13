@@ -13,8 +13,8 @@ from lexer import tokens
 # -----------------------------------------------------------------------------
 #   General Structure of a LooLu Program
 # -----------------------------------------------------------------------------
-def p_program(p):
-    '''program : LOOLU ID SEMICOLON CLASES COLON program_classes VARS COLON program_vars FUNCS COLON program_funcs LOO LEFTPAREN RIGHTPAREN block LU SEMICOLON'''
+def p_LOOLU(p):
+    '''loolu : LOOLU ID SEMICOLON CLASS COLON program_classes VARS COLON program_vars FUNCS COLON program_funcs LOO LEFTPAREN RIGHTPAREN block LU SEMICOLON'''
     p[0] = "COMPILED"
 
 
@@ -42,7 +42,7 @@ def p_program_funcs(p):
 # -----------------------------------------------------------------------------
 # <CLASSES>
 def p_classes(p):
-    '''classes : CLASE ID LEFTBRACKET VARS COLON program_vars FUNCS COLON program_funcs RIGHTBRACKET classes_block'''
+    '''classes : CLASS ID LEFTBRACKET VARS COLON program_vars FUNCS COLON program_funcs RIGHTBRACKET classes_block'''
 
 
 # -----------------------------------------------------------------------------
@@ -65,14 +65,20 @@ def p_var_id_2(p):
 # -----------------------------------------------------------------------------
 # <FUNCS>
 def p_funcs(p):####
-    '''funcs : FUNC ID LEFTPAREN PARAMETERS RIGHTPAREN type_simple LEFTBRACKET block RIGHTBRACKET funcs_block'''
-
+    '''funcs : FUNC ID LEFTPAREN parameters RIGHTPAREN type_simple LEFTBRACKET block RIGHTBRACKET funcs_block'''
 
 # -----------------------------------------------------------------------------
-#   Blocks this allow to recursively create N classe, vars, funcs. IN PROGRESS
+#   PARAMETERS definition    IN PROGRESS
 # -----------------------------------------------------------------------------
+# <PARAMETERS>
+# -----------------------------------------------------------------------------
+#   DUMMY
+# -----------------------------------------------------------------------------
+def p_parameters(p):
+    '''parameters : empty'''
+
 def p_classes_block(p):
-    '''vars_block : CLASE ID LEFTBRACKET VARS COLON program_vars FUNCS COLON program_funcs RIGHTBRACKET classes_block
+    '''classes_block : CLASS ID LEFTBRACKET VARS COLON program_vars FUNCS COLON program_funcs RIGHTBRACKET classes_block
                   | empty'''
 
 def p_vars_block(p):
@@ -80,7 +86,7 @@ def p_vars_block(p):
                   | empty'''
 
 def p_funcs_block(p):####
-    '''funcs_block : FUNC ID LEFTPAREN PARAMETERS RIGHTPAREN type_simple LEFTBRACKET block RIGHTBRACKET funcs_block
+    '''funcs_block : FUNC ID LEFTPAREN parameters RIGHTPAREN type_simple LEFTBRACKET block RIGHTBRACKET funcs_block
                   | empty'''
 
 
@@ -97,7 +103,8 @@ def p_type_simple(p):
     '''type_simple : INT
                    | FLOAT
                    | CHAR
-                   | BOOL'''
+                   | BOOL
+                   | VOID'''
 
 # <TYPE_COMPOUND>
 def p_type_compound(p):
@@ -120,7 +127,7 @@ def p_statement(p):
 
 # STATEMENTS
 def p_assignment(p):
-    '''assignment : ID EQUALS expression SEMICOLON'''
+    '''assignment : ID EQUAL expression SEMICOLON'''
 
 def p_condition(p):
     '''condition : IF LEFTPAREN expression RIGHTPAREN block else_condition SEMICOLON'''
@@ -135,8 +142,7 @@ def p_else_condition(p):
 
 # Definiciónes de print_val y print_exp
 def p_print_val(p):
-    '''print_val : expression print_exp
-                 | CTESTRING print_exp'''
+    '''print_val : expression print_exp'''
 
 def p_print_exp(p):
     '''print_exp : COMMA  print_val

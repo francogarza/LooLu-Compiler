@@ -1,0 +1,183 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Unused terminals:
+
+    CLASSES
+    CTECHAR
+    CTEFLOAT
+    CTEINT
+    EQUAL
+    FOR
+    IN
+    LEFTSQUAREBRACKET
+    LOGICOPERATOR
+    OPERTYPE1
+    OPERTYPE2
+    READ
+    RELOPER
+    RIGHTSQUAREBRACKET
+    WHILE
+
+Grammar
+
+Rule 0     S' -> loolu
+Rule 1     loolu -> LOOLU ID SEMICOLON CLASS COLON program_classes VARS COLON program_vars FUNCS COLON program_funcs LOO LEFTPAREN RIGHTPAREN block LU SEMICOLON
+Rule 2     program_classes -> classes
+Rule 3     program_classes -> empty
+Rule 4     program_vars -> vars
+Rule 5     program_vars -> empty
+Rule 6     program_funcs -> funcs
+Rule 7     program_funcs -> empty
+Rule 8     classes -> CLASS ID LEFTBRACKET VARS COLON program_vars FUNCS COLON program_funcs RIGHTBRACKET classes_block
+Rule 9     vars -> VAR types COLON var_id SEMICOLON vars_block
+Rule 10    var_id -> ID var_id_2
+Rule 11    var_id_2 -> COMMA ID var_id_2
+Rule 12    var_id_2 -> empty
+Rule 13    funcs -> FUNC ID LEFTPAREN parameters RIGHTPAREN type_simple LEFTBRACKET block RIGHTBRACKET funcs_block
+Rule 14    parameters -> empty
+Rule 15    classes_block -> CLASS ID LEFTBRACKET VARS COLON program_vars FUNCS COLON program_funcs RIGHTBRACKET classes_block
+Rule 16    classes_block -> empty
+Rule 17    vars_block -> VAR types COLON var_id SEMICOLON vars_block
+Rule 18    vars_block -> empty
+Rule 19    funcs_block -> FUNC ID LEFTPAREN parameters RIGHTPAREN type_simple LEFTBRACKET block RIGHTBRACKET funcs_block
+Rule 20    funcs_block -> empty
+Rule 21    types -> type_simple
+Rule 22    types -> type_compound
+Rule 23    type_simple -> INT
+Rule 24    type_simple -> FLOAT
+Rule 25    type_simple -> CHAR
+Rule 26    type_simple -> BOOL
+Rule 27    type_simple -> VOID
+Rule 28    type_compound -> ID
+Rule 29    block -> LEFTBRACKET statement_block RIGHTBRACKET
+Rule 30    statement_block -> statement statement_block
+Rule 31    statement_block -> empty
+Rule 32    statement -> assignment
+Rule 33    statement -> condition
+Rule 34    statement -> writing
+Rule 35    assignment -> ID EQUALS expression SEMICOLON
+Rule 36    condition -> IF LEFTPAREN expression RIGHTPAREN block else_condition SEMICOLON
+Rule 37    writing -> PRINT LEFTPAREN print_val RIGHTPAREN SEMICOLON
+Rule 38    else_condition -> ELSE block
+Rule 39    else_condition -> empty
+Rule 40    print_val -> expression print_exp
+Rule 41    print_val -> CTESTRING print_exp
+Rule 42    print_exp -> COMMA print_val
+Rule 43    print_exp -> empty
+Rule 44    expression -> exp comparation
+Rule 45    comparation -> GREATER comparation_exp
+Rule 46    comparation -> LESS comparation_exp
+Rule 47    comparation -> NOTEQUAL comparation_exp
+Rule 48    comparation -> empty
+Rule 49    comparation_exp -> exp
+Rule 50    exp -> term operator
+Rule 51    operator -> PLUS term operator
+Rule 52    operator -> MINUS term operator
+Rule 53    operator -> empty
+Rule 54    term -> factor term_operator
+Rule 55    term_operator -> TIMES factor term_operator
+Rule 56    term_operator -> DIVIDE factor term_operator
+Rule 57    term_operator -> empty
+Rule 58    factor -> LEFTPAREN expression RIGHTPAREN
+Rule 59    factor -> sign var_cte
+Rule 60    sign -> PLUS
+Rule 61    sign -> MINUS
+Rule 62    sign -> empty
+Rule 63    var_cte -> ID
+Rule 64    var_cte -> CTEI
+Rule 65    var_cte -> CTEF
+Rule 66    empty -> <empty>
+
+Terminals, with rules where they appear
+
+BOOL                 : 26
+CHAR                 : 25
+CLASS                : 1 8 15
+CLASSES              : 
+COLON                : 1 1 1 8 8 9 15 15 17
+COMMA                : 11 42
+CTECHAR              : 
+CTEFLOAT             : 
+CTEINT               : 
+ELSE                 : 38
+EQUAL                : 
+FLOAT                : 24
+FOR                  : 
+FUNC                 : 13 19
+FUNCS                : 1 8 15
+ID                   : 1 8 10 11 13 15 19 28 35 63
+IF                   : 36
+IN                   : 
+INT                  : 23
+LEFTBRACKET          : 8 13 15 19 29
+LEFTPAREN            : 1 13 19 36 37 58
+LEFTSQUAREBRACKET    : 
+LOGICOPERATOR        : 
+LOO                  : 1
+LOOLU                : 1
+LU                   : 1
+OPERTYPE1            : 
+OPERTYPE2            : 
+PRINT                : 37
+READ                 : 
+RELOPER              : 
+RIGHTBRACKET         : 8 13 15 19 29
+RIGHTPAREN           : 1 13 19 36 37 58
+RIGHTSQUAREBRACKET   : 
+SEMICOLON            : 1 1 9 17 35 36 37
+VAR                  : 9 17
+VARS                 : 1 8 15
+VOID                 : 27
+WHILE                : 
+error                : 
+
+Nonterminals, with rules where they appear
+
+CTEF                 : 65
+CTEI                 : 64
+CTESTRING            : 41
+DIVIDE               : 56
+EQUALS               : 35
+GREATER              : 45
+LESS                 : 46
+MINUS                : 52 61
+NOTEQUAL             : 47
+PLUS                 : 51 60
+TIMES                : 55
+assignment           : 32
+block                : 1 13 19 36 38
+classes              : 2
+classes_block        : 8 15
+comparation          : 44
+comparation_exp      : 45 46 47
+condition            : 33
+else_condition       : 36
+empty                : 3 5 7 12 14 16 18 20 31 39 43 48 53 57 62
+exp                  : 44 49
+expression           : 35 36 40 58
+factor               : 54 55 56
+funcs                : 6
+funcs_block          : 13 19
+loolu                : 0
+operator             : 50 51 52
+parameters           : 13 19
+print_exp            : 40 41
+print_val            : 37 42
+program_classes      : 1
+program_funcs        : 1 8 15
+program_vars         : 1 8 15
+sign                 : 59
+statement            : 30
+statement_block      : 29 30
+term                 : 50 51 52
+term_operator        : 54 55 56
+type_compound        : 22
+type_simple          : 13 19 21
+types                : 9 17
+var_cte              : 59
+var_id               : 9 17
+var_id_2             : 10 11
+vars                 : 4
+vars_block           : 9 17
+writing              : 34
+

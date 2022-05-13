@@ -1,0 +1,11 @@
+LooLu miPrograma;
+
+clases:
+
+vars:
+
+funcs:
+
+Loo() {
+
+} Lu;
