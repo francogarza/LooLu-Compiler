@@ -14,7 +14,7 @@ from lexer import tokens
 #   General Structure of a LooLu Program
 # -----------------------------------------------------------------------------
 def p_LOOLU(p):
-    '''loolu : LOOLU ID SEMICOLON CLASSES COLON program_classes VARS COLON program_vars FUNCS COLON program_funcs LOO LEFTPAREN RIGHTPAREN block LU SEMICOLON'''
+    '''loolu : LOOLU ID SEMICOLON CLASSES COLON declare_classes VARS COLON declare_vars FUNCS COLON declare_funcs LOO LEFTPAREN RIGHTPAREN block LU SEMICOLON'''
     p[0] = "COMPILED"
 
 
@@ -22,18 +22,18 @@ def p_LOOLU(p):
 #   Initialization of program classes, vars, funcs.
 # -----------------------------------------------------------------------------
 # Class Declaration Section
-def p_program_classes(p):
-    '''program_classes : classes
+def p_declare_classes(p):
+    '''declare_classes : classes
                | empty'''
 
 # Variable Declaration Section
-def p_program_vars(p):
-    '''program_vars : vars
+def p_declare_vars(p):
+    '''declare_vars : vars
                | empty'''
 
 # Function Declaration Section
-def p_program_funcs(p):
-    '''program_funcs : funcs
+def p_declare_funcs(p):
+    '''declare_funcs : funcs
                | empty'''
 
 
@@ -42,7 +42,7 @@ def p_program_funcs(p):
 # -----------------------------------------------------------------------------
 # <CLASSES>
 def p_classes(p):
-    '''classes : CLASS ID LEFTBRACKET VARS COLON program_vars FUNCS COLON program_funcs RIGHTBRACKET classes_block'''
+    '''classes : CLASS ID LEFTBRACKET VARS COLON declare_vars FUNCS COLON declare_funcs RIGHTBRACKET classes_block'''
 
 
 # -----------------------------------------------------------------------------
@@ -50,7 +50,7 @@ def p_classes(p):
 # -----------------------------------------------------------------------------
 # <VARS>
 def p_vars(p):
-    '''vars : VAR types COLON var_id SEMICOLON vars_block'''
+    '''vars : VAR type COLON var_id SEMICOLON vars_block'''
 
 def p_var_id(p):
     '''var_id : ID var_id_2'''
@@ -65,37 +65,42 @@ def p_var_id_2(p):
 # -----------------------------------------------------------------------------
 # <FUNCS>
 def p_funcs(p):####
-    '''funcs : FUNC ID LEFTPAREN parameters RIGHTPAREN type_simple LEFTBRACKET block RIGHTBRACKET funcs_block'''
+    '''funcs : FUNC ID LEFTPAREN parameter RIGHTPAREN type_simple block funcs_block'''
 
 # -----------------------------------------------------------------------------
-#   PARAMETERS definition    IN PROGRESS
+#   PARAMETER definition    IN PROGRESS
 # -----------------------------------------------------------------------------
-# <PARAMETERS>
+# <PARAMETER>
 # -----------------------------------------------------------------------------
 #   DUMMY
 # -----------------------------------------------------------------------------
-def p_parameters(p):
-    '''parameters : empty'''
+def p_parameter(p):
+    '''parameter : ID COLON type parameter2
+                  | empty'''
+
+def p_parameter2(p):
+    '''parameter2 : COMMA parameter
+                  | empty'''
 
 def p_classes_block(p):
-    '''classes_block : CLASS ID LEFTBRACKET VARS COLON program_vars FUNCS COLON program_funcs RIGHTBRACKET classes_block
+    '''classes_block : CLASS ID LEFTBRACKET VARS COLON declare_vars FUNCS COLON declare_funcs RIGHTBRACKET classes_block
                   | empty'''
 
 def p_vars_block(p):
-    '''vars_block : VAR types COLON var_id SEMICOLON vars_block
+    '''vars_block : VAR type COLON var_id SEMICOLON vars_block
                   | empty'''
 
 def p_funcs_block(p):####
-    '''funcs_block : FUNC ID LEFTPAREN parameters RIGHTPAREN type_simple LEFTBRACKET block RIGHTBRACKET funcs_block
+    '''funcs_block : FUNC ID LEFTPAREN parameter RIGHTPAREN type_simple LEFTBRACKET block RIGHTBRACKET funcs_block
                   | empty'''
 
 
 # -----------------------------------------------------------------------------
-#   Types definition
+#   Type definition
 # -----------------------------------------------------------------------------
-# TYPES
-def p_types(p):
-    '''types : type_simple
+# TYPE
+def p_type(p):
+    '''type : type_simple
              | type_compound'''
 
 # <TYPE_SIMPLE>
@@ -123,7 +128,8 @@ def p_statement_block(p):
 def p_statement(p):
     '''statement : assignment
                  | condition
-                 | writing'''
+                 | writing
+                 | return_func'''
 
 # STATEMENTS
 def p_assignment(p):
@@ -134,6 +140,9 @@ def p_condition(p):
 
 def p_writing(p):
     '''writing : PRINT LEFTPAREN print_val RIGHTPAREN SEMICOLON'''
+
+def p_return_func(p):
+    '''return_func : RETURN LEFTPAREN expression RIGHTPAREN SEMICOLON'''
 
 # Definición de la condición else
 def p_else_condition(p):

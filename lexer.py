@@ -8,7 +8,7 @@ reserved = {
     'LooLu': 'LOOLU', #nuestro program
     'Loo': 'LOO', #nuestro inicio de main
     'classes': 'CLASSES',
-    'class': 'CLASS',
+    'Class': 'CLASS',
     'vars': 'VARS',
     'var': 'VAR',
     'int': 'INT',
@@ -25,6 +25,7 @@ reserved = {
     'void': 'VOID',
     'read': 'READ',
     'print': 'PRINT',
+    'return': 'RETURN',
     'Lu': "LU" #lo utilizamos para indicar que se acabo el main
 }
 
