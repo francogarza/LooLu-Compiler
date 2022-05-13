@@ -95,6 +95,21 @@ def p_funcs_block(p):####
                   | empty'''
 
 
+def p_access_atribute(p):
+    '''access_atribute : ID DOT ID '''
+
+def p_function_call(p):
+    '''function_call : ID LEFTPAREN expression function_call2 RIGHTPAREN SEMICOLON'''
+
+def p_function_call2(p):
+    '''function_call2 : COMMA expression function_call2
+                      | empty'''
+
+def p_class_function_call(p):
+    ''''''
+
+
+
 # -----------------------------------------------------------------------------
 #   Type definition
 # -----------------------------------------------------------------------------
@@ -129,7 +144,9 @@ def p_statement(p):
     '''statement : assignment
                  | condition
                  | writing
-                 | return_func'''
+                 | return_func
+                 | access_atribute
+                 | function_call'''
 
 # STATEMENTS
 def p_assignment(p):

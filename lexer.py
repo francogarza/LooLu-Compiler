@@ -7,15 +7,15 @@ import ply.yacc as yacc
 reserved = {
     'LooLu': 'LOOLU', #nuestro program
     'Loo': 'LOO', #nuestro inicio de main
-    'classes': 'CLASSES',
+    'CLASSES': 'CLASSES',
     'Class': 'CLASS',
-    'vars': 'VARS',
+    'VARS': 'VARS',
     'var': 'VAR',
     'int': 'INT',
     'float': 'FLOAT',
     'char': 'CHAR',
     'bool': 'BOOL',
-    'funcs': 'FUNCS',
+    'FUNCS': 'FUNCS',
     'func': 'FUNC',
     'if': 'IF',
     'else': 'ELSE',
@@ -37,7 +37,7 @@ tokens = [
     'OPERTYPE1', 'OPERTYPE2', 'LOGICOPERATOR',
     'ID', 'CTEINT', 'CTEFLOAT', 'CTECHAR',
     'RELOPER',
-    'COLON', 'SEMICOLON', 'COMMA', 'EQUAL'
+    'COLON', 'SEMICOLON', 'COMMA', 'EQUAL', 'DOT'
 ] + list(reserved.values())
 
 # Definicion de las RegEx basicas que conforman el lenguaje
@@ -61,6 +61,7 @@ t_COLON = r':'
 t_SEMICOLON = r'\;'
 t_COMMA = r'\,'
 t_EQUAL = r'\='
+t_DOT = r'\.'
 t_ignore = " \t"
 
 #Definicion regex
