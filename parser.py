@@ -41,7 +41,7 @@ def p_declare_funcs(p):
 #   Class definition
 # -----------------------------------------------------------------------------
 # <CLASSES>
-def p_classes(p):
+def p_classes(p): 
     '''classes : CLASS ID LEFTBRACKET VARS COLON declare_vars FUNCS COLON declare_funcs RIGHTBRACKET classes_block'''
 
 
