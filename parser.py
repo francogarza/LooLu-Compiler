@@ -95,8 +95,11 @@ def p_funcs_block(p):####
                   | empty'''
 
 
-def p_access_atribute(p):
-    '''access_atribute : ID DOT ID '''
+def p_access_class_atribute(p):
+    '''access_class_atribute : ID DOT ID '''
+
+def p_class_function_call(p):
+    '''class_function_call : ID DOT function_call'''
 
 def p_function_call(p):
     '''function_call : ID LEFTPAREN expression function_call2 RIGHTPAREN SEMICOLON'''
@@ -105,8 +108,6 @@ def p_function_call2(p):
     '''function_call2 : COMMA expression function_call2
                       | empty'''
 
-def p_class_function_call(p):
-    ''''''
 
 
 
@@ -145,15 +146,17 @@ def p_statement(p):
                  | condition
                  | writing
                  | return_func
-                 | access_atribute
-                 | function_call'''
+                 | function_call
+                 | class_function_call'''
 
 # STATEMENTS
 def p_assignment(p):
-    '''assignment : ID EQUAL expression SEMICOLON'''
+    '''assignment : ID EQUAL expression SEMICOLON
+                  | ID EQUAL class_function_call
+                  | access_class_atribute EQUAL expression SEMICOLON'''
 
 def p_condition(p):
-    '''condition : IF LEFTPAREN expression RIGHTPAREN block else_condition SEMICOLON'''
+    '''condition : IF LEFTPAREN expression RIGHTPAREN block else_condition'''
 
 def p_writing(p):
     '''writing : PRINT LEFTPAREN print_val RIGHTPAREN SEMICOLON'''
@@ -214,7 +217,9 @@ def p_factor(p):
 def p_var_cte(p):
     '''var_cte : ID
                | CTEINT
-               | CTEFLOAT'''
+               | CTEFLOAT
+               | access_class_atribute
+               | class_function_call'''
 
 # # Definición del mensaje que se emitira en el error de sintaxis
 # def p_error(p):

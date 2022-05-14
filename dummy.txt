@@ -15,7 +15,7 @@ CLASSES:
 
 VARS:
   var int : a;
-  var flotante : disminucionSueldo;
+  var flotante : x;
   var bool : b, c, d;
 
 FUNCS:
@@ -25,5 +25,16 @@ FUNCS:
 
 Loo() {
   lectura(a,b,c);
+  disminucionSueld = empleadoUno.disminuirEdad(10);
+  print(disminucionSueld);
+
+  incrementaSueldo(empleadoUno, 0.2);
+  print(disminucionSueldo);
+
+  if (a + 24) {
+    a = b + 23;
+  }
+
+
 
 } Lu;

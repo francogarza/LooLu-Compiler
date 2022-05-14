@@ -28,12 +28,22 @@ Loo() {
   lectura(a,b,c);
 
   disminucionSueldo = empleadoUno.disminuirEdad(10);
-  imprime(disminucionSueldo);
+  print(disminucionSueldo);
 
   incrementaSueldo(empleadoUno, 0.2);
-  imprime(empleadoUno.sueldo);
+  print(empleadoUno.sueldo);
 
-  mientras (empleado.edad > 5) {
+  if (a + 24) {
+    a = b + 23;
+  }
+
+  if (empleado.edad(10)) {
+    print(20);
+  } else {
+    empleado.disminuir(20);
+  }
+
+  while (empleado.edad > 5) {
 		empleado.edad = empleado.edad - 1;
   }
 
