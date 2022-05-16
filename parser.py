@@ -41,7 +41,7 @@ def p_declare_funcs(p):
 #   Class definition
 # -----------------------------------------------------------------------------
 # <CLASSES>
-def p_classes(p): 
+def p_classes(p):
     '''classes : CLASS ID LEFTBRACKET VARS COLON declare_vars FUNCS COLON declare_funcs RIGHTBRACKET classes_block'''
 
 
@@ -102,7 +102,7 @@ def p_class_function_call(p):
     '''class_function_call : ID DOT function_call'''
 
 def p_function_call(p):
-    '''function_call : ID LEFTPAREN expression function_call2 RIGHTPAREN SEMICOLON'''
+    '''function_call : ID LEFTPAREN expression function_call2 RIGHTPAREN'''
 
 def p_function_call2(p):
     '''function_call2 : COMMA expression function_call2
@@ -142,18 +142,19 @@ def p_statement_block(p):
 
 # Definición de tipos de statements
 def p_statement(p):
-    '''statement : assignment
+    '''statement : assignment SEMICOLON
                  | condition
+                 | while_statement
                  | writing
-                 | return_func
-                 | function_call
-                 | class_function_call'''
+                 | return_func SEMICOLON
+                 | function_call SEMICOLON
+                 | class_function_call SEMICOLON'''
 
 # STATEMENTS
 def p_assignment(p):
-    '''assignment : ID EQUAL expression SEMICOLON
+    '''assignment : ID EQUAL expression
                   | ID EQUAL class_function_call
-                  | access_class_atribute EQUAL expression SEMICOLON'''
+                  | access_class_atribute EQUAL expression'''
 
 def p_condition(p):
     '''condition : IF LEFTPAREN expression RIGHTPAREN block else_condition'''
@@ -161,8 +162,11 @@ def p_condition(p):
 def p_writing(p):
     '''writing : PRINT LEFTPAREN print_val RIGHTPAREN SEMICOLON'''
 
+def p_while_statement(p):
+    '''while_statement : WHILE LEFTPAREN expression RIGHTPAREN block'''
+
 def p_return_func(p):
-    '''return_func : RETURN LEFTPAREN expression RIGHTPAREN SEMICOLON'''
+    '''return_func : RETURN LEFTPAREN expression RIGHTPAREN'''
 
 # Definición de la condición else
 def p_else_condition(p):
@@ -235,4 +239,3 @@ def p_error(t):
     raise Exception("Syntax error")
 
 yacc.yacc()
-
