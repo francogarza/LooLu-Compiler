@@ -5,8 +5,19 @@
 # -----------------------------------------------------------------------------
 import sys
 import ply.yacc as yacc
+import varsTable as vt
 
 from lexer import tokens
+
+
+#Global
+
+dirFunc = vt.DirFunc()
+rowVarsAux = {}
+currentFunc = None
+currentType = None
+currentVarTable = None
+
 
 # Delcaration of Grammar Rules
 
@@ -14,8 +25,7 @@ from lexer import tokens
 #   General Structure of a LooLu Program
 # -----------------------------------------------------------------------------
 def p_LOOLU(p):
-    '''loolu : LOOLU ID SEMICOLON CLASSES COLON declare_classes VARS COLON declare_vars FUNCS COLON declare_funcs LOO LEFTPAREN RIGHTPAREN block LU SEMICOLON'''
-    p[0] = "COMPILED"
+    '''loolu : LOOLU ID SEMICOLON np1CreateGlobalVarsTable CLASSES COLON declare_classes VARS COLON np2CreateVarsTable declare_vars FUNCS COLON declare_funcs LOO LEFTPAREN RIGHTPAREN block LU SEMICOLON'''
 
 
 # -----------------------------------------------------------------------------
@@ -28,7 +38,7 @@ def p_declare_classes(p):
 
 # Variable Declaration Section
 def p_declare_vars(p):
-    '''declare_vars : vars
+    '''declare_vars : vars 
                | empty'''
 
 # Function Declaration Section
@@ -50,6 +60,7 @@ def p_classes(p):
 # -----------------------------------------------------------------------------
 # <VARS>
 def p_vars(p):
+    # '''vars : VAR type COLON var_id SEMICOLON np3AddVarToCurrentTable vars_block'''
     '''vars : VAR type COLON var_id SEMICOLON vars_block'''
 
 def p_var_id(p):
@@ -87,6 +98,7 @@ def p_classes_block(p):
                   | empty'''
 
 def p_vars_block(p):
+    # '''vars_block : VAR type COLON var_id SEMICOLON np3AddVarToCurrentTable vars_block
     '''vars_block : VAR type COLON var_id SEMICOLON vars_block
                   | empty'''
 
@@ -116,7 +128,7 @@ def p_function_call2(p):
 # -----------------------------------------------------------------------------
 # TYPE
 def p_type(p):
-    '''type : type_simple
+    '''type : type_simple np4SetCurrentType
              | type_compound'''
 
 # <TYPE_SIMPLE>
@@ -225,14 +237,77 @@ def p_var_cte(p):
                | access_class_atribute
                | class_function_call'''
 
-# # Definición del mensaje que se emitira en el error de sintaxis
-# def p_error(p):
-#     print("ERROR in iput syntax - {} ".format(p))
-
 # Definición del epsilon/nulo/vacío
 def p_empty(p):
     '''empty :'''
     pass
+
+
+######################
+# Puntos Neuralgicos #
+######################
+
+def p_np1_create_global_vars_table(p):
+    '''np1CreateGlobalVarsTable : empty'''
+    global dirFunc
+    global currentFunc
+    dirFunc = vt.DirFunc()
+    dirFunc.insert({"name": p[-1], "type": "global", "table": None})
+    dirFunc.printDirFunc()
+    currentFunc = p[-1]
+
+def p_np2_create_vars_table(p):
+    '''np2CreateVarsTable : empty'''
+    global dirFunc
+    global currentVarTable
+    row = dirFunc.getFunctionByName(currentFunc)
+    if (row["table"] == None):
+        currentVarTable = vt.Vars()
+        dirFunc.addVarsTable(currentFunc, currentVarTable)
+        print("asdf")
+        print(currentVarTable)
+    dirFunc.printDirFunc()
+    print(dirFunc.dirFuncData[0]["table"].items)
+
+def p_np3_add_var_to_current_table(p):
+    '''np3AddVarToCurrentTable : empty'''
+    global currentVarTable
+    global currentType
+    id = currentVarTable.getVariableByName(p[-1])
+    if (id != None):
+        print("redeclartion of variable ID " + p[-1])
+    else:
+        currentVarTable.insert({"name": p[-1], "type": currentType, })
+
+def p_np4_set_current_type(p):
+    '''np4SetCurrentType : empty'''
+    global currenType 
+    currentType = p[-1]
+
+def p_np5_delete_dirfunc_and_current_vartable(p):
+    '''np5DeleteDirfuncAndCurrentVartable : empty'''
+
+def p_np6_set_current_type_void(p):
+    '''np6SetCurrentTypeVoid : empty'''
+    currentType = p[-1]
+
+def p_np6_add_function(p):
+    '''np6AddFunction : empty'''
+    global currentType
+    global currentFunc
+    row = dirFunc.getFunctionByName(p[-1])
+    if (row != None):
+        print("redeclaration of function " + p[-1])
+    else:
+        dirFunc.insert({"name": p[-1], "type": currentType, "table": None})
+        currentFunc = p[-1]
+
+def p_np7_delete_current_vars_table(p):
+    '''np6DeleteCurrentVarsTable : empty'''
+    global currentVarTable
+    currentVarTable = None
+
+
 
 def p_error(t):
     print("Syntax error (parser):", t.lexer.token(), t.value)

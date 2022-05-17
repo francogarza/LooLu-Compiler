@@ -16,6 +16,7 @@ lex.input(data)
 
 try:
     parser.parse(data)
+    dirFunc.printDirFunc()
     print('Code passed!')
-except:
-    print('Error in code!')
+except Exception as excep: 
+    print('Error in code!', excep)
