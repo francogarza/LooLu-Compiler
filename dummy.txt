@@ -1,6 +1,5 @@
 LooLu miPrograma;
 
-
 VARS:
   var int : a;
   var float : x;
@@ -11,8 +10,11 @@ FUNCS:
   	emp.sueldo = emp.sueldo * porcentaje;
   }
 
-
 CLASSES:
+  Class Empleado {
+    VARS:
+    FUNCS:
+  }
 
 Loo() {
   lectura(a,b,c);

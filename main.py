@@ -1,7 +1,7 @@
 from lexer import *
+from lexer import tokens
 import ply.yacc as yacc
 import varsTable as vt
-from lexer import tokens
 
 ###################
 ### GLOBAL VARS ###
@@ -24,7 +24,7 @@ print("Lexer generated")
 ##############
 
 def p_LOOLU(p):
-    '''loolu : LOOLU ID SEMICOLON np1CreateGlobalVarsTable VARS COLON np2CreateVarsTable declare_vars FUNCS COLON declare_funcs CLASSES COLON declare_classes LOO LEFTPAREN RIGHTPAREN block LU SEMICOLON'''
+    '''loolu : LOOLU ID np1CreateGlobalVarsTable SEMICOLON VARS COLON np2CreateVarsTable declare_vars FUNCS COLON declare_funcs CLASSES COLON declare_classes LOO LEFTPAREN RIGHTPAREN block LU SEMICOLON'''
 
 def p_declare_classes(p):
     '''declare_classes : classes
@@ -39,7 +39,7 @@ def p_declare_funcs(p):
                | empty'''
 
 def p_classes(p):
-    '''classes : CLASS ID LEFTBRACKET VARS COLON declare_vars FUNCS COLON declare_funcs RIGHTBRACKET classes_block'''
+    '''classes : CLASS ID np8AddClass LEFTBRACKET VARS COLON declare_vars FUNCS COLON declare_funcs RIGHTBRACKET classes_block'''
 
 def p_vars(p):
     '''vars : VAR type COLON var_id SEMICOLON vars_block'''
@@ -218,9 +218,9 @@ def p_np3_add_var_to_current_table(p):
     global currentType
     id = currentVarTable.getVariableByName(p[-1])
     if (id != None):
-        print("redeclartion of variable ID " + p[-1])
+        raise Exception("   ERROR: Redeclaration of variable ID = " + p[-1])
     else:
-        currentVarTable.insert({"name": p[-1], "type": currentType, })
+        currentVarTable.insert({"name": p[-1], "type": currentType})
 
 def p_np4_set_current_type(p):
     '''np4SetCurrentType : empty'''
@@ -234,18 +234,33 @@ def p_np6_set_current_type_void(p):
     '''np6SetCurrentTypeVoid : empty'''
     currentType = p[-1]
 
-def p_np6_add_function(p):
+def p_np7_add_function(p):
     '''np6AddFunction : empty'''
     global currentType
     global currentFunc
     row = dirFunc.getFunctionByName(p[-1])
     if (row != None):
+        print("if")
         print("redeclaration of function " + p[-1])
     else:
-        dirFunc.insert({"name": p[-1], "type": currentType, "table": None})
+        print("else")
+        dirFunc.insert({"name": p[-1], "type": "class", "table": None})
         currentFunc = p[-1]
 
-def p_np7_delete_current_vars_table(p):
+def p_np8_add_class(p):
+    '''np8AddClass : empty'''
+    global currentType
+    global currentFunc
+    row = dirFunc.getFunctionByName(p[-1])
+    if (row != None):
+        print("if")
+        print("redeclaration of class " + p[-1])
+    else:
+        print("else")
+        dirFunc.insert({"name": p[-1], "type": "class", "table": None})
+        currentFunc = p[-1]
+
+def p_np9_delete_current_vars_table(p):
     '''np6DeleteCurrentVarsTable : empty'''
     global currentVarTable
     currentVarTable = None
@@ -270,4 +285,4 @@ try:
     currentVarTable.printVars()
     print('Code passed!')
 except Exception as excep: 
-    print('Error in code!', excep)
+    print('Error in code!\n', excep)
