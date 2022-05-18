@@ -1,27 +1,18 @@
 LooLu miPrograma;
 
-CLASSES:
-    Class Empleado {
-        VARS:
-            var int : edad;
-            var char : nombre[30];
-            var flotante: sueldo;
-
-        FUNCS:
-            func disminuirEdad ( x : int , b : int ) int {
-                return ( edad - x );
-            }
-    }
 
 VARS:
   var int : a;
-  var flotante : x;
+  var float : x;
   var bool : b, c, d;
 
 FUNCS:
   func incrementaSueldo(emp: Empleado, porcentaje: float) void {
   	emp.sueldo = emp.sueldo * porcentaje;
   }
+
+
+CLASSES:
 
 Loo() {
   lectura(a,b,c);

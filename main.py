@@ -24,7 +24,7 @@ print("Lexer generated")
 ##############
 
 def p_LOOLU(p):
-    '''loolu : LOOLU ID SEMICOLON np1CreateGlobalVarsTable CLASSES COLON declare_classes VARS COLON np2CreateVarsTable declare_vars FUNCS COLON declare_funcs LOO LEFTPAREN RIGHTPAREN block LU SEMICOLON'''
+    '''loolu : LOOLU ID SEMICOLON np1CreateGlobalVarsTable VARS COLON np2CreateVarsTable declare_vars FUNCS COLON declare_funcs CLASSES COLON declare_classes LOO LEFTPAREN RIGHTPAREN block LU SEMICOLON'''
 
 def p_declare_classes(p):
     '''declare_classes : classes
@@ -42,14 +42,13 @@ def p_classes(p):
     '''classes : CLASS ID LEFTBRACKET VARS COLON declare_vars FUNCS COLON declare_funcs RIGHTBRACKET classes_block'''
 
 def p_vars(p):
-    # '''vars : VAR type COLON var_id SEMICOLON np3AddVarToCurrentTable vars_block'''
     '''vars : VAR type COLON var_id SEMICOLON vars_block'''
 
 def p_var_id(p):
-    '''var_id : ID var_id_2'''
+    '''var_id : ID np3AddVarToCurrentTable var_id_2'''
 
 def p_var_id_2(p):
-    '''var_id_2 : COMMA ID var_id_2
+    '''var_id_2 : COMMA ID np3AddVarToCurrentTable var_id_2
                 | empty'''
 
 def p_funcs(p):
@@ -68,7 +67,6 @@ def p_classes_block(p):
                   | empty'''
 
 def p_vars_block(p):
-    # '''vars_block : VAR type COLON var_id SEMICOLON np3AddVarToCurrentTable vars_block
     '''vars_block : VAR type COLON var_id SEMICOLON vars_block
                   | empty'''
 
@@ -90,14 +88,14 @@ def p_function_call2(p):
                       | empty'''
 
 def p_type(p):
-    '''type : type_simple np4SetCurrentType
-             | type_compound'''
+    '''type : type_simple
+            | type_compound'''
 
 def p_type_simple(p):
-    '''type_simple : INT
-                   | FLOAT
-                   | CHAR
-                   | BOOL
+    '''type_simple : INT np4SetCurrentType 
+                   | FLOAT np4SetCurrentType
+                   | CHAR np4SetCurrentType
+                   | BOOL np4SetCurrentType
                    | VOID'''
 
 def p_type_compound(p):
@@ -203,8 +201,6 @@ def p_np1_create_global_vars_table(p):
     global currentFunc
     dirFunc = vt.DirFunc()
     dirFunc.insert({"name": p[-1], "type": "global", "table": None})
-    # dirFunc.printDirFunc()
-    # print(dirFunc.dirFuncData)
     currentFunc = p[-1]
 
 def p_np2_create_vars_table(p):
@@ -228,7 +224,7 @@ def p_np3_add_var_to_current_table(p):
 
 def p_np4_set_current_type(p):
     '''np4SetCurrentType : empty'''
-    global currenType 
+    global currentType
     currentType = p[-1]
 
 def p_np5_delete_dirfunc_and_current_vartable(p):
@@ -271,6 +267,7 @@ lex.input(data)
 try:
     parser.parse(data)
     dirFunc.printDirFunc()
+    currentVarTable.printVars()
     print('Code passed!')
 except Exception as excep: 
     print('Error in code!', excep)
