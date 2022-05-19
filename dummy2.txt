@@ -1,0 +1,38 @@
+LooLu miPrograma;
+
+VARS:
+  var int : a;
+  var float : x;
+  var bool : b, c, d;
+
+FUNCS:
+  func void incrementaSueldo(emp: int, porcentaje1: float) {
+  }
+  func void incrementaSueldo2(asdf: float, porcentaje2: float) {
+  }
+
+CLASSES:
+  Class Empleado {
+    VARS:
+      var int : a;
+      var float : x, y;
+    FUNCS:
+      func void asdf3(emp: float, porcentaje3: float)  {
+      }
+  }
+  Class Persona {
+    VARS:
+      var int : a;
+      var float : x, y;
+    FUNCS:
+      func void asdf(emp: int, porcentaje: float)  {
+      }
+      func void asdf3(emp: int, porcentaje: bool)  {
+      }
+  }
+
+Loo() {
+
+	p = a;
+
+} Lu;
