@@ -2,11 +2,13 @@ from lexer import *
 from lexer import tokens
 import ply.yacc as yacc
 import varsTable as vt
+import quadrupleGenerator
 
 ###################
 ### GLOBAL VARS ###
 ###################
 
+programName = None
 dirFunc = None
 currentFunc = None
 currentType = None
@@ -14,13 +16,15 @@ currentVarTable = None
 currentClass = None
 currentClassVarTable = None
 currentClassDirFunc = None
-
+qg = None
 #############
 ### LEXER ###
 #############
 
 lex.lex()
 print("Lexer generated")
+
+qg = quadrupleGenerator.quadrupleGenerator()
 
 ##############
 ### PARSER ###
@@ -30,7 +34,7 @@ def p_LOOLU(p):
     '''loolu : LOOLU ID np1CreateGlobalVarsTable SEMICOLON VARS COLON np2CreateVarsTable declare_vars FUNCS COLON declare_funcs CLASSES COLON declare_classes LOO LEFTPAREN RIGHTPAREN block LU SEMICOLON'''
 
 def p_declare_vars(p):
-    '''declare_vars : vars 
+    '''declare_vars : vars
                | empty'''
 
 def p_vars(p):
@@ -77,7 +81,7 @@ def p_type(p):
             | type_compound'''
 
 def p_type_simple(p):
-    '''type_simple : INT np4SetCurrentType 
+    '''type_simple : INT np4SetCurrentType
                    | FLOAT np4SetCurrentType
                    | CHAR np4SetCurrentType
                    | BOOL np4SetCurrentType
@@ -114,12 +118,12 @@ def p_classes(p):
     '''classes : CLASS ID np8AddClass np9CreateGlobalVarsTableForClass LEFTBRACKET VARS COLON np10CreateVarsTableForClass declare_vars_class FUNCS COLON declare_funcs_class RIGHTBRACKET classes_block'''
 
 def p_declare_vars_class(p):
-    '''declare_vars_class : vars_class 
+    '''declare_vars_class : vars_class
                           | empty'''
 
 def p_vars_class(p):
     '''vars_class : VAR type COLON var_id_class SEMICOLON vars_block_class'''
-    
+
 def p_vars_block_class(p):
     '''vars_block_class : VAR type COLON var_id_class SEMICOLON vars_block_class
                         | empty'''
@@ -217,7 +221,7 @@ def p_factor(p):
               | var_cte'''
 
 def p_var_cte(p):
-    '''var_cte : ID
+    '''var_cte : ID np16isOnCurrentVarsTable qnp1sendToQuadruples
                | CTEINT
                | CTEFLOAT
                | access_class_atribute
@@ -233,6 +237,8 @@ def p_empty(p):
 
 def p_np1_create_global_vars_table(p):
     '''np1CreateGlobalVarsTable : empty'''
+    global programName
+    programName = p[-1] # Save the program name on the global var
     global dirFunc
     global currentFunc
     dirFunc = vt.DirFunc()
@@ -249,7 +255,7 @@ def p_np2_create_vars_table(p):
         row["table"] = vt.Vars()
         currentVarTable = row["table"]
         dirFunc.addVarsTable(currentFunc, currentVarTable)
-    else: 
+    else:
         raise Exception("ERROR: could not find function with that name in DirFunc")
 
 def p_np3_add_var_to_current_table(p):
@@ -312,7 +318,7 @@ def p_np9_create_global_vars_table_for_class(p):
         # currentClassDirFunc.printDirFunc()
         currentClassFunc = currentClass
         # print(currentClassFunc)
-    else: 
+    else:
         raise Exception("ERROR: could not find function with that name in DirFunc")
 
 def p_np10_create_vars_table_for_class(p):
@@ -324,7 +330,7 @@ def p_np10_create_vars_table_for_class(p):
     if (row["table"] == None):
         currentClassVarTable = vt.Vars()
         currentClassDirFunc.addVarsTable(currentClassFunc, currentVarTable)
-    else: 
+    else:
         raise Exception("ERROR: could not find function with that name in DirFunc")
 
 def p_np11_delete_current_vars_table(p):
@@ -377,6 +383,35 @@ def p_np15_add_parameter_as_variable_to_func_class(p):
     else:
         currentClassVarTable.insert({"name": p[-3], "type": currentType})
 
+'''
+    MAIN PROGRAM NEURALGIC POINTS
+'''
+def p_np16_is_on_current_vars_table(p): # Check if an ID is declared in the Global Scope
+    '''np16isOnCurrentVarsTable : empty'''
+    global currentVarTable
+    global currentType
+    global currentFunc
+    global dirFunc
+    currentFunc = dirFunc.getFunctionByName(programName)
+    currentVarTable = currentFunc["table"]
+
+    id = currentVarTable.getVariableByName(p[-1])
+    if (id == None):
+        raise Exception("   ERROR: Variable not declared on scope " + p[-1])
+    else:
+        currentVarTable.insert({"name": p[-1], "type": currentType})
+
+'''
+    QUADRUPLE NEURALGIC POINTS
+'''
+def p_qnp1_send_to_quadruples(p):
+    '''qnp1sendToQuadruples : empty'''
+    print("entra" + p[-2])
+    global currentVarTable
+    variable = currentVarTable.getVariableByName(p[-2])
+    qg.operand(variable["name"], variable["type"])
+    print(qg.operandStack[0])
+
 def p_error(t):
     print("Syntax error (parser):", t.lexer.token(), t.value)
     raise Exception("Syntax error")
@@ -387,7 +422,8 @@ yacc.yacc()
 parser = yacc.yacc()
 print("Yacc has been generated!")
 
-codeToCompile = open('dummy.txt','r')
+
+codeToCompile = open('dummy2.txt','r')
 data = str(codeToCompile.read())
 lex.input(data)
 
@@ -398,5 +434,5 @@ try:
     # currentClassDirFunc.printDirFunc()
     # currentClassVarTable.printVars()
     print('Code passed!')
-except Exception as excep: 
+except Exception as excep:
     print('Error in code!\n', excep)
