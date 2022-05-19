@@ -59,12 +59,80 @@ def p_funcs_block(p):
                    | empty'''
 
 def p_parameter(p):
-    '''parameter : ID COLON type parameter2
-                  | empty'''
+    '''parameter : ID COLON type np14AddParameterAsVariableToFunc parameter2'''
 
 def p_parameter2(p):
-    '''parameter2 : COMMA parameter
+    '''parameter2 : COMMA ID COLON type np14AddParameterAsVariableToFunc
                   | empty'''
+
+
+
+
+
+def p_declare_funcs_class(p):
+    '''declare_funcs_class : funcs_class
+                           | empty'''
+
+def p_funcs_class(p):
+    '''funcs_class : FUNC type_simple ID np13AddFunctionClass LEFTPAREN np10CreateVarsTableForClass parameter_class RIGHTPAREN block funcs_block_class'''
+
+def p_funcs_block_class(p):
+    '''funcs_block_class : FUNC type_simple ID np13AddFunctionClass LEFTPAREN np10CreateVarsTableForClass parameter_class RIGHTPAREN block funcs_block_class
+                         | empty'''
+
+def p_parameter_class(p):
+    '''parameter_class : ID COLON type np15AddParameterAsVariableToFuncClass parameter2_class'''
+
+def p_parameter2_class(p):
+    '''parameter2_class : COMMA ID COLON type np15AddParameterAsVariableToFuncClass
+                        | empty'''
+
+
+
+
+
+
+
+def p_np7_add_function(p):
+    '''np7AddFunction : empty'''
+    global currentType
+    global currentFunc
+    global dirFunc
+    row = dirFunc.getFunctionByName(p[-1])
+    if (row != None):
+        print("redeclaration of function " + p[-1])
+    else:
+        dirFunc.insert({"name": p[-1], "type": currentType, "table": None})
+        currentFunc = p[-1]
+
+
+def p_np2_create_vars_table(p):
+    '''np2CreateVarsTable : empty'''
+    global dirFunc
+    global currentVarTable
+    global currentFunc
+    row = dirFunc.getFunctionByName(currentFunc)
+    if (row["table"] == None):
+        row["table"] = vt.Vars()
+        currentVarTable = row["table"]
+        dirFunc.addVarsTable(currentFunc, currentVarTable)
+    else: 
+        raise Exception("ERROR: could not find function with that name in DirFunc")
+
+
+def p_np14_add_parameter_as_variable_to_func(p):
+    '''np14AddParameterAsVariableToFunc : empty'''
+    global currentVarTable
+    global currentType
+    # currentVarTable.printVars()
+    id = currentVarTable.getVariableByName(p[-3])
+    if (id != None):
+        raise Exception("   ERROR: Redeclaration of variable ID = " + p[-3])
+    else:
+        currentVarTable.insert({"name": p[-3], "type": currentType})
+        # print(currentFunc)
+        # currentVarTable.printVars()
+
 
 def p_function_call(p):
     '''function_call : ID LEFTPAREN expression function_call2 RIGHTPAREN'''
@@ -114,16 +182,20 @@ def p_declare_classes(p):
 def p_classes(p):
     '''classes : CLASS ID np8AddClass np9CreateGlobalVarsTableForClass LEFTBRACKET VARS COLON np10CreateVarsTableForClass declare_vars_class FUNCS COLON declare_funcs_class RIGHTBRACKET classes_block'''
 
-def p_declare_funcs_class(p):
-    '''declare_funcs_class : funcs_class
-                           | empty'''
 
-def p_funcs_class(p):
-    '''funcs_class : FUNC type_simple ID np13AddFunctionClass LEFTPAREN np10CreateVarsTableForClass parameter RIGHTPAREN block funcs_block_class'''
+def p_np15_add_parameter_as_variable_to_func_class(p):
+    '''np15AddParameterAsVariableToFuncClass : empty'''
+    global currentClassVarTable
+    global currentType
+    # currentVarTable.printVars()
+    id = currentClassVarTable.getVariableByName(p[-3])
+    if (id != None):
+        raise Exception("   ERROR: Redeclaration of variable ID = " + p[-3])
+    else:
+        currentClassVarTable.insert({"name": p[-3], "type": currentType})
+        # print(currentFunc)
+        # currentClassVarTable.printVars()
 
-def p_funcs_block_class(p):
-    '''funcs_block_class : FUNC type_simple ID np13AddFunctionClass LEFTPAREN np10CreateVarsTableForClass parameter RIGHTPAREN block funcs_block_class
-                         | empty'''
 
 def p_declare_vars_class(p):
     '''declare_vars_class : vars_class 
@@ -233,16 +305,6 @@ def p_np1_create_global_vars_table(p):
     dirFunc.insert({"name": p[-1], "type": "global", "table": None})
     currentFunc = p[-1]
 
-def p_np2_create_vars_table(p):
-    '''np2CreateVarsTable : empty'''
-    global dirFunc
-    global currentVarTable
-    row = dirFunc.getFunctionByName(currentFunc)
-    if (row["table"] == None):
-        currentVarTable = vt.Vars()
-        dirFunc.addVarsTable(currentFunc, currentVarTable)
-    else: 
-        raise Exception("ERROR: could not find function with that name in DirFunc")
 
 def p_np3_add_var_to_current_table(p):
     '''np3AddVarToCurrentTable : empty'''
@@ -265,19 +327,6 @@ def p_np5_delete_dirfunc_and_current_vartable(p):
 def p_np6_set_current_type_void(p):
     '''np6SetCurrentTypeVoid : empty'''
     currentType = p[-1]
-
-def p_np7_add_function(p):
-    '''np7AddFunction : empty'''
-    global currentType
-    global currentFunc
-    global dirFunc
-    row = dirFunc.getFunctionByName(p[-1])
-    if (row != None):
-        print("redeclaration of function " + p[-1])
-    else:
-        # print("else")
-        dirFunc.insert({"name": p[-1], "type": currentType, "table": None})
-        currentFunc = p[-1]
 
 def p_np8_add_class(p):
     '''np8AddClass : empty'''
@@ -366,7 +415,7 @@ try:
     parser.parse(data)
     # dirFunc.printDirFunc()
     # currentVarTable.printVars()
-    currentClassDirFunc.printDirFunc()
+    # currentClassDirFunc.printDirFunc()
     # currentClassVarTable.printVars()
     print('Code passed!')
 except Exception as excep: 

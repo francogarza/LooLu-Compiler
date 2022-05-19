@@ -6,10 +6,10 @@ VARS:
   var bool : b, c, d;
 
 FUNCS:
-  func void incrementaSueldo(emp: Empleado, porcentaje: float) {
+  func void incrementaSueldo(emp: int, porcentaje: float) {
   	emp.sueldo = emp.sueldo * porcentaje;
   }
-  func void incrementaSueldo2(emp: Empleado, porcentaje: float) {
+  func void incrementaSueldo2(asdf: float, porcentaje: float) {
   	emp.sueldo = emp.sueldo * porcentaje;
   }
 
@@ -19,7 +19,7 @@ CLASSES:
       var int : a;
       var float : x, y;
     FUNCS:
-      func void asdf3(emp: Empleado, porcentaje: float)  {
+      func void asdf3(emp: float, porcentaje: float)  {
         emp.sueldo = emp.sueldo * porcentaje;
       }
   }
@@ -28,10 +28,10 @@ CLASSES:
       var int : a;
       var float : x, y;
     FUNCS:
-      func void asdf(emp: Empleado, porcentaje: float)  {
+      func void asdf(emp: int, porcentaje: float)  {
         emp.sueldo = emp.sueldo * porcentaje;
       }
-      func void asdf3(emp: Empleado, porcentaje: float)  {
+      func void asdf3(emp: int, porcentaje: float)  {
         emp.sueldo = emp.sueldo * porcentaje;
       }
   }
