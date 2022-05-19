@@ -31,7 +31,7 @@ CLASSES:
       func void asdf(emp: int, porcentaje: float)  {
         emp.sueldo = emp.sueldo * porcentaje;
       }
-      func void asdf3(emp: int, porcentaje: float)  {
+      func void asdf3(emp: int, porcentaje: bool)  {
         emp.sueldo = emp.sueldo * porcentaje;
       }
   }
