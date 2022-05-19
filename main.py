@@ -46,13 +46,13 @@ def p_classes(p):
 
 def p_declare_vars_class(p):
     '''declare_vars_class : vars_class 
-               | empty'''
+                          | empty'''
 
 def p_vars_class(p):
     '''vars_class : VAR type COLON var_id_class SEMICOLON vars_block_class'''
     
 def p_vars_block_class(p):
-    '''vars_block_class : VAR type COLON var_id_class SEMICOLON vars_block
+    '''vars_block_class : VAR type COLON var_id_class SEMICOLON vars_block_class
                         | empty'''
 
 def p_var_id_class(p):
@@ -85,6 +85,10 @@ def p_np3_add_var_to_current_table(p):
 def p_vars(p):
     '''vars : VAR type COLON var_id SEMICOLON vars_block'''
 
+def p_vars_block(p):
+    '''vars_block : VAR type COLON var_id SEMICOLON vars_block
+                  | empty'''
+
 def p_var_id(p):
     '''var_id : ID np3AddVarToCurrentTable var_id_2'''
 
@@ -104,12 +108,9 @@ def p_parameter2(p):
                   | empty'''
 
 def p_classes_block(p):
-    '''classes_block : CLASS ID LEFTBRACKET VARS COLON declare_vars FUNCS COLON declare_funcs RIGHTBRACKET classes_block
+    '''classes_block : CLASS ID np8AddClass np9CreateGlobalVarsTableForClass LEFTBRACKET VARS COLON np10CreateVarsTableForClass declare_vars_class FUNCS COLON declare_funcs RIGHTBRACKET classes_block
                   | empty'''
 
-def p_vars_block(p):
-    '''vars_block : VAR type COLON var_id SEMICOLON vars_block
-                  | empty'''
 
 def p_funcs_block(p):
     '''funcs_block : FUNC ID LEFTPAREN parameter RIGHTPAREN type_simple LEFTBRACKET block RIGHTBRACKET funcs_block
@@ -292,7 +293,7 @@ def p_np8_add_class(p):
     currentClass = p[-1]
     row = dirFunc.getFunctionByName(currentClass)
     if (row != None):
-        print("redeclaration of class " + currentClass)
+        raise Exception("redeclaration of class " + currentClass)
     else:
         dirFunc.insert({"name": currentClass, "type": "class", "DirFunc": None})
         # dirFunc.printDirFunc()
@@ -348,10 +349,10 @@ lex.input(data)
 
 try:
     parser.parse(data)
-    # dirFunc.printDirFunc()
+    dirFunc.printDirFunc()
     # currentVarTable.printVars()
-    currentClassDirFunc.printDirFunc()
-    currentClassVarTable.printVars()
+    # currentClassDirFunc.printDirFunc()
+    # currentClassVarTable.printVars()
     print('Code passed!')
 except Exception as excep: 
     print('Error in code!\n', excep)

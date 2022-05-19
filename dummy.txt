@@ -11,6 +11,12 @@ FUNCS:
   }
 
 CLASSES:
+  Class Persona {
+    VARS:
+      var int : a;
+      var float : x, y;
+    FUNCS:
+  }
   Class Empleado {
     VARS:
       var int : a;
