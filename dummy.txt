@@ -9,19 +9,31 @@ FUNCS:
   func void incrementaSueldo(emp: Empleado, porcentaje: float) {
   	emp.sueldo = emp.sueldo * porcentaje;
   }
+  func void incrementaSueldo2(emp: Empleado, porcentaje: float) {
+  	emp.sueldo = emp.sueldo * porcentaje;
+  }
 
 CLASSES:
-  Class Persona {
-    VARS:
-      var int : a;
-      var float : x, y;
-    FUNCS:
-  }
   Class Empleado {
     VARS:
       var int : a;
       var float : x, y;
     FUNCS:
+      func void asdf3(emp: Empleado, porcentaje: float)  {
+        emp.sueldo = emp.sueldo * porcentaje;
+      }
+  }
+  Class Persona {
+    VARS:
+      var int : a;
+      var float : x, y;
+    FUNCS:
+      func void asdf(emp: Empleado, porcentaje: float)  {
+        emp.sueldo = emp.sueldo * porcentaje;
+      }
+      func void asdf3(emp: Empleado, porcentaje: float)  {
+        emp.sueldo = emp.sueldo * porcentaje;
+      }
   }
 
 Loo() {
