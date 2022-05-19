@@ -11,6 +11,9 @@ dirFunc = None
 currentFunc = None
 currentType = None
 currentVarTable = None
+currentClass = None
+currentClassVarTable = None
+currentClassDirFunc = None
 
 #############
 ### LEXER ###
@@ -26,23 +29,16 @@ print("Lexer generated")
 def p_LOOLU(p):
     '''loolu : LOOLU ID np1CreateGlobalVarsTable SEMICOLON VARS COLON np2CreateVarsTable declare_vars FUNCS COLON declare_funcs CLASSES COLON declare_classes LOO LEFTPAREN RIGHTPAREN block LU SEMICOLON'''
 
-def p_declare_classes(p):
-    '''declare_classes : classes
-               | empty'''
-
 def p_declare_vars(p):
     '''declare_vars : vars 
                | empty'''
 
-def p_declare_funcs(p):
-    '''declare_funcs : funcs
-               | empty'''
-
-def p_classes(p):
-    '''classes : CLASS ID np8AddClass LEFTBRACKET VARS COLON declare_vars FUNCS COLON declare_funcs RIGHTBRACKET classes_block'''
-
 def p_vars(p):
     '''vars : VAR type COLON var_id SEMICOLON vars_block'''
+
+def p_vars_block(p):
+    '''vars_block : VAR type COLON var_id SEMICOLON vars_block
+                  | empty'''
 
 def p_var_id(p):
     '''var_id : ID np3AddVarToCurrentTable var_id_2'''
@@ -51,34 +47,23 @@ def p_var_id_2(p):
     '''var_id_2 : COMMA ID np3AddVarToCurrentTable var_id_2
                 | empty'''
 
+def p_declare_funcs(p):
+    '''declare_funcs : funcs
+                     | empty'''
+
 def p_funcs(p):
-    '''funcs : FUNC ID LEFTPAREN parameter RIGHTPAREN type_simple block funcs_block'''
-
-def p_parameter(p):
-    '''parameter : ID COLON type parameter2
-                  | empty'''
-
-def p_parameter2(p):
-    '''parameter2 : COMMA parameter
-                  | empty'''
-
-def p_classes_block(p):
-    '''classes_block : CLASS ID LEFTBRACKET VARS COLON declare_vars FUNCS COLON declare_funcs RIGHTBRACKET classes_block
-                  | empty'''
-
-def p_vars_block(p):
-    '''vars_block : VAR type COLON var_id SEMICOLON vars_block
-                  | empty'''
+    '''funcs : FUNC type_simple ID np7AddFunction LEFTPAREN np2CreateVarsTable parameter RIGHTPAREN block funcs_block'''
 
 def p_funcs_block(p):
-    '''funcs_block : FUNC ID LEFTPAREN parameter RIGHTPAREN type_simple LEFTBRACKET block RIGHTBRACKET funcs_block
+    '''funcs_block : FUNC type_simple ID np7AddFunction LEFTPAREN np2CreateVarsTable parameter RIGHTPAREN block funcs_block
+                   | empty'''
+
+def p_parameter(p):
+    '''parameter : ID COLON type np14AddParameterAsVariableToFunc parameter2'''
+
+def p_parameter2(p):
+    '''parameter2 : COMMA ID COLON type np14AddParameterAsVariableToFunc
                   | empty'''
-
-def p_access_class_atribute(p):
-    '''access_class_atribute : ID DOT ID '''
-
-def p_class_function_call(p):
-    '''class_function_call : ID DOT function_call'''
 
 def p_function_call(p):
     '''function_call : ID LEFTPAREN expression function_call2 RIGHTPAREN'''
@@ -96,7 +81,7 @@ def p_type_simple(p):
                    | FLOAT np4SetCurrentType
                    | CHAR np4SetCurrentType
                    | BOOL np4SetCurrentType
-                   | VOID'''
+                   | VOID np4SetCurrentType'''
 
 def p_type_compound(p):
     '''type_compound : ID'''
@@ -116,6 +101,63 @@ def p_statement(p):
                  | return_func SEMICOLON
                  | function_call SEMICOLON
                  | class_function_call SEMICOLON'''
+
+################
+#### Clases ####
+################
+
+def p_declare_classes(p):
+    '''declare_classes : classes
+               | empty'''
+
+def p_classes(p):
+    '''classes : CLASS ID np8AddClass np9CreateGlobalVarsTableForClass LEFTBRACKET VARS COLON np10CreateVarsTableForClass declare_vars_class FUNCS COLON declare_funcs_class RIGHTBRACKET classes_block'''
+
+def p_declare_vars_class(p):
+    '''declare_vars_class : vars_class 
+                          | empty'''
+
+def p_vars_class(p):
+    '''vars_class : VAR type COLON var_id_class SEMICOLON vars_block_class'''
+    
+def p_vars_block_class(p):
+    '''vars_block_class : VAR type COLON var_id_class SEMICOLON vars_block_class
+                        | empty'''
+
+def p_var_id_class(p):
+    '''var_id_class : ID np12AddVarToCurrentTableClass var_id_class_2'''
+
+def p_var_id_class_2(p):
+    '''var_id_class_2 : COMMA ID np12AddVarToCurrentTableClass var_id_class_2
+                      | empty'''
+
+def p_declare_funcs_class(p):
+    '''declare_funcs_class : funcs_class
+                           | empty'''
+
+def p_funcs_class(p):
+    '''funcs_class : FUNC type_simple ID np13AddFunctionClass LEFTPAREN np10CreateVarsTableForClass parameter_class RIGHTPAREN block funcs_block_class'''
+
+def p_funcs_block_class(p):
+    '''funcs_block_class : FUNC type_simple ID np13AddFunctionClass LEFTPAREN np10CreateVarsTableForClass parameter_class RIGHTPAREN block funcs_block_class
+                         | empty'''
+
+def p_parameter_class(p):
+    '''parameter_class : ID COLON type np15AddParameterAsVariableToFuncClass parameter2_class'''
+
+def p_parameter2_class(p):
+    '''parameter2_class : COMMA ID COLON type np15AddParameterAsVariableToFuncClass
+                        | empty'''
+
+def p_classes_block(p):
+    '''classes_block : CLASS ID np8AddClass np9CreateGlobalVarsTableForClass LEFTBRACKET VARS COLON np10CreateVarsTableForClass declare_vars_class FUNCS COLON declare_funcs_class RIGHTBRACKET classes_block
+                  | empty'''
+
+def p_access_class_atribute(p):
+    '''access_class_atribute : ID DOT ID '''
+
+def p_class_function_call(p):
+    '''class_function_call : ID DOT function_call'''
 
 # STATEMENTS
 def p_assignment(p):
@@ -159,26 +201,21 @@ def p_comparation_exp(p):
 def p_exp(p):
     '''exp : term operator'''
 
-# Definición de los operadores de suma y resta
 def p_operator(p):
     '''operator : OPERTYPE1 term operator
                 | empty'''
 
-# Definición de un termino
 def p_term(p):
     '''term : factor term_operator'''
 
-# Definición de los operadores de multiplicación y división
 def p_term_operator(p):
     '''term_operator : OPERTYPE2 factor term_operator
                      | empty'''
 
-# Definición de un factor
 def p_factor(p):
     '''factor : LEFTPAREN expression RIGHTPAREN
               | var_cte'''
 
-# Definición de la declaración de variables
 def p_var_cte(p):
     '''var_cte : ID
                | CTEINT
@@ -186,7 +223,6 @@ def p_var_cte(p):
                | access_class_atribute
                | class_function_call'''
 
-# Definición del epsilon/nulo/vacío
 def p_empty(p):
     '''empty :'''
     pass
@@ -207,10 +243,14 @@ def p_np2_create_vars_table(p):
     '''np2CreateVarsTable : empty'''
     global dirFunc
     global currentVarTable
+    global currentFunc
     row = dirFunc.getFunctionByName(currentFunc)
     if (row["table"] == None):
-        currentVarTable = vt.Vars()
+        row["table"] = vt.Vars()
+        currentVarTable = row["table"]
         dirFunc.addVarsTable(currentFunc, currentVarTable)
+    else: 
+        raise Exception("ERROR: could not find function with that name in DirFunc")
 
 def p_np3_add_var_to_current_table(p):
     '''np3AddVarToCurrentTable : empty'''
@@ -235,35 +275,107 @@ def p_np6_set_current_type_void(p):
     currentType = p[-1]
 
 def p_np7_add_function(p):
-    '''np6AddFunction : empty'''
+    '''np7AddFunction : empty'''
     global currentType
     global currentFunc
+    global dirFunc
     row = dirFunc.getFunctionByName(p[-1])
     if (row != None):
-        print("if")
         print("redeclaration of function " + p[-1])
     else:
-        print("else")
-        dirFunc.insert({"name": p[-1], "type": "class", "table": None})
+        dirFunc.insert({"name": p[-1], "type": currentType, "table": None})
         currentFunc = p[-1]
 
 def p_np8_add_class(p):
     '''np8AddClass : empty'''
-    global currentType
-    global currentFunc
-    row = dirFunc.getFunctionByName(p[-1])
+    global currentClass
+    global dirFunc
+    currentClass = p[-1]
+    row = dirFunc.getFunctionByName(currentClass)
     if (row != None):
-        print("if")
-        print("redeclaration of class " + p[-1])
+        raise Exception("redeclaration of class " + currentClass)
     else:
-        print("else")
-        dirFunc.insert({"name": p[-1], "type": "class", "table": None})
-        currentFunc = p[-1]
+        dirFunc.insert({"name": currentClass, "type": "class", "DirFunc": None})
 
-def p_np9_delete_current_vars_table(p):
-    '''np6DeleteCurrentVarsTable : empty'''
+def p_np9_create_global_vars_table_for_class(p):
+    '''np9CreateGlobalVarsTableForClass : empty'''
+    global currentClassDirFunc
+    global currentClassFunc
+    global currentClass
+    global dirFunc
+    row = dirFunc.getFunctionByName(currentClass)
+    if (row["DirFunc"] == None):
+        row["DirFunc"] = vt.DirFunc()
+        currentClassDirFunc = row["DirFunc"]
+        currentClassDirFunc.insert({"name": currentClass, "type": "global", "table": None})
+        # dirFunc.printDirFunc()
+        # currentClassDirFunc.printDirFunc()
+        currentClassFunc = currentClass
+        # print(currentClassFunc)
+    else: 
+        raise Exception("ERROR: could not find function with that name in DirFunc")
+
+def p_np10_create_vars_table_for_class(p):
+    '''np10CreateVarsTableForClass : empty'''
+    global currentClassDirFunc
+    global currentClassVarTable
+    global currentClassFunc
+    row = currentClassDirFunc.getFunctionByName(currentClassFunc)
+    if (row["table"] == None):
+        currentClassVarTable = vt.Vars()
+        currentClassDirFunc.addVarsTable(currentClassFunc, currentVarTable)
+    else: 
+        raise Exception("ERROR: could not find function with that name in DirFunc")
+
+def p_np11_delete_current_vars_table(p):
+    '''np11DeleteCurrentVarsTable : empty'''
     global currentVarTable
     currentVarTable = None
+
+def p_np12_add_var_to_current_table_class(p):
+    '''np12AddVarToCurrentTableClass : empty'''
+    global currentClassVarTable
+    global currentType
+    id = currentClassVarTable.getVariableByName(p[-1])
+    if (id != None):
+        raise Exception("   ERROR: Redeclaration of variable ID = " + p[-1])
+    else:
+        currentClassVarTable.insert({"name": p[-1], "type": currentType})
+
+def p_np13_add_function_class(p):
+    '''np13AddFunctionClass : empty'''
+    global currentType
+    global currentClassFunc
+    global currentClassDirFunc
+    row = currentClassDirFunc.getFunctionByName(p[-1])
+    if (row != None):
+        print("redeclaration of function " + p[-1])
+    else:
+        # print("else")
+        currentClassDirFunc.insert({"name": p[-1], "type": currentType, "table": None})
+        currentClassFunc = p[-1]
+
+def p_np14_add_parameter_as_variable_to_func(p):
+    '''np14AddParameterAsVariableToFunc : empty'''
+    global currentVarTable
+    global currentType
+    # currentVarTable.printVars()
+    id = currentVarTable.getVariableByName(p[-3])
+    if (id != None):
+        raise Exception("   ERROR: Redeclaration of variable ID = " + p[-3])
+    else:
+        currentVarTable.insert({"name": p[-3], "type": currentType})
+
+def p_np15_add_parameter_as_variable_to_func_class(p):
+    '''np15AddParameterAsVariableToFuncClass : empty'''
+    global currentClassVarTable
+    global currentType
+    # currentVarTable.printVars()
+    id = currentClassVarTable.getVariableByName(p[-3])
+    if (id != None):
+        raise Exception("   ERROR: Redeclaration of variable ID = " + p[-3])
+    else:
+        currentClassVarTable.insert({"name": p[-3], "type": currentType})
 
 def p_error(t):
     print("Syntax error (parser):", t.lexer.token(), t.value)
@@ -281,8 +393,10 @@ lex.input(data)
 
 try:
     parser.parse(data)
-    dirFunc.printDirFunc()
-    currentVarTable.printVars()
+    # dirFunc.printDirFunc()
+    # currentVarTable.printVars()
+    # currentClassDirFunc.printDirFunc()
+    # currentClassVarTable.printVars()
     print('Code passed!')
 except Exception as excep: 
     print('Error in code!\n', excep)
