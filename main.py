@@ -62,26 +62,6 @@ def p_var_id_class_2(p):
     '''var_id_class_2 : COMMA ID np12AddVarToCurrentTableClass var_id_class_2
                       | empty'''
 
-def p_np12_add_var_to_current_table_class(p):
-    '''np12AddVarToCurrentTableClass : empty'''
-    global currentClassVarTable
-    global currentType
-    id = currentClassVarTable.getVariableByName(p[-1])
-    if (id != None):
-        raise Exception("   ERROR: Redeclaration of variable ID = " + p[-1])
-    else:
-        currentClassVarTable.insert({"name": p[-1], "type": currentType})
-
-def p_np3_add_var_to_current_table(p):
-    '''np3AddVarToCurrentTable : empty'''
-    global currentVarTable
-    global currentType
-    id = currentVarTable.getVariableByName(p[-1])
-    if (id != None):
-        raise Exception("   ERROR: Redeclaration of variable ID = " + p[-1])
-    else:
-        currentVarTable.insert({"name": p[-1], "type": currentType})
-
 def p_vars(p):
     '''vars : VAR type COLON var_id SEMICOLON vars_block'''
 
@@ -110,7 +90,6 @@ def p_parameter2(p):
 def p_classes_block(p):
     '''classes_block : CLASS ID np8AddClass np9CreateGlobalVarsTableForClass LEFTBRACKET VARS COLON np10CreateVarsTableForClass declare_vars_class FUNCS COLON declare_funcs RIGHTBRACKET classes_block
                   | empty'''
-
 
 def p_funcs_block(p):
     '''funcs_block : FUNC ID LEFTPAREN parameter RIGHTPAREN type_simple LEFTBRACKET block RIGHTBRACKET funcs_block
@@ -285,7 +264,6 @@ def p_np7_add_function(p):
         dirFunc.insert({"name": p[-1], "type": currentType, "table": None})
         currentFunc = p[-1]
 
-
 def p_np8_add_class(p):
     '''np8AddClass : empty'''
     global currentClass
@@ -296,7 +274,6 @@ def p_np8_add_class(p):
         raise Exception("redeclaration of class " + currentClass)
     else:
         dirFunc.insert({"name": currentClass, "type": "class", "DirFunc": None})
-        # dirFunc.printDirFunc()
 
 def p_np9_create_global_vars_table_for_class(p):
     '''np9CreateGlobalVarsTableForClass : empty'''
@@ -332,6 +309,16 @@ def p_np11_delete_current_vars_table(p):
     '''np11DeleteCurrentVarsTable : empty'''
     global currentVarTable
     currentVarTable = None
+
+def p_np12_add_var_to_current_table_class(p):
+    '''np12AddVarToCurrentTableClass : empty'''
+    global currentClassVarTable
+    global currentType
+    id = currentClassVarTable.getVariableByName(p[-1])
+    if (id != None):
+        raise Exception("   ERROR: Redeclaration of variable ID = " + p[-1])
+    else:
+        currentClassVarTable.insert({"name": p[-1], "type": currentType})
 
 def p_error(t):
     print("Syntax error (parser):", t.lexer.token(), t.value)
