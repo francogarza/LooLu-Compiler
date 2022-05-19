@@ -6,13 +6,15 @@ VARS:
   var bool : b, c, d;
 
 FUNCS:
-  func incrementaSueldo(emp: Empleado, porcentaje: float) void {
+  func void incrementaSueldo(emp: Empleado, porcentaje: float) {
   	emp.sueldo = emp.sueldo * porcentaje;
   }
 
 CLASSES:
   Class Empleado {
     VARS:
+      var int : a;
+      var float : x, y;
     FUNCS:
   }
 
