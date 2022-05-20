@@ -33,6 +33,6 @@ CLASSES:
 
 Loo() {
 
-	a = b + c * d / a;
+	a = b + c * d / a + c;
 
 } Lu;

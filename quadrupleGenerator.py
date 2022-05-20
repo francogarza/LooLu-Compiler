@@ -20,10 +20,11 @@ class quadrupleGenerator:
         self.tempCounter = 0
 
     def operator(self, o):
+        print(o)
         if o in ['*','/']:
+            print(self.operatorStack,self.operatorStack[-1])
             while self.operatorStack and self.operatorStack[-1] in ['*','/']: #mientras haya operadores de mayor o igual jerarquia, ejecutarlos.
-                # print(self.operandStack[-1], self.operandStack[-2], self.operatorStack[-1])
-                # print(self.typeStack[-1], self.typeStack[-2], self.operatorStack[-1])
+                print("operatorstack",self.operatorStack)
                 self.quadruplesOutput.append((self.operatorStack[-1], self.operandStack[-2], self.operandStack[-1], 'Temporal_'+str(self.tempCounter)))
                 result = sc.cube(self.typeStack[-2],self.typeStack[-1],self.operatorStack[-1],None,None)
                 self.operatorStack.pop()
@@ -40,7 +41,7 @@ class quadrupleGenerator:
                 self.tempCounter = self.tempCounter + 1
             self.operatorStack.append(o)
         if o in ['+','-']:
-            while self.operatorStack and self.operatorStack[-1] in ['*','/', '+','-']: #mientras haya operadores de mayor o igual jerarquia, ejecutarlos.
+            while self.operatorStack and self.operatorStack[-1] in ['*','/','+','-']: #mientras haya operadores de mayor o igual jerarquia, ejecutarlos.
                 self.quadruplesOutput.append((self.operatorStack[-1], self.operandStack[-2], self.operandStack[-1], 'Temporal_'+str(self.tempCounter)))
                 result = sc.cube(self.typeStack[-2],self.typeStack[-1],self.operatorStack[-1],None,None)
                 self.operatorStack.pop() #remueve operador 1
