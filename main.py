@@ -206,14 +206,14 @@ def p_exp(p):
     '''exp : term operator'''
 
 def p_operator(p):
-    '''operator : OPERTYPE1 term operator
+    '''operator : OPERTYPE1 qnp2insertOperator term operator
                 | empty'''
 
 def p_term(p):
     '''term : factor term_operator'''
 
 def p_term_operator(p):
-    '''term_operator : OPERTYPE2 factor term_operator
+    '''term_operator : OPERTYPE2 qnp2insertOperator factor term_operator
                      | empty'''
 
 def p_factor(p):
@@ -221,7 +221,7 @@ def p_factor(p):
               | var_cte'''
 
 def p_var_cte(p):
-    '''var_cte : ID np16isOnCurrentVarsTable qnp1sendToQuadruples
+    '''var_cte : ID np16isOnCurrentVarsTable qnp1sendToQuadruplesExpression
                | CTEINT
                | CTEFLOAT
                | access_class_atribute
@@ -404,13 +404,17 @@ def p_np16_is_on_current_vars_table(p): # Check if an ID is declared in the Glob
 '''
     QUADRUPLE NEURALGIC POINTS
 '''
-def p_qnp1_send_to_quadruples(p):
-    '''qnp1sendToQuadruples : empty'''
-    print("entra" + p[-2])
+def p_qnp1_send_to_quadruplesExpression(p):
+    '''qnp1sendToQuadruplesExpression : empty'''
+    print(p[-2])
     global currentVarTable
     variable = currentVarTable.getVariableByName(p[-2])
     qg.operand(variable["name"], variable["type"])
-    print(qg.operandStack[0])
+
+def p_qnp2_insertOperator(p):
+    '''qnp2insertOperator : empty'''
+    qg.operator(p[-1])
+    print(p[-1])
 
 def p_error(t):
     print("Syntax error (parser):", t.lexer.token(), t.value)

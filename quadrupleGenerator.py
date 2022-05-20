@@ -8,6 +8,7 @@ class quadrupleGenerator:
     typeStack = None
     dimensionStack = None
     quadruplesOutput = None
+    tempCounter = None
 
     def __init__(self):
         self.jumpStack = []
@@ -16,12 +17,46 @@ class quadrupleGenerator:
         self.typeStack = []
         self.dimensionStack = []
         self.quadruplesOutput = []
+        self.tempCounter = 0
 
-    def operator(o):
+    def operator(self, o):
         if o in ['*','/']:
-            pass
+            # while self.operatorStack and self.operatorStack[-1] in ['*','/']: #mientras haya operadores de mayor o igual jerarquia, ejecutarlos.
+            #     self.quadruplesOutput.append((self.operatorStack[-1], self.operandStack[-2], self.operandStack[-1], 'Temporal_'+str(self.tempCounter)))
+            #     result = sc.cube(self.typeStack[-2],self.typeStack[-1],self.operatorStack[-1],None,None)
+            #     self.operatorStack.pop() #remueve operador 1
+            #     self.operandStack.pop() #remueve operando 1
+            #     self.operandStack.pop() #remueve operando 2
+            #     self.typeStack.pop()
+            #     self.typeStack.pop()
+            #     self.pilaDimensiones.pop()
+            #     self.pilaDimensiones.pop()
+            #
+            #     self.operandStack.append('Temporal_'+str(self.tempCounter))
+            #     self.typeStack.append(result[0])
+            #     self.pilaDimensiones.append(result[1])
+            #     self.tempCounter = self.tempCounter + 1
+            #
+            self.operatorStack.append(o)
         if o in ['+','-']:
-            pass
+            # while self.operatorStack and self.operatorStack[-1] in ['*','/', '+','-']: #mientras haya operadores de mayor o igual jerarquia, ejecutarlos.
+            #     self.quadruplesOutput.append((self.operatorStack[-1], self.operandStack[-2], self.operandStack[-1], 'Temporal_'+str(self.tempCounter)))
+            #     result = sc.cube(self.typeStack[-2],self.typeStack[-1],self.operatorStack[-1],None,None)
+            #     self.operatorStack.pop() #remueve operador 1
+            #     self.operandStack.pop() #remueve operando 1
+            #     self.operandStack.pop() #remueve operando 2
+            #     self.typeStack.pop()
+            #     self.typeStack.pop()
+            #     self.pilaDimensiones.pop()
+            #     self.pilaDimensiones.pop()
+            #
+            #     self.operandStack.append('Temporal_'+str(self.tempCounter))
+            #     print("Resultado:",result[0])
+            #     self.typeStack.append(result[0])
+            #     self.pilaDimensiones.append(result[1])
+            #     self.tempCounter = self.tempCounter + 1
+            #
+            self.operatorStack.append(o)
         if o in ['&&', '||']:
             pass
         if o in ['<=','>=','<>','>','<','==']:
