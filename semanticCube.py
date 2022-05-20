@@ -87,10 +87,10 @@ cubeDimensions = [[  #UniqueValue  Array  Matrix
 
 def typeToInt(typeInput):
     switcher = {
-        'INT':   0,
-        'FLOAT': 1,
-        'CHAR':  2,
-        'BOOL':  3,
+        'int':   0,
+        'float': 1,
+        'char':  2,
+        'bool':  3,
         '+':     0,
         '-':     1,
         '*':     2,
@@ -113,6 +113,9 @@ def typeToInt(typeInput):
         exit(-1)
 
 def cube(type1, type2, oper, dimension1, dimension2):
-    typeResponse = cubeTypes[typeToInt(oper  )][typeToInt(type1)][typeToInt(type2)]
-    dimensionResponse = cubeDimensions[typeToInt(oper) if (oper  != '<>' and oper   != '==') else 6][dimension1][dimension2]
-    print("type:",typeResponse, "| dimension:", dimensionResponse)
+    print(typeToInt(oper),typeToInt(type1),typeToInt(type2))
+    typeResponse = cubeTypes[typeToInt(oper)][typeToInt(type1)][typeToInt(type2)]
+#     dimensionResponse = cubeDimensions[typeToInt(oper) if (oper  != '<>' and oper   != '==') else 6][dimension1][dimension2]
+#     print("type:",typeResponse, "| dimension:", dimensionResponse)
+    print("type:",typeResponse)
+    return [typeResponse]

@@ -445,7 +445,9 @@ try:
     # currentClassDirFunc.printDirFunc()
     # currentClassVarTable.printVars()
     print('Code passed!')
-    print(qg.operandStack)
-    print(qg.operatorStack)
+    # print(qg.operandStack)
+    # print(qg.operatorStack)
+    # print(qg.typeStack)
+    print(qg.quadruplesOutput)
 except Exception as excep:
     print('Error in code!\n', excep)

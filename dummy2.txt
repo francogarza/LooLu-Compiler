@@ -3,7 +3,7 @@ LooLu miPrograma;
 VARS:
   var int : a;
   var float : x;
-  var bool : b, c, d;
+  var float : b, c, d;
 
 FUNCS:
   func void incrementaSueldo(emp: int, porcentaje1: float) {
