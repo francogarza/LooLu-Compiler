@@ -62,6 +62,7 @@ class quadrupleGenerator:
         if o in ['<=','>=','<>','>','<','==']:
             pass
         if o == '=':
+            self.operatorStack.append(o)
             pass
 
     #Para cada operador, implementar lógica de pops y push

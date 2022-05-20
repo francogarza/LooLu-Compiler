@@ -165,9 +165,15 @@ def p_class_function_call(p):
 
 # STATEMENTS
 def p_assignment(p):
-    '''assignment : ID EQUAL expression
-                  | ID EQUAL class_function_call
+    '''assignment : assignmentVariable expression
+                  | assignmentVariable class_function_call
                   | access_class_atribute EQUAL expression'''
+
+def p_assignment_variable(p):
+    '''assignmentVariable : ID np16isOnCurrentVarsTable qnp1sendToQuadruples EQUAL qnp2insertOperator'''
+
+def p_np17_test(p):
+    '''np17Test : empty'''
 
 def p_condition(p):
     '''condition : IF LEFTPAREN expression RIGHTPAREN block else_condition'''
@@ -221,7 +227,7 @@ def p_factor(p):
               | var_cte'''
 
 def p_var_cte(p):
-    '''var_cte : ID np16isOnCurrentVarsTable qnp1sendToQuadruplesExpression
+    '''var_cte : ID np16isOnCurrentVarsTable qnp1sendToQuadruples
                | CTEINT
                | CTEFLOAT
                | access_class_atribute
@@ -388,6 +394,7 @@ def p_np15_add_parameter_as_variable_to_func_class(p):
 '''
 def p_np16_is_on_current_vars_table(p): # Check if an ID is declared in the Global Scope
     '''np16isOnCurrentVarsTable : empty'''
+    # print("llegue")/
     global currentVarTable
     global currentType
     global currentFunc
@@ -400,12 +407,13 @@ def p_np16_is_on_current_vars_table(p): # Check if an ID is declared in the Glob
         raise Exception("   ERROR: Variable not declared on scope " + p[-1])
     else:
         currentVarTable.insert({"name": p[-1], "type": currentType})
+    
 
 '''
     QUADRUPLE NEURALGIC POINTS
 '''
-def p_qnp1_send_to_quadruplesExpression(p):
-    '''qnp1sendToQuadruplesExpression : empty'''
+def p_qnp1_send_to_quadruples(p):
+    '''qnp1sendToQuadruples : empty'''
     print(p[-2])
     global currentVarTable
     variable = currentVarTable.getVariableByName(p[-2])
@@ -414,7 +422,6 @@ def p_qnp1_send_to_quadruplesExpression(p):
 def p_qnp2_insertOperator(p):
     '''qnp2insertOperator : empty'''
     qg.operator(p[-1])
-    print(p[-1])
 
 def p_error(t):
     print("Syntax error (parser):", t.lexer.token(), t.value)
@@ -438,5 +445,7 @@ try:
     # currentClassDirFunc.printDirFunc()
     # currentClassVarTable.printVars()
     print('Code passed!')
+    print(qg.operandStack)
+    print(qg.operatorStack)
 except Exception as excep:
     print('Error in code!\n', excep)
