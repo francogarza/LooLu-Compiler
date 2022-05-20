@@ -26,12 +26,11 @@ class quadrupleGenerator:
                 # print(self.typeStack[-1], self.typeStack[-2], self.operatorStack[-1])
                 self.quadruplesOutput.append((self.operatorStack[-1], self.operandStack[-2], self.operandStack[-1], 'Temporal_'+str(self.tempCounter)))
                 result = sc.cube(self.typeStack[-2],self.typeStack[-1],self.operatorStack[-1],None,None)
-                self.operatorStack.pop() #remueve operador 1
-                self.operandStack.pop() #remueve operando 1
-                self.operandStack.pop() #remueve operando 2
+                self.operatorStack.pop()
+                self.operandStack.pop()
+                self.operandStack.pop()
                 self.typeStack.pop()
                 self.typeStack.pop()
-                # print(result)
                 # self.pilaDimensiones.pop()
                 # self.pilaDimensiones.pop()
             

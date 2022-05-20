@@ -112,10 +112,20 @@ def typeToInt(typeInput):
         print(response)
         exit(-1)
 
+def intToType(entero):
+    switcher = {
+        0:    'INT',
+        1:    'FLOAT',
+        2:    'CHAR',
+        3:    'BOOL',
+    }
+    regresa = switcher.get(entero, "Caracter inválido.")
+    return regresa
+
 def cube(type1, type2, oper, dimension1, dimension2):
-    print(typeToInt(oper),typeToInt(type1),typeToInt(type2))
+#     print(typeToInt(oper),typeToInt(type1),typeToInt(type2))
     typeResponse = cubeTypes[typeToInt(oper)][typeToInt(type1)][typeToInt(type2)]
 #     dimensionResponse = cubeDimensions[typeToInt(oper) if (oper  != '<>' and oper   != '==') else 6][dimension1][dimension2]
 #     print("type:",typeResponse, "| dimension:", dimensionResponse)
-    print("type:",typeResponse)
-    return [typeResponse]
+#     print("type:",typeResponse)
+    return [intToType(typeResponse)]

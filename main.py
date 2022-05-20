@@ -414,7 +414,7 @@ def p_np16_is_on_current_vars_table(p): # Check if an ID is declared in the Glob
 '''
 def p_qnp1_send_to_quadruples(p):
     '''qnp1sendToQuadruples : empty'''
-    print(p[-2])
+    # print(p[-2])
     global currentVarTable
     variable = currentVarTable.getVariableByName(p[-2])
     qg.operand(variable["name"], variable["type"])
