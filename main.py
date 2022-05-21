@@ -18,7 +18,7 @@ currentClass = None
 currentClassVarTable = None
 currentClassDirFunc = None
 qg = None
-tempCounter = 0
+tempCounter = 1
 quadruplesOutput = []
 #############
 ### LEXER ###
@@ -202,14 +202,14 @@ def p_print_exp(p):
                  | empty'''
 
 def p_expression(p):
-    '''expression : exp qnp6 comparation'''
+    '''expression : exp comparation'''
 
 def p_comparation(p):
-    '''comparation : RELOPER comparation_exp
+    '''comparation : RELOPER qnp9 comparation_exp 
                    | empty'''
 
 def p_comparation_exp(p):
-    '''comparation_exp : exp'''
+    '''comparation_exp : exp qnp10'''
 
 def p_exp(p):
     '''exp : term qnp4 operator'''
@@ -446,10 +446,10 @@ def p_qnp3(p):
 def p_qnp4(p):
     '''qnp4 : empty'''
     global tempCounter
-    print("top del operatorstack: ",qg.operatorStack[-1])
+    # print("top del operatorstack: ",qg.operatorStack[-1])
     if qg.operatorStack and qg.operatorStack[-1] in ['+','-','*','/']:
-        print("operandStack",qg.operandStack)
-        print("typeStack",qg.typeStack)
+        # print("operandStack",qg.operandStack)
+        # print("typeStack",qg.typeStack)
         right_operand = qg.operandStack.pop() 
         right_type = qg.typeStack.pop()
         left_operand = qg.operandStack.pop()
@@ -466,11 +466,10 @@ def p_qnp4(p):
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
 
-
 def p_qnp5(p):
     '''qnp5 : empty'''
     global tempCounter
-    print("top del operatorstack: ",qg.operatorStack[-1])
+    # print("top del operatorstack: ",qg.operatorStack[-1])
     if qg.operatorStack and qg.operatorStack[-1] in ['*','/']:
         right_operand = qg.operandStack.pop() 
         right_type = qg.typeStack.pop()
@@ -491,9 +490,9 @@ def p_qnp5(p):
 def p_qnp6(p):
     '''qnp6 : empty'''
     global tempCounter
-    print("before type",qg.typeStack)
-    print("before operand",qg.operandStack)
-    print("before operator",qg.operatorStack)
+    # print("before type",qg.typeStack)
+    # print("before operand",qg.operandStack)
+    # print("before operator",qg.operatorStack)
     if qg.operatorStack and qg.operatorStack[-1] in ['=']:
         right_operand = qg.operandStack.pop() 
         right_type = qg.typeStack.pop()
@@ -509,8 +508,8 @@ def p_qnp6(p):
             print(quadruplesOutput)
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
-    print("after",qg.typeStack)
-    print("after",qg.operandStack)
+    # print("after",qg.typeStack)
+    # print("after",qg.operandStack)
 
 def p_qnp7(p):
     '''qnp7 : empty'''
@@ -522,6 +521,35 @@ def p_qnp8(p):
     if qg.operatorStack and qg.operatorStack[-1] in ['(']:
         qg.operatorStack.pop()
 
+def p_qnp9(p):
+    '''qnp9 : empty'''
+    qg.operatorStack.append(p[-1])
+
+def p_qnp10(p):
+    '''qnp10 : empty'''
+    global tempCounter
+    print("before type",qg.typeStack)
+    print("before operand",qg.operandStack)
+    print("before operator",qg.operatorStack)
+    if qg.operatorStack and qg.operatorStack[-1] in ['<','<=','>','>=','==']:
+        right_operand = qg.operandStack.pop() 
+        right_type = qg.typeStack.pop()
+        left_operand = qg.operandStack.pop()
+        left_type = qg.typeStack.pop()
+        operator = qg.operatorStack.pop()
+        result_type = sc.cube(left_type, right_type, operator, None, None)
+        if result_type != -1:
+            result = 'Temporal_'+str(tempCounter)
+            tempCounter = tempCounter + 1
+            quadruplesOutput.append((operator, right_operand, '', left_operand))
+            qg.operandStack.append(result)
+            qg.typeStack.append(sc.intToType(result_type))
+            print(quadruplesOutput)
+        else:
+            raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
+    print("after type",qg.typeStack)
+    print("after operand",qg.operandStack)
+    print("after operator",qg.operatorStack)
 
 def p_error(t):
     print("Syntax error (parser):", t.lexer.token(), t.value)
