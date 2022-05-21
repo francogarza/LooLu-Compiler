@@ -25,6 +25,7 @@ reserved = {
     'void': 'VOID',
     'read': 'READ',
     'print': 'PRINT',
+    'read': 'READ',
     'return': 'RETURN',
     'Lu': "LU" #lo utilizamos para indicar que se acabo el main
 }

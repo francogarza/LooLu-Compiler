@@ -184,6 +184,9 @@ def p_condition(p):
 def p_writing(p):
     '''writing : PRINT LEFTPAREN print_val RIGHTPAREN SEMICOLON'''
 
+# def p_reading(p):
+#     '''reading : READ LEFTPAREN read_val RIGHTPAREN SEMICOLON'''
+
 def p_while_statement(p):
     '''while_statement : WHILE LEFTPAREN expression RIGHTPAREN block'''
 
@@ -195,11 +198,20 @@ def p_else_condition(p):
                       | empty'''
 
 def p_print_val(p):
-    '''print_val : expression print_exp'''
+    '''print_val : qnp13 ID qnp14 print_exp'''
 
 def p_print_exp(p):
     '''print_exp : COMMA  print_val
                  | empty'''
+
+# def p_read_val(p):
+#     '''read_val : qnp15 ID qnp16 read_exp'''
+
+# def p_read_exp(p):
+#     '''read_exp : COMMA read_val
+#                  | empty'''
+
+
 
 def p_super_expression(p):
     '''super_expression : expression super_expression_helper'''
@@ -588,6 +600,20 @@ def p_qnp12(p):
     print("after type",qg.typeStack)
     print("after operand",qg.operandStack)
     print("after operator",qg.operatorStack)
+
+def p_qnp13(p): # Insert PRINT to operator stack
+    '''qnp13 : empty'''
+    qg.operatorStack.append('PRINT')
+
+def p_qnp14(p): 
+    '''qnp14 : empty'''
+
+    qg.operandStack.append(p[-1])
+    quadruplesOutput.append((qg.operatorStack[-1], '', '', qg.operandStack[-1]))
+
+    qg.operatorStack.pop()
+    qg.operandStack.pop()
+    print(quadruplesOutput)
 
 def p_error(t):
     print("Syntax error (parser):", t.lexer.token(), t.value)
