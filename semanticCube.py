@@ -126,4 +126,4 @@ def cube(type1, type2, oper, dimension1, dimension2):
 #     print(typeToInt(oper),typeToInt(type1),typeToInt(type2))
     typeResponse = cubeTypes[typeToInt(oper)][typeToInt(type1)][typeToInt(type2)]
 #     dimensionResponse = cubeDimensions[typeToInt(oper) if (oper  != '<>' and oper   != '==') else 6][dimension1][dimension2]
-    return [intToType(typeResponse)]
+    return typeResponse

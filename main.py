@@ -3,6 +3,7 @@ from lexer import tokens
 import ply.yacc as yacc
 import varsTable as vt
 import quadrupleGenerator
+import semanticCube as sc
 
 ###################
 ### GLOBAL VARS ###
@@ -17,6 +18,8 @@ currentClass = None
 currentClassVarTable = None
 currentClassDirFunc = None
 qg = None
+tempCounter = 0
+quadruplesOutput = []
 #############
 ### LEXER ###
 #############
@@ -209,17 +212,17 @@ def p_comparation_exp(p):
     '''comparation_exp : exp'''
 
 def p_exp(p):
-    '''exp : term operator'''
+    '''exp : term qnp4 operator'''
 
 def p_operator(p):
-    '''operator : OPERTYPE1 qnp2insertOperator term operator
+    '''operator : OPERTYPE1 qnp3 term qnp4 operator
                 | empty'''
 
 def p_term(p):
-    '''term : factor term_operator'''
+    '''term : factor qnp5 term_operator'''
 
 def p_term_operator(p):
-    '''term_operator : OPERTYPE2 qnp2insertOperator factor term_operator
+    '''term_operator : OPERTYPE2 qnp2 factor qnp5 term_operator
                      | empty'''
 
 def p_factor(p):
@@ -227,7 +230,7 @@ def p_factor(p):
               | var_cte'''
 
 def p_var_cte(p):
-    '''var_cte : ID np16isOnCurrentVarsTable qnp1sendToQuadruples
+    '''var_cte : ID qnp1
                | CTEINT
                | CTEFLOAT
                | access_class_atribute
@@ -423,6 +426,68 @@ def p_qnp2_insertOperator(p):
     '''qnp2insertOperator : empty'''
     qg.operator(p[-1])
 
+def p_qnp1(p):
+    '''qnp1 : empty'''
+    global currentVarTable
+    variable = currentVarTable.getVariableByName(p[-1])
+    qg.operandStack.append(variable["name"])
+    qg.typeStack.append(variable["type"])
+
+def p_qnp2(p):
+    '''qnp2 : empty'''
+    qg.operatorStack.append(p[-1])
+    print("operatorStack",qg.operatorStack)
+
+def p_qnp3(p):
+    '''qnp3 : empty'''
+    qg.operatorStack.append(p[-1])
+    print(qg.operatorStack)
+
+def p_qnp4(p):
+    '''qnp4 : empty'''
+    global tempCounter
+    print("top del operatorstack: ",qg.operatorStack[-1])
+    if qg.operatorStack and qg.operatorStack[-1] in ['+','-','*','/']:
+        print("operandStack",qg.operandStack)
+        print("typeStack",qg.typeStack)
+        right_operand = qg.operandStack.pop() 
+        right_type = qg.typeStack.pop()
+        left_operand = qg.operandStack.pop()
+        left_type = qg.typeStack.pop()
+        operator = qg.operatorStack.pop()
+        result_type = sc.cube(left_type, right_type, operator, None, None)
+        if result_type != -1:
+            result = 'Temporal_'+str(tempCounter)
+            tempCounter = tempCounter + 1
+            quadruplesOutput.append((operator, left_operand, right_operand, result))
+            qg.operandStack.append(result)
+            qg.typeStack.append(sc.intToType(result_type))
+            print(quadruplesOutput)
+        else:
+            print("asdf")
+
+
+def p_qnp5(p):
+    '''qnp5 : empty'''
+    global tempCounter
+    print("top del operatorstack: ",qg.operatorStack[-1])
+    if qg.operatorStack and qg.operatorStack[-1] in ['*','/']:
+        right_operand = qg.operandStack.pop() 
+        right_type = qg.typeStack.pop()
+        left_operand = qg.operandStack.pop()
+        left_type = qg.typeStack.pop()
+        operator = qg.operatorStack.pop()
+        result_type = sc.cube(left_type, right_type, operator, None, None)
+        if result_type != -1:
+            result = 'Temporal_'+str(tempCounter)
+            tempCounter = tempCounter + 1
+            quadruplesOutput.append((operator, left_operand, right_operand, result))
+            qg.operandStack.append(result)
+            qg.typeStack.append(sc.intToType(result_type))
+            print(quadruplesOutput)
+        else:
+            print("asdf")
+
 def p_error(t):
     print("Syntax error (parser):", t.lexer.token(), t.value)
     raise Exception("Syntax error")
@@ -448,6 +513,7 @@ try:
     # print(qg.operandStack)
     # print(qg.operatorStack)
     # print(qg.typeStack)
-    print(qg.quadruplesOutput)
+    for quad in qg.quadruplesOutput:
+        print(quad)
 except Exception as excep:
     print('Error in code!\n', excep)
