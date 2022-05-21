@@ -202,11 +202,15 @@ def p_print_exp(p):
                  | empty'''
 
 def p_super_expression(p):
-    '''super_expression : expression LOGICOPERATOR qnp11 super_expression qnp12
-                        | expression qnp12'''
+    '''super_expression : expression super_expression_helper'''
+
+def p_super_expression_helper(p):
+    '''super_expression_helper : LOGICOPERATOR qnp11 super_expression qnp12
+                               | expression qnp12
+                               | empty'''
 
 def p_expression(p):
-    '''expression : exp comparation'''
+    '''expression : exp comparation qnp12'''
 
 def p_comparation(p):
     '''comparation : RELOPER qnp9 comparation_exp 
