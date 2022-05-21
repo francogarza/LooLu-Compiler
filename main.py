@@ -226,7 +226,7 @@ def p_term_operator(p):
                      | empty'''
 
 def p_factor(p):
-    '''factor : LEFTPAREN expression RIGHTPAREN
+    '''factor : LEFTPAREN qnp7 expression RIGHTPAREN qnp8
               | var_cte'''
 
 def p_var_cte(p):
@@ -512,6 +512,16 @@ def p_qnp6(p):
     print("after",qg.typeStack)
     print("after",qg.operandStack)
 
+def p_qnp7(p):
+    '''qnp7 : empty'''
+    if qg.operatorStack:
+        qg.operatorStack.append(p[-1])
+
+def p_qnp8(p):
+    '''qnp8 : empty'''
+    if qg.operatorStack and qg.operatorStack[-1] in ['(']:
+        qg.operatorStack.pop()
+
 
 def p_error(t):
     print("Syntax error (parser):", t.lexer.token(), t.value)
@@ -540,5 +550,6 @@ try:
     # print(qg.typeStack)
     for quad in qg.quadruplesOutput:
         print(quad)
+
 except Exception as excep:
     print('Error in code!\n', excep)

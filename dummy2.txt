@@ -1,7 +1,7 @@
 LooLu miPrograma;
 
 VARS:
-  var int : a;
+  var float : a;
   var float : x;
   var float : b, c, d;
 
@@ -33,6 +33,6 @@ CLASSES:
 
 Loo() {
 
-	a = b + c * d / a + c;
+	a = ((b + c) * d) / a + c;
 
 } Lu;
