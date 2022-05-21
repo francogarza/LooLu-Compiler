@@ -168,7 +168,7 @@ def p_class_function_call(p):
 
 # STATEMENTS
 def p_assignment(p):
-    '''assignment : assignmentVariable expression
+    '''assignment : assignmentVariable expression qnp6
                   | assignmentVariable class_function_call
                   | access_class_atribute EQUAL expression'''
 
@@ -202,7 +202,7 @@ def p_print_exp(p):
                  | empty'''
 
 def p_expression(p):
-    '''expression : exp comparation'''
+    '''expression : exp qnp6 comparation'''
 
 def p_comparation(p):
     '''comparation : RELOPER comparation_exp
@@ -464,7 +464,7 @@ def p_qnp4(p):
             qg.typeStack.append(sc.intToType(result_type))
             print(quadruplesOutput)
         else:
-            print("asdf")
+            raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
 
 
 def p_qnp5(p):
@@ -486,7 +486,32 @@ def p_qnp5(p):
             qg.typeStack.append(sc.intToType(result_type))
             print(quadruplesOutput)
         else:
-            print("asdf")
+            raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type)  
+
+def p_qnp6(p):
+    '''qnp6 : empty'''
+    global tempCounter
+    print("before type",qg.typeStack)
+    print("before operand",qg.operandStack)
+    print("before operator",qg.operatorStack)
+    if qg.operatorStack and qg.operatorStack[-1] in ['=']:
+        right_operand = qg.operandStack.pop() 
+        right_type = qg.typeStack.pop()
+        left_operand = qg.operandStack.pop()
+        left_type = qg.typeStack.pop()
+        operator = qg.operatorStack.pop()
+        result_type = sc.cube(left_type, right_type, operator, None, None)
+        if result_type != -1:
+            tempCounter = tempCounter + 1
+            quadruplesOutput.append((operator, right_operand, '', left_operand))
+            # qg.operandStack.append(result)
+            # qg.typeStack.append(sc.intToType(result_type))
+            print(quadruplesOutput)
+        else:
+            raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
+    print("after",qg.typeStack)
+    print("after",qg.operandStack)
+
 
 def p_error(t):
     print("Syntax error (parser):", t.lexer.token(), t.value)

@@ -38,6 +38,13 @@ cubeTypes =   [[#INT  FLOAT  CHAR  BOOL
                [3,     3,    -1,    3], #FLOAT
                [-1,   -1,     3,   -1], #CHAR
                [3,     3,    -1,    3], #BOOL
+               ],
+
+               [#INT  FLOAT  CHAR  BOOL
+               [0,    -1,    -1,   -1], #INT       TYPE: '='
+               [1,     1,    -1,   -1], #FLOAT
+               [-1,   -1,     2,   -1], #CHAR
+               [-1,   -1,    -1,    3], #BOOL
                ]
              ]
 
@@ -103,6 +110,7 @@ def typeToInt(typeInput):
         '<':     5,
         '>':     5,
         '==':    5,
+        '=':     6,
         'UNDEF': 5,
     }
     response = switcher.get(typeInput, "Invalid Character.")
