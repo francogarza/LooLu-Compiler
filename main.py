@@ -168,7 +168,7 @@ def p_class_function_call(p):
 
 # STATEMENTS
 def p_assignment(p):
-    '''assignment : assignmentVariable expression qnp6
+    '''assignment : assignmentVariable super_expression qnp6
                   | assignmentVariable class_function_call
                   | access_class_atribute EQUAL expression'''
 
@@ -200,6 +200,10 @@ def p_print_val(p):
 def p_print_exp(p):
     '''print_exp : COMMA  print_val
                  | empty'''
+
+def p_super_expression(p):
+    '''super_expression : expression LOGICOPERATOR qnp11 super_expression qnp12
+                        | expression qnp12'''
 
 def p_expression(p):
     '''expression : exp comparation'''
@@ -457,7 +461,7 @@ def p_qnp4(p):
         operator = qg.operatorStack.pop()
         result_type = sc.cube(left_type, right_type, operator, None, None)
         if result_type != -1:
-            result = 'Temporal_'+str(tempCounter)
+            result = 'T'+str(tempCounter)
             tempCounter = tempCounter + 1
             quadruplesOutput.append((operator, left_operand, right_operand, result))
             qg.operandStack.append(result)
@@ -478,7 +482,7 @@ def p_qnp5(p):
         operator = qg.operatorStack.pop()
         result_type = sc.cube(left_type, right_type, operator, None, None)
         if result_type != -1:
-            result = 'Temporal_'+str(tempCounter)
+            result = 'T'+str(tempCounter)
             tempCounter = tempCounter + 1
             quadruplesOutput.append((operator, left_operand, right_operand, result))
             qg.operandStack.append(result)
@@ -528,9 +532,9 @@ def p_qnp9(p):
 def p_qnp10(p):
     '''qnp10 : empty'''
     global tempCounter
-    print("before type",qg.typeStack)
-    print("before operand",qg.operandStack)
-    print("before operator",qg.operatorStack)
+    # print("before type",qg.typeStack)
+    # print("before operand",qg.operandStack)
+    # print("before operator",qg.operatorStack)
     if qg.operatorStack and qg.operatorStack[-1] in ['<','<=','>','>=','==']:
         right_operand = qg.operandStack.pop() 
         right_type = qg.typeStack.pop()
@@ -539,9 +543,39 @@ def p_qnp10(p):
         operator = qg.operatorStack.pop()
         result_type = sc.cube(left_type, right_type, operator, None, None)
         if result_type != -1:
-            result = 'Temporal_'+str(tempCounter)
+            result = 'T'+str(tempCounter)
             tempCounter = tempCounter + 1
-            quadruplesOutput.append((operator, right_operand, '', left_operand))
+            quadruplesOutput.append((operator, left_operand, right_operand, result))
+            qg.operandStack.append(result)
+            qg.typeStack.append(sc.intToType(result_type))
+            print(quadruplesOutput)
+        else:
+            raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
+    # print("after type",qg.typeStack)
+    # print("after operand",qg.operandStack)
+    # print("after operator",qg.operatorStack)
+
+def p_qnp11(p):
+    '''qnp11 : empty'''
+    qg.operatorStack.append(p[-1])
+
+def p_qnp12(p):
+    '''qnp12 : empty'''
+    global tempCounter
+    print("before type",qg.typeStack)
+    print("before operand",qg.operandStack)
+    print("before operator",qg.operatorStack)
+    if qg.operatorStack and qg.operatorStack[-1] in ['&&', '||']:
+        right_operand = qg.operandStack.pop() 
+        right_type = qg.typeStack.pop()
+        left_operand = qg.operandStack.pop()
+        left_type = qg.typeStack.pop()
+        operator = qg.operatorStack.pop()
+        result_type = sc.cube(left_type, right_type, operator, None, None)
+        if result_type != -1:
+            result = 'T'+str(tempCounter)
+            tempCounter = tempCounter + 1
+            quadruplesOutput.append((operator, left_operand, right_operand, result))
             qg.operandStack.append(result)
             qg.typeStack.append(sc.intToType(result_type))
             print(quadruplesOutput)
@@ -576,8 +610,9 @@ try:
     # print(qg.operandStack)
     # print(qg.operatorStack)
     # print(qg.typeStack)
-    for quad in qg.quadruplesOutput:
+    for quad in quadruplesOutput:
         print(quad)
+    # print(quadruplesOutput)
 
 except Exception as excep:
     print('Error in code!\n', excep)

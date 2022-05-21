@@ -1,9 +1,9 @@
 LooLu miPrograma;
 
 VARS:
-  var bool : a;
+  var bool : abc;
   var float : x;
-  var float : b, c, d, e, f, g, h, i, j, k, l, m;
+  var float : a, b, c, d, e, f, g, h, i, j, k, l, m;
 
 FUNCS:
   func void incrementaSueldo(emp: int, porcentaje1: float) {
@@ -33,6 +33,6 @@ CLASSES:
 
 Loo() {
 
-	a = ((a + b) + (c + d) + e * (f + k) / h * j ) + g * l + h + j > (a - c * d ) / f;
+	abc = ((a * b - c * d) > c + d * e / f) && (g * h - j > l - a) && b + c > d * f;
 
 } Lu;
