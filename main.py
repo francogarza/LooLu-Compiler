@@ -105,6 +105,7 @@ def p_statement(p):
                  | condition
                  | while_statement
                  | writing
+                 | reading
                  | return_func SEMICOLON
                  | function_call SEMICOLON
                  | class_function_call SEMICOLON'''
@@ -184,8 +185,8 @@ def p_condition(p):
 def p_writing(p):
     '''writing : PRINT LEFTPAREN print_val RIGHTPAREN SEMICOLON'''
 
-# def p_reading(p):
-#     '''reading : READ LEFTPAREN read_val RIGHTPAREN SEMICOLON'''
+def p_reading(p):
+    '''reading : READ LEFTPAREN read_val RIGHTPAREN SEMICOLON'''
 
 def p_while_statement(p):
     '''while_statement : WHILE LEFTPAREN expression RIGHTPAREN block'''
@@ -204,12 +205,12 @@ def p_print_exp(p):
     '''print_exp : COMMA  print_val
                  | empty'''
 
-# def p_read_val(p):
-#     '''read_val : qnp15 ID qnp16 read_exp'''
+def p_read_val(p):
+    '''read_val : qnp15 ID qnp16 read_exp'''
 
-# def p_read_exp(p):
-#     '''read_exp : COMMA read_val
-#                  | empty'''
+def p_read_exp(p):
+    '''read_exp : COMMA read_val
+                 | empty'''
 
 
 
@@ -607,6 +608,20 @@ def p_qnp13(p): # Insert PRINT to operator stack
 
 def p_qnp14(p): 
     '''qnp14 : empty'''
+
+    qg.operandStack.append(p[-1])
+    quadruplesOutput.append((qg.operatorStack[-1], '', '', qg.operandStack[-1]))
+
+    qg.operatorStack.pop()
+    qg.operandStack.pop()
+    print(quadruplesOutput)
+
+def p_qnp15(p): # Insert READ to operator stack
+    '''qnp15 : empty'''
+    qg.operatorStack.append('READ')
+
+def p_qnp16(p): 
+    '''qnp16 : empty'''
 
     qg.operandStack.append(p[-1])
     quadruplesOutput.append((qg.operatorStack[-1], '', '', qg.operandStack[-1]))
