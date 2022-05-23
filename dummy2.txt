@@ -1,8 +1,10 @@
 LooLu miPrograma;
 
 VARS:
+  var int : myInt, myInt2;
   var bool : abc;
   var float : x;
+  var char : myChar;
   var float : a, b, c, d, e, f, g, h, i, j, k, l, m;
 
 FUNCS:

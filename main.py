@@ -2,6 +2,7 @@ from lexer import *
 from lexer import tokens
 import ply.yacc as yacc
 import varsTable as vt
+import memoryHandler
 import quadrupleGenerator
 import semanticCube as sc
 
@@ -18,6 +19,7 @@ currentClass = None
 currentClassVarTable = None
 currentClassDirFunc = None
 qg = None
+mh = None
 tempCounter = 1
 quadruplesOutput = []
 #############
@@ -28,6 +30,7 @@ lex.lex()
 print("Lexer generated")
 
 qg = quadrupleGenerator.quadrupleGenerator()
+mh = memoryHandler.memoryHandler()
 
 ##############
 ### PARSER ###
@@ -290,13 +293,20 @@ def p_np2_create_vars_table(p):
 
 def p_np3_add_var_to_current_table(p):
     '''np3AddVarToCurrentTable : empty'''
+    global currentFunc
     global currentVarTable
     global currentType
     id = currentVarTable.getVariableByName(p[-1])
     if (id != None):
         raise Exception("   ERROR: Redeclaration of variable ID = " + p[-1])
     else:
-        currentVarTable.insert({"name": p[-1], "type": currentType})
+        # Add to Memory
+        address = mh.addVariable(currentFunc, p[-1], currentType, None, programName)
+        # Add to current Var Table
+        currentVarTable.insert({"name": p[-1], "type": currentType,  "address": address})
+        
+
+
 
 def p_np4_set_current_type(p):
     '''np4SetCurrentType : empty'''
@@ -648,7 +658,7 @@ lex.input(data)
 try:
     parser.parse(data)
     # dirFunc.printDirFunc()
-    # currentVarTable.printVars()
+    currentVarTable.printVars()
     # currentClassDirFunc.printDirFunc()
     # currentClassVarTable.printVars()
     print('Code passed!')
