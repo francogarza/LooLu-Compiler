@@ -255,7 +255,7 @@ def p_factor(p):
 
 def p_var_cte(p):
     '''var_cte : ID qnp1
-               | CTEINT
+               | CTEINT qnp_cte_int
                | CTEFLOAT
                | access_class_atribute
                | class_function_call'''
@@ -267,6 +267,12 @@ def p_empty(p):
 ######################
 # Puntos Neuralgicos #
 ######################
+
+def p_qnp_cte_int(p):
+    '''qnp_cte_int : empty'''
+    print('entraCTEINT')
+    # address = mh.addVariable(currentFunc, p[-1], 'CTEINT', None, programName)
+    # qg.operandStack.append(address)
 
 def p_np1_create_global_vars_table(p):
     '''np1CreateGlobalVarsTable : empty'''
@@ -451,7 +457,7 @@ def p_qnp1_send_to_quadruples(p):
     # print(p[-2])
     global currentVarTable
     variable = currentVarTable.getVariableByName(p[-2])
-    qg.operand(variable["name"], variable["type"])
+    qg.operand(variable["address"], variable["type"])
 
 def p_qnp2_insertOperator(p):
     '''qnp2insertOperator : empty'''
@@ -459,9 +465,10 @@ def p_qnp2_insertOperator(p):
 
 def p_qnp1(p):
     '''qnp1 : empty'''
+    print('entraQNP1')
     global currentVarTable
     variable = currentVarTable.getVariableByName(p[-1])
-    qg.operandStack.append(variable["name"])
+    qg.operandStack.append(variable["address"])
     qg.typeStack.append(variable["type"])
 
 def p_qnp2(p):
@@ -658,13 +665,13 @@ lex.input(data)
 try:
     parser.parse(data)
     # dirFunc.printDirFunc()
-    currentVarTable.printVars()
+    # currentVarTable.printVars()
     # currentClassDirFunc.printDirFunc()
     # currentClassVarTable.printVars()
     print('Code passed!')
-    # print(qg.operandStack)
-    # print(qg.operatorStack)
-    # print(qg.typeStack)
+    print(qg.operandStack)
+    print(qg.operatorStack)
+    print(qg.typeStack)
     for quad in quadruplesOutput:
         print(quad)
     # print(quadruplesOutput)

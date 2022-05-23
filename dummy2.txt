@@ -34,6 +34,9 @@ CLASSES:
   }
 
 Loo() {
+  a = b;
+  f = g;
+  k = j;
 
 	abc = ((a * b - c * d) > c + d * e / f) && (g * h - j > l - a) && b + c > d * f;
 

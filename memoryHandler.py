@@ -50,6 +50,14 @@ class memoryHandler:
             self.globalChar[1] += 1
             return address
 
+        if funcName == programName and varType == 'CTEINT':
+            address = self.constAddress[1]
+            print('var: ', varName, 'assigned at: ', address)
+            self.constAddress[address] = varName
+            self.constAddress[1] += 1
+            return address
+            exit(-1)
+
 
         # if varName in self.tablaFunciones[funcName].tablaVariable:
         #     print("Error, variable ya fue declarada\n", varName, funcName)
