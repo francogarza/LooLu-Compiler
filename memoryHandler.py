@@ -9,6 +9,7 @@ class memoryHandler:
     globalInt = None
     globalFloat = None
     globalChar = None
+    globalBool = None
     localInt = None
     localFloat = None
     localChar = None
@@ -22,9 +23,10 @@ class memoryHandler:
         self.globalInt = [2000, 2000]
         self.globalFloat = [3000, 3000]
         self.globalChar = [4000, 4000]
-        self.localInt = [5000, 5000]
+        self.globalBool = [5000, 5000]
+        self.localInt = [6000, 6000]
         self.localFloat = [7000, 7000]
-        self.localChar = [9000, 9000]
+        self.localChar = [8000, 8000]
         self.tempAddressGlobal = [12000, 12000]
         self.constAddressINT = [14000, 14000]
         self.constAddressFLOAT = [15000, 15000]
@@ -53,16 +55,15 @@ class memoryHandler:
             return address
 
         if funcName == programName and varType == 'bool':
-            address = self.globalChar[1]
+            address = self.globalBool[1]
             print('var: ', varName, 'assigned at: ', address)
-            self.globalChar[1] += 1
+            self.globalBool[1] += 1
             return address
 
         if funcName == programName and varType == 'CTEINT':
             address = self.constAddressINT[1]
             print('var: ', varName, 'assigned at: ', address)
             ct.insert({"address": address, "value": varName})
-            print(ct.constantTable[0])
             self.constAddressINT[1] += 1
             return address
 
@@ -70,17 +71,21 @@ class memoryHandler:
             address = self.constAddressFLOAT[1]
             print('var: ', varName, 'assigned at: ', address)
             ct.insert({"address": address, "value": varName})
-            print(ct.constantTable[0])
             self.constAddressFLOAT[1] += 1
             return address
 
         if funcName == programName and varType == 'CTECHAR':
             address = self.constAddressCHAR[1]
-            print(address)
             print('var: ', varName, 'assigned at: ', address)
             ct.insert({"address": address, "value": varName})
-            print(ct.constantTable[0])
             self.constAddressCHAR[1] += 1
+            return address
+
+        if funcName == programName and varType == 'CTEBOOL':
+            address = self.constAddressBOOL[1]
+            print('var: ', varName, 'assigned at: ', address)
+            ct.insert({"address": address, "value": varName})
+            self.constAddressBOOL[1] += 1
             return address
 
         if funcName == programName and varType == 'TEMPORAL':
@@ -88,47 +93,3 @@ class memoryHandler:
             print('var: ', varName, 'assigned at: ', address)
             self.tempAddressGlobal[1] += 1
             return address
-        # if varName in self.tablaFunciones[funcName].tablaVariable:
-        #     print("Error, variable ya fue declarada\n", varName, funcName)
-        #     exit(-1)
-
-
-
-        # if funcName == 'PROGRAMA' and varType == 'FLOAT':
-        #     address = self.globalFloat[1]
-        #     self.globalFloat[1] += 1
-
-        # if funcName == 'PROGRAMA' and varType == 'CHAR':
-        #     address = self.globalChar[1]
-        #     self.globalChar[1] += 1
-
-        # if funcName != 'PROGRAMA' and varType == 'INT':
-        #     address = self.localInt[1]
-        #     self.localInt[1] += 1
-
-        # if funcName != 'PROGRAMA' and varType == 'FLOAT':
-        #     address = self.localFloat[1]
-        #     self.localFloat[1] += 1
-
-        # if funcName != 'PROGRAMA' and varType == 'CHAR':
-        #     address = self.localChar[1]
-        #     self.localChar[1] += 1        
-
-        # if funcName == 'TEMPORALES':
-        #     address = self.tempAddressGlobal[1]
-        #     self.tempAddressGlobal[1] += 1
-
-        # v = Variable(varType, address)
-
-        # if isParameter:
-        #     if varType == 'INT':
-        #         self.tablaFunciones[funcName].parametros += "i"
-        #     if varType == 'FLOAT':
-        #         self.tablaFunciones[funcName].parametros += "f"
-        #     if varType == 'CHAR':
-        #         self.tablaFunciones[funcName].parametros += "c"
-        #     if varType == 'BOOL':
-        #         self.tablaFunciones[funcName].parametros += "b"
-
-        # self.tablaFunciones[funcName].tablaVariable[varName] = v
-        # #print(self.tablaFunciones[funcName].tablaVariable)

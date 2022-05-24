@@ -15,6 +15,8 @@ reserved = {
     'float': 'FLOAT',
     'char': 'CHAR',
     'bool': 'BOOL',
+    'true': 'TRUE',
+    'false': 'FALSE',
     'FUNCS': 'FUNCS',
     'func': 'FUNC',
     'if': 'IF',
@@ -48,6 +50,8 @@ t_ELSE = r'else'
 t_INT = r'int'
 t_FLOAT = r'float'
 t_PRINT = r'print'
+t_TRUE = r'true'
+t_FALSE = r'false'
 t_RELOPER = r'\<\>|\<|\>|\=\='
 t_LEFTBRACKET = r'\{'
 t_RIGHTBRACKET = r'\}'
@@ -72,7 +76,7 @@ def t_ID(t):
     return t
 
 def t_CTEFLOAT(t):
-    r'[0-9]*\.[0-9]+|[0-9]+'
+    r'\d+\.\d+'
     t.value = float(t.value)
     return t
 

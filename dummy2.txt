@@ -39,8 +39,10 @@ Loo() {
   f = g;
   k = j;
 
-  myFloat = 1;
+  myFloat = 1.0;
+  myInt = 2;
   myChar = 'a';
+  abc = 't';
 
 	abc = ((a * b - c * d) > c + d * e / f) && (g * h - j > l - a) && b + c > d * f;
 

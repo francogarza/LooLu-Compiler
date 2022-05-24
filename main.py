@@ -4,6 +4,7 @@ import ply.yacc as yacc
 import varsTable as vt
 import memoryHandler
 import quadrupleGenerator
+import constantTable as ct
 import semanticCube as sc
 
 ###################
@@ -258,6 +259,8 @@ def p_var_cte(p):
                | CTEINT qnp_cte_int
                | CTEFLOAT qnp_cte_float
                | CTECHAR qnp_cte_char
+               | TRUE qnp_cte_bool
+               | FALSE qnp_cte_bool
                | access_class_atribute
                | class_function_call'''
 
@@ -272,11 +275,15 @@ def p_empty(p):
 def p_qnp_cte_int(p):
     '''qnp_cte_int : empty'''
     print('entraCTEINT')
-    # address = mh.addVariable(currentFunc, p[-1], 'CTEINT', None, programName)
-    # qg.operandStack.append(address)
+    global currentFunc
+    global programName
+    address = mh.addVariable(currentFunc["name"], p[-1], 'CTEINT', None, programName)
+    qg.operandStack.append(address)
+    qg.typeStack.append('int')
 
 def p_qnp_cte_float(p):
     '''qnp_cte_float : empty'''
+    print('entra FLOAT')
     global currentFunc
     global programName
     address = mh.addVariable(currentFunc["name"], p[-1], 'CTEFLOAT', None, programName)
@@ -290,6 +297,14 @@ def p_qnp_cte_char(p):
     address = mh.addVariable(currentFunc["name"], p[-1], 'CTECHAR', None, programName)
     qg.operandStack.append(address)
     qg.typeStack.append('char')
+
+def p_qnp_cte_bool(p):
+    '''qnp_cte_bool : empty'''
+    global currentFunc
+    global programName
+    address = mh.addVariable(currentFunc["name"], p[-1], 'CTEBOOL', None, programName)
+    qg.operandStack.append(address)
+    qg.typeStack.append('bool')
 
 def p_np1_create_global_vars_table(p):
     '''np1CreateGlobalVarsTable : empty'''
@@ -377,10 +392,7 @@ def p_np9_create_global_vars_table_for_class(p):
         row["DirFunc"] = vt.DirFunc()
         currentClassDirFunc = row["DirFunc"]
         currentClassDirFunc.insert({"name": currentClass, "type": "global", "table": None})
-        # dirFunc.printDirFunc()
-        # currentClassDirFunc.printDirFunc()
         currentClassFunc = currentClass
-        # print(currentClassFunc)
     else:
         raise Exception("ERROR: could not find function with that name in DirFunc")
 
@@ -428,7 +440,6 @@ def p_np14_add_parameter_as_variable_to_func(p):
     '''np14AddParameterAsVariableToFunc : empty'''
     global currentVarTable
     global currentType
-    # currentVarTable.printVars()
     id = currentVarTable.getVariableByName(p[-3])
     if (id != None):
         raise Exception("   ERROR: Redeclaration of variable ID = " + p[-3])
@@ -482,7 +493,6 @@ def p_qnp2_insertOperator(p):
 
 def p_qnp1(p):
     '''qnp1 : empty'''
-    print('entraQNP1')
     global currentVarTable
     variable = currentVarTable.getVariableByName(p[-1])
     qg.operandStack.append(variable["address"])
@@ -491,20 +501,15 @@ def p_qnp1(p):
 def p_qnp2(p):
     '''qnp2 : empty'''
     qg.operatorStack.append(p[-1])
-    print("operatorStack",qg.operatorStack)
 
 def p_qnp3(p):
     '''qnp3 : empty'''
     qg.operatorStack.append(p[-1])
-    print(qg.operatorStack)
 
 def p_qnp4(p):
     '''qnp4 : empty'''
     global tempCounter
-    # print("top del operatorstack: ",qg.operatorStack[-1])
     if qg.operatorStack and qg.operatorStack[-1] in ['+','-','*','/']:
-        # print("operandStack",qg.operandStack)
-        # print("typeStack",qg.typeStack)
         right_operand = qg.operandStack.pop() 
         right_type = qg.typeStack.pop()
         left_operand = qg.operandStack.pop()
@@ -520,14 +525,12 @@ def p_qnp4(p):
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
             qg.typeStack.append(sc.intToType(result_type))
-            print(quadruplesOutput)
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
 
 def p_qnp5(p):
     '''qnp5 : empty'''
     global tempCounter
-    # print("top del operatorstack: ",qg.operatorStack[-1])
     if qg.operatorStack and qg.operatorStack[-1] in ['*','/']:
         right_operand = qg.operandStack.pop() 
         right_type = qg.typeStack.pop()
@@ -544,16 +547,12 @@ def p_qnp5(p):
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
             qg.typeStack.append(sc.intToType(result_type))
-            print(quadruplesOutput)
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type)  
 
 def p_qnp6(p):
     '''qnp6 : empty'''
     global tempCounter
-    print("before type",qg.typeStack)
-    print("before operand",qg.operandStack)
-    print("before operator",qg.operatorStack)
     if qg.operatorStack and qg.operatorStack[-1] in ['=']:
         right_operand = qg.operandStack.pop() 
         right_type = qg.typeStack.pop()
@@ -565,11 +564,9 @@ def p_qnp6(p):
             quadruplesOutput.append((operator, right_operand, '', left_operand))
             # qg.operandStack.append(result)
             # qg.typeStack.append(sc.intToType(result_type))
-            print(quadruplesOutput)
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
-    # print("after",qg.typeStack)
-    # print("after",qg.operandStack)
+
 
 def p_qnp7(p):
     '''qnp7 : empty'''
@@ -589,9 +586,6 @@ def p_qnp10(p):
     '''qnp10 : empty'''
     global tempCounter
     global currentFunc
-    # print("before type",qg.typeStack)
-    # print("before operand",qg.operandStack)
-    # print("before operator",qg.operatorStack)
     if qg.operatorStack and qg.operatorStack[-1] in ['<','<=','>','>=','==']:
         right_operand = qg.operandStack.pop() 
         right_type = qg.typeStack.pop()
@@ -608,12 +602,9 @@ def p_qnp10(p):
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
             qg.typeStack.append(sc.intToType(result_type))
-            print(quadruplesOutput)
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
-    # print("after type",qg.typeStack)
-    # print("after operand",qg.operandStack)
-    # print("after operator",qg.operatorStack)
+
 
 def p_qnp11(p):
     '''qnp11 : empty'''
@@ -622,9 +613,6 @@ def p_qnp11(p):
 def p_qnp12(p):
     '''qnp12 : empty'''
     global tempCounter
-    print("before type",qg.typeStack)
-    print("before operand",qg.operandStack)
-    print("before operator",qg.operatorStack)
     if qg.operatorStack and qg.operatorStack[-1] in ['&&', '||']:
         right_operand = qg.operandStack.pop() 
         right_type = qg.typeStack.pop()
@@ -641,12 +629,9 @@ def p_qnp12(p):
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
             qg.typeStack.append(sc.intToType(result_type))
-            print(quadruplesOutput)
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
-    print("after type",qg.typeStack)
-    print("after operand",qg.operandStack)
-    print("after operator",qg.operatorStack)
+
 
 def p_qnp13(p): # Insert PRINT to operator stack
     '''qnp13 : empty'''
@@ -660,7 +645,6 @@ def p_qnp14(p):
 
     qg.operatorStack.pop()
     qg.operandStack.pop()
-    print(quadruplesOutput)
 
 def p_qnp15(p): # Insert READ to operator stack
     '''qnp15 : empty'''
@@ -674,7 +658,6 @@ def p_qnp16(p):
 
     qg.operatorStack.pop()
     qg.operandStack.pop()
-    print(quadruplesOutput)
 
 def p_error(t):
     print("Syntax error (parser):", t.lexer.token(), t.value)
@@ -693,14 +676,11 @@ lex.input(data)
 
 try:
     parser.parse(data)
-    # dirFunc.printDirFunc()
-    # currentVarTable.printVars()
-    # currentClassDirFunc.printDirFunc()
-    # currentClassVarTable.printVars()
     print('Code passed!')
-    print(qg.operandStack)
-    print(qg.operatorStack)
-    print(qg.typeStack)
+    # print(qg.operandStack)
+    # print(qg.operatorStack)
+    # print(qg.typeStack)
+    print(ct.constantTable)
     for quad in quadruplesOutput:
         print(quad)
     # print(quadruplesOutput)
