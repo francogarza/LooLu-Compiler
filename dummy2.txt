@@ -2,6 +2,7 @@ LooLu miPrograma;
 
 VARS:
   var int : myInt, myInt2;
+  var float : myFloat;
   var bool : abc;
   var float : x;
   var char : myChar;
@@ -37,6 +38,9 @@ Loo() {
   a = b;
   f = g;
   k = j;
+
+  myFloat = 1;
+  myChar = 'a';
 
 	abc = ((a * b - c * d) > c + d * e / f) && (g * h - j > l - a) && b + c > d * f;
 

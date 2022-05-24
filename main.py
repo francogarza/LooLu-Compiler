@@ -256,7 +256,8 @@ def p_factor(p):
 def p_var_cte(p):
     '''var_cte : ID qnp1
                | CTEINT qnp_cte_int
-               | CTEFLOAT
+               | CTEFLOAT qnp_cte_float
+               | CTECHAR qnp_cte_char
                | access_class_atribute
                | class_function_call'''
 
@@ -273,6 +274,22 @@ def p_qnp_cte_int(p):
     print('entraCTEINT')
     # address = mh.addVariable(currentFunc, p[-1], 'CTEINT', None, programName)
     # qg.operandStack.append(address)
+
+def p_qnp_cte_float(p):
+    '''qnp_cte_float : empty'''
+    global currentFunc
+    global programName
+    address = mh.addVariable(currentFunc["name"], p[-1], 'CTEFLOAT', None, programName)
+    qg.operandStack.append(address)
+    qg.typeStack.append('float')
+
+def p_qnp_cte_char(p):
+    '''qnp_cte_char : empty'''
+    global currentFunc
+    global programName
+    address = mh.addVariable(currentFunc["name"], p[-1], 'CTECHAR', None, programName)
+    qg.operandStack.append(address)
+    qg.typeStack.append('char')
 
 def p_np1_create_global_vars_table(p):
     '''np1CreateGlobalVarsTable : empty'''
@@ -497,8 +514,11 @@ def p_qnp4(p):
         if result_type != -1:
             result = 'T'+str(tempCounter)
             tempCounter = tempCounter + 1
-            quadruplesOutput.append((operator, left_operand, right_operand, result))
-            qg.operandStack.append(result)
+
+            address = mh.addVariable(currentFunc['name'], result, 'TEMPORAL', None, programName)
+
+            quadruplesOutput.append((operator, left_operand, right_operand, address))
+            qg.operandStack.append(address)
             qg.typeStack.append(sc.intToType(result_type))
             print(quadruplesOutput)
         else:
@@ -518,8 +538,11 @@ def p_qnp5(p):
         if result_type != -1:
             result = 'T'+str(tempCounter)
             tempCounter = tempCounter + 1
-            quadruplesOutput.append((operator, left_operand, right_operand, result))
-            qg.operandStack.append(result)
+
+            address = mh.addVariable(currentFunc['name'], result, 'TEMPORAL', None, programName)
+
+            quadruplesOutput.append((operator, left_operand, right_operand, address))
+            qg.operandStack.append(address)
             qg.typeStack.append(sc.intToType(result_type))
             print(quadruplesOutput)
         else:
@@ -528,9 +551,9 @@ def p_qnp5(p):
 def p_qnp6(p):
     '''qnp6 : empty'''
     global tempCounter
-    # print("before type",qg.typeStack)
-    # print("before operand",qg.operandStack)
-    # print("before operator",qg.operatorStack)
+    print("before type",qg.typeStack)
+    print("before operand",qg.operandStack)
+    print("before operator",qg.operatorStack)
     if qg.operatorStack and qg.operatorStack[-1] in ['=']:
         right_operand = qg.operandStack.pop() 
         right_type = qg.typeStack.pop()
@@ -539,7 +562,6 @@ def p_qnp6(p):
         operator = qg.operatorStack.pop()
         result_type = sc.cube(left_type, right_type, operator, None, None)
         if result_type != -1:
-            tempCounter = tempCounter + 1
             quadruplesOutput.append((operator, right_operand, '', left_operand))
             # qg.operandStack.append(result)
             # qg.typeStack.append(sc.intToType(result_type))
@@ -566,6 +588,7 @@ def p_qnp9(p):
 def p_qnp10(p):
     '''qnp10 : empty'''
     global tempCounter
+    global currentFunc
     # print("before type",qg.typeStack)
     # print("before operand",qg.operandStack)
     # print("before operator",qg.operatorStack)
@@ -579,8 +602,11 @@ def p_qnp10(p):
         if result_type != -1:
             result = 'T'+str(tempCounter)
             tempCounter = tempCounter + 1
-            quadruplesOutput.append((operator, left_operand, right_operand, result))
-            qg.operandStack.append(result)
+
+            address = mh.addVariable(currentFunc['name'], result, 'TEMPORAL', None, programName)
+
+            quadruplesOutput.append((operator, left_operand, right_operand, address))
+            qg.operandStack.append(address)
             qg.typeStack.append(sc.intToType(result_type))
             print(quadruplesOutput)
         else:
@@ -609,8 +635,11 @@ def p_qnp12(p):
         if result_type != -1:
             result = 'T'+str(tempCounter)
             tempCounter = tempCounter + 1
-            quadruplesOutput.append((operator, left_operand, right_operand, result))
-            qg.operandStack.append(result)
+
+            address = mh.addVariable(currentFunc['name'], result, 'TEMPORAL', None, programName)
+
+            quadruplesOutput.append((operator, left_operand, right_operand, address))
+            qg.operandStack.append(address)
             qg.typeStack.append(sc.intToType(result_type))
             print(quadruplesOutput)
         else:

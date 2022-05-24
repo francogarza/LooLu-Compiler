@@ -82,8 +82,8 @@ def t_CTEINT(t):
     return t
 
 def t_CTECHAR(t):
-    r'^[a-zA-Z]+$'
-    t.value = int(t.value)
+    r'\'[a-zA-Z]\''
+    t.value = t.value
     return t
 
 def t_NEWLINE(t):

@@ -1,3 +1,5 @@
+import constantTable as ct
+
 class memoryHandler:
     functionTable = None
 
@@ -10,8 +12,11 @@ class memoryHandler:
     localInt = None
     localFloat = None
     localChar = None
-    tempAddress = None
-    constAddress = None
+    tempAddressGlobal = None
+    constAddressINT = None
+    constAddressFLOAT = None
+    constAddressCHAR = None
+    constAddressBOOL = None
 
     def __init__(self):
         self.globalInt = [2000, 2000]
@@ -20,8 +25,11 @@ class memoryHandler:
         self.localInt = [5000, 5000]
         self.localFloat = [7000, 7000]
         self.localChar = [9000, 9000]
-        self.tempAddress = [12000, 12000]
-        self.constAddress = [14000, 14000]
+        self.tempAddressGlobal = [12000, 12000]
+        self.constAddressINT = [14000, 14000]
+        self.constAddressFLOAT = [15000, 15000]
+        self.constAddressCHAR = [16000, 16000]
+        self.constAddressBOOL = [17000, 17000]
     
     def addVariable(self, funcName, varName, varType, isParameter, programName):
         address = None
@@ -51,14 +59,35 @@ class memoryHandler:
             return address
 
         if funcName == programName and varType == 'CTEINT':
-            address = self.constAddress[1]
+            address = self.constAddressINT[1]
             print('var: ', varName, 'assigned at: ', address)
-            self.constAddress[address] = varName
-            self.constAddress[1] += 1
+            ct.insert({"address": address, "value": varName})
+            print(ct.constantTable[0])
+            self.constAddressINT[1] += 1
             return address
-            exit(-1)
 
+        if funcName == programName and varType == 'CTEFLOAT':
+            address = self.constAddressFLOAT[1]
+            print('var: ', varName, 'assigned at: ', address)
+            ct.insert({"address": address, "value": varName})
+            print(ct.constantTable[0])
+            self.constAddressFLOAT[1] += 1
+            return address
 
+        if funcName == programName and varType == 'CTECHAR':
+            address = self.constAddressCHAR[1]
+            print(address)
+            print('var: ', varName, 'assigned at: ', address)
+            ct.insert({"address": address, "value": varName})
+            print(ct.constantTable[0])
+            self.constAddressCHAR[1] += 1
+            return address
+
+        if funcName == programName and varType == 'TEMPORAL':
+            address = self.tempAddressGlobal[1]
+            print('var: ', varName, 'assigned at: ', address)
+            self.tempAddressGlobal[1] += 1
+            return address
         # if varName in self.tablaFunciones[funcName].tablaVariable:
         #     print("Error, variable ya fue declarada\n", varName, funcName)
         #     exit(-1)
@@ -86,8 +115,8 @@ class memoryHandler:
         #     self.localChar[1] += 1        
 
         # if funcName == 'TEMPORALES':
-        #     address = self.tempAddress[1]
-        #     self.tempAddress[1] += 1
+        #     address = self.tempAddressGlobal[1]
+        #     self.tempAddressGlobal[1] += 1
 
         # v = Variable(varType, address)
 
