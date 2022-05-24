@@ -9,6 +9,7 @@ VARS:
 
 FUNCS:
   func void incrementaSueldo(emp: int, porcentaje1: float) {
+    a = b + c;
   }
   func void incrementaSueldo2(asdf: float, porcentaje2: float) {
   }

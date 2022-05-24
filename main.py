@@ -76,7 +76,10 @@ def p_declare_funcs(p):
                      | empty'''
 
 def p_funcs(p):
-    '''funcs : FUNC type_simple ID np7AddFunction LEFTPAREN np2CreateVarsTable parameter RIGHTPAREN block funcs_block'''
+    '''funcs : FUNC type_simple ID np7AddFunction LEFTPAREN np2CreateVarsTable parameter RIGHTPAREN npGoToFunc1 block funcs_block'''
+
+def p_npGoToFunc1(p):
+    '''npGoToFunc1 : empty'''
 
 def p_funcs_block(p):
     '''funcs_block : FUNC type_simple ID np7AddFunction LEFTPAREN np2CreateVarsTable parameter RIGHTPAREN block funcs_block
