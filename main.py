@@ -21,6 +21,7 @@ currentClassDirFunc = None
 qg = None
 mh = None
 tempCounter = 1
+whileOperand = []
 quadruplesOutput = []
 #############
 ### LEXER ###
@@ -198,7 +199,6 @@ def p_ifnp3else(p):
     param1 = quadruplesOutput[migaja][0]
     param2 = quadruplesOutput[migaja][1]
     quadruplesOutput[migaja] = (param1,param2,'empty',siguienteQuad)
-    
 
 def p_ifnp1(p):
     '''ifnp1 : empty'''
@@ -210,9 +210,6 @@ def p_ifnp1(p):
         quadruplesOutput.append(('GOTOF', expressionResult, 'empty', None))
         currentQuadNumber = len(quadruplesOutput) - 1
         qg.jumpStack.append(currentQuadNumber)
-        # print(qg.jumpStack)
-        
-    # print(expressionType)
 
 def p_ifnp2(p):
     '''ifnp2 : empty'''
@@ -222,7 +219,6 @@ def p_ifnp2(p):
     param2 = quadruplesOutput[migaja][1]
     quadruplesOutput[migaja] = (param1,param2,'empty',siguienteQuad)
 
-
 def p_writing(p):
     '''writing : PRINT LEFTPAREN print_val RIGHTPAREN SEMICOLON'''
 
@@ -230,11 +226,29 @@ def p_reading(p):
     '''reading : READ LEFTPAREN read_val RIGHTPAREN SEMICOLON'''
 
 def p_while_statement(p):
-    '''while_statement : WHILE LEFTPAREN expression RIGHTPAREN block'''
+    '''while_statement : WHILE LEFTPAREN expression whilenp1 RIGHTPAREN block whilenp2'''
+
+def p_whilenp1(p):
+    '''whilenp1 : empty'''
+    global whileOperand
+    expressionType = qg.typeStack.pop()
+    nextQuad = len(quadruplesOutput)
+    qg.jumpStack.append(nextQuad)
+    if(expressionType != 'bool'):
+        raise Exception("Sematic Error: Type in while statement is not a bool")
+    else:
+        whileOperand.append(qg.operandStack.pop())
+
+
+def p_whilenp2(p):
+    '''whilenp2 : empty'''
+    global whileOperand
+    quadnum = qg.jumpStack.pop()
+    quadruplesOutput.append(('GOTOV', whileOperand.pop(), 'empty', quadnum))
+
 
 def p_return_func(p):
     '''return_func : RETURN LEFTPAREN expression RIGHTPAREN'''
-
 
 def p_print_val(p):
     '''print_val : qnp13 ID qnp14 print_exp'''
@@ -249,8 +263,6 @@ def p_read_val(p):
 def p_read_exp(p):
     '''read_exp : COMMA read_val
                  | empty'''
-
-
 
 def p_super_expression(p):
     '''super_expression : expression super_expression_helper'''
@@ -339,9 +351,6 @@ def p_np3_add_var_to_current_table(p):
         address = mh.addVariable(currentFunc, p[-1], currentType, None, programName)
         # Add to current Var Table
         currentVarTable.insert({"name": p[-1], "type": currentType,  "address": address})
-        
-
-
 
 def p_np4_set_current_type(p):
     '''np4SetCurrentType : empty'''
@@ -477,7 +486,6 @@ def p_np16_is_on_current_vars_table(p): # Check if an ID is declared in the Glob
     else:
         currentVarTable.insert({"name": p[-1], "type": currentType})
     
-
 '''
     QUADRUPLE NEURALGIC POINTS
 '''
@@ -574,8 +582,6 @@ def p_qnp6(p):
             # print(quadruplesOutput)
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
-    # print("after",qg.typeStack)
-    # print("after",qg.operandStack)
 
 def p_qnp7(p):
     '''qnp7 : empty'''
@@ -613,9 +619,6 @@ def p_qnp10(p):
             # print(quadruplesOutput)
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
-    # print("after type",qg.typeStack)
-    # print("after operand",qg.operandStack)
-    # print("after operator",qg.operatorStack)
 
 def p_qnp11(p):
     '''qnp11 : empty'''
@@ -643,9 +646,6 @@ def p_qnp12(p):
             # print(quadruplesOutput)
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
-    # print("after type",qg.typeStack)
-    # print("after operand",qg.operandStack)
-    # print("after operator",qg.operatorStack)
 
 def p_qnp13(p): # Insert PRINT to operator stack
     '''qnp13 : empty'''
@@ -659,7 +659,6 @@ def p_qnp14(p):
 
     qg.operatorStack.pop()
     qg.operandStack.pop()
-    # print(quadruplesOutput)
 
 def p_qnp15(p): # Insert READ to operator stack
     '''qnp15 : empty'''
@@ -673,7 +672,6 @@ def p_qnp16(p):
 
     qg.operatorStack.pop()
     qg.operandStack.pop()
-    # print(quadruplesOutput)
 
 def p_error(t):
     print("Syntax error (parser):", t.lexer.token(), t.value)
@@ -706,10 +704,6 @@ try:
         print(temp)
         temp += 1
         print(quad)
-    
-    
-    
-    # print(quadruplesOutput)
 
 except Exception as excep:
     print('Error in code!\n', excep)

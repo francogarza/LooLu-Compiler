@@ -34,21 +34,24 @@ CLASSES:
   }
 
 Loo() {
-
 	abc = ((a * b - c * d) > c + d * e / f) && (g * h - j > l - a) && b + c > d * f;
-
   read(abc, a, b, c);
-  print(abc, a, b, c);
-
-  if (abc) {
-    print(abc);
-    read(a);
-    a = b + c;
-  } else {
-    b = a + c;
-    read(c);
-  }
+  print(abc, a, b, c);  
   print(abc);
   a = b + c;
+
+  while(abc){
+    if (abc) {
+      print(abc);
+      read(a);
+      a = b + c;
+    } else {
+      b = a + c;
+      read(c);
+    }
+    while(abc){
+      d = c;
+    }
+  }
 
 } Lu;
