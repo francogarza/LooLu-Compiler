@@ -44,6 +44,11 @@ Loo() {
     print(abc);
     read(a);
     a = b + c;
+  } else {
+    b = a + c;
+    read(c);
   }
+  print(abc);
+  a = b + c;
 
 } Lu;

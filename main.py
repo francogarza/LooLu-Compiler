@@ -186,8 +186,19 @@ def p_condition(p):
     '''condition : IF LEFTPAREN expression ifnp1 RIGHTPAREN block else_condition'''
 
 def p_else_condition(p):
-    '''else_condition : ELSE block
+    '''else_condition : ELSE ifnp3else block ifnp2
                       | empty ifnp2'''
+
+def p_ifnp3else(p):
+    '''ifnp3else : empty'''
+    quadruplesOutput.append(("GOTO",'empty','empty',None))
+    migaja = qg.jumpStack.pop()
+    siguienteQuad = len(quadruplesOutput)
+    qg.jumpStack.append(siguienteQuad - 1)
+    param1 = quadruplesOutput[migaja][0]
+    param2 = quadruplesOutput[migaja][1]
+    quadruplesOutput[migaja] = (param1,param2,'empty',siguienteQuad)
+    
 
 def p_ifnp1(p):
     '''ifnp1 : empty'''
