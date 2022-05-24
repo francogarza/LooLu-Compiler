@@ -55,15 +55,9 @@ class memoryHandler:
             return address
 
         if funcName == programName and varType == 'bool':
-<<<<<<< HEAD
             address = self.globalBool[1]
             print('var: ', varName, 'assigned at: ', address)
             self.globalBool[1] += 1
-=======
-            address = self.globalChar[1]
-            # print('var: ', varName, 'assigned at: ', address)
-            self.globalChar[1] += 1
->>>>>>> cuadruplosCondicionalesTEST
             return address
 
         if funcName == programName and varType == 'CTEINT':

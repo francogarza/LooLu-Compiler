@@ -3,7 +3,7 @@ LooLu miPrograma;
 VARS:
   var int : myInt, myInt2;
   var float : myFloat;
-  var bool : abc;
+  var bool : abc, cba;
   var float : x;
   var char : myChar;
   var float : a, b, c, d, e, f, g, h, i, j, k, l, m;
@@ -36,7 +36,6 @@ CLASSES:
   }
 
 Loo() {
-<<<<<<< HEAD
   a = b;
   f = g;
   k = j;
@@ -44,10 +43,9 @@ Loo() {
   myFloat = 1.0;
   myInt = 2;
   myChar = 'a';
-  abc = 't';
+  abc = true;
+  cba = false;
 
-=======
->>>>>>> cuadruplosCondicionalesTEST
 	abc = ((a * b - c * d) > c + d * e / f) && (g * h - j > l - a) && b + c > d * f;
   read(abc, a, b, c);
   print(abc, a, b, c);  
@@ -55,7 +53,7 @@ Loo() {
   a = b + c;
 
   while(abc){
-    if (abc) {
+    if (cba) {
       print(abc);
       read(a);
       a = b + c;

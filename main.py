@@ -560,18 +560,10 @@ def p_qnp1(p):
 def p_qnp2(p):
     '''qnp2 : empty'''
     qg.operatorStack.append(p[-1])
-<<<<<<< HEAD
-=======
-    # print("operatorStack",qg.operatorStack)
->>>>>>> cuadruplosCondicionalesTEST
 
 def p_qnp3(p):
     '''qnp3 : empty'''
     qg.operatorStack.append(p[-1])
-<<<<<<< HEAD
-=======
-    # print(qg.operatorStack)
->>>>>>> cuadruplosCondicionalesTEST
 
 def p_qnp4(p):
     '''qnp4 : empty'''
@@ -592,10 +584,6 @@ def p_qnp4(p):
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
             qg.typeStack.append(sc.intToType(result_type))
-<<<<<<< HEAD
-=======
-            # print(quadruplesOutput)
->>>>>>> cuadruplosCondicionalesTEST
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
 
@@ -618,10 +606,6 @@ def p_qnp5(p):
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
             qg.typeStack.append(sc.intToType(result_type))
-<<<<<<< HEAD
-=======
-            # print(quadruplesOutput)
->>>>>>> cuadruplosCondicionalesTEST
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type)  
 
@@ -639,15 +623,9 @@ def p_qnp6(p):
             quadruplesOutput.append((operator, right_operand, '', left_operand))
             # qg.operandStack.append(result)
             # qg.typeStack.append(sc.intToType(result_type))
-<<<<<<< HEAD
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
 
-=======
-            # print(quadruplesOutput)
-        else:
-            raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
->>>>>>> cuadruplosCondicionalesTEST
 
 def p_qnp7(p):
     '''qnp7 : empty'''
@@ -683,15 +661,9 @@ def p_qnp10(p):
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
             qg.typeStack.append(sc.intToType(result_type))
-<<<<<<< HEAD
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
 
-=======
-            # print(quadruplesOutput)
-        else:
-            raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
->>>>>>> cuadruplosCondicionalesTEST
 
 def p_qnp11(p):
     '''qnp11 : empty'''
@@ -700,12 +672,6 @@ def p_qnp11(p):
 def p_qnp12(p):
     '''qnp12 : empty'''
     global tempCounter
-<<<<<<< HEAD
-=======
-    # print("before type",qg.typeStack)
-    # print("before operand",qg.operandStack)
-    # print("before operator",qg.operatorStack)
->>>>>>> cuadruplosCondicionalesTEST
     if qg.operatorStack and qg.operatorStack[-1] in ['&&', '||']:
         right_operand = qg.operandStack.pop() 
         right_type = qg.typeStack.pop()
@@ -722,15 +688,9 @@ def p_qnp12(p):
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
             qg.typeStack.append(sc.intToType(result_type))
-<<<<<<< HEAD
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
 
-=======
-            # print(quadruplesOutput)
-        else:
-            raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
->>>>>>> cuadruplosCondicionalesTEST
 
 def p_qnp13(p): # Insert PRINT to operator stack
     '''qnp13 : empty'''
@@ -775,23 +735,13 @@ lex.input(data)
 
 try:
     parser.parse(data)
-<<<<<<< HEAD
-=======
-    # dirFunc.printDirFunc()
-    # currentVarTable.printVars()
-    # currentClassDirFunc.printDirFunc()
-    # currentClassVarTable.printVars()
->>>>>>> cuadruplosCondicionalesTEST
     print('Code passed!')
     # print(qg.operandStack)
     # print(qg.operatorStack)
     # print(qg.typeStack)
-<<<<<<< HEAD
     print(ct.constantTable)
-=======
 
     temp = 0
->>>>>>> cuadruplosCondicionalesTEST
     for quad in quadruplesOutput:
         print(temp)
         temp += 1
