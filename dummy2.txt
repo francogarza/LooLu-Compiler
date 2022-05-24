@@ -10,6 +10,7 @@ VARS:
 
 FUNCS:
   func void incrementaSueldo(emp: int, porcentaje1: float) {
+    a = b + c;
   }
   func void incrementaSueldo2(asdf: float, porcentaje2: float) {
   }
@@ -35,6 +36,7 @@ CLASSES:
   }
 
 Loo() {
+<<<<<<< HEAD
   a = b;
   f = g;
   k = j;
@@ -44,9 +46,26 @@ Loo() {
   myChar = 'a';
   abc = 't';
 
+=======
+>>>>>>> cuadruplosCondicionalesTEST
 	abc = ((a * b - c * d) > c + d * e / f) && (g * h - j > l - a) && b + c > d * f;
-
   read(abc, a, b, c);
-  print(abc, a, b, c);
+  print(abc, a, b, c);  
+  print(abc);
+  a = b + c;
+
+  while(abc){
+    if (abc) {
+      print(abc);
+      read(a);
+      a = b + c;
+    } else {
+      b = a + c;
+      read(c);
+    }
+    while(abc){
+      d = c;
+    }
+  }
 
 } Lu;

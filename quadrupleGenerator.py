@@ -20,6 +20,10 @@ class quadrupleGenerator:
         self.tempCounter = 0
 
     def operator(self, o):
+<<<<<<< HEAD
+=======
+        # print(o)
+>>>>>>> cuadruplosCondicionalesTEST
         if o in ['*','/']:
             pass    
         if o in ['+','-']:

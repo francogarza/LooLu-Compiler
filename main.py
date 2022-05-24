@@ -1,3 +1,4 @@
+from unittest import result
 from lexer import *
 from lexer import tokens
 import ply.yacc as yacc
@@ -22,6 +23,7 @@ currentClassDirFunc = None
 qg = None
 mh = None
 tempCounter = 1
+whileOperand = []
 quadruplesOutput = []
 #############
 ### LEXER ###
@@ -38,7 +40,19 @@ mh = memoryHandler.memoryHandler()
 ##############
 
 def p_LOOLU(p):
-    '''loolu : LOOLU ID np1CreateGlobalVarsTable SEMICOLON VARS COLON np2CreateVarsTable declare_vars FUNCS COLON declare_funcs CLASSES COLON declare_classes LOO LEFTPAREN RIGHTPAREN block LU SEMICOLON'''
+    '''loolu : LOOLU ID np1CreateGlobalVarsTable npGoToMain1 SEMICOLON VARS COLON np2CreateVarsTable declare_vars FUNCS COLON declare_funcs CLASSES COLON declare_classes LOO LEFTPAREN RIGHTPAREN npGoToMain2 block LU SEMICOLON'''
+
+def p_npGoToMain1(p):
+    '''npGoToMain1 : empty'''
+    global quadruplesOutput
+    quadruplesOutput.append(("GOTOMAIN", 'empty', 'empty', None))
+
+def p_npmain2(p):
+    '''npGoToMain2 : empty'''
+    global quadruplesOutput
+    firstMainFuncQuad = len(quadruplesOutput)
+    quadruplesOutput[0] = (("GOTOMAIN", 'empty', 'empty', firstMainFuncQuad))
+
 
 def p_declare_vars(p):
     '''declare_vars : vars
@@ -63,7 +77,10 @@ def p_declare_funcs(p):
                      | empty'''
 
 def p_funcs(p):
-    '''funcs : FUNC type_simple ID np7AddFunction LEFTPAREN np2CreateVarsTable parameter RIGHTPAREN block funcs_block'''
+    '''funcs : FUNC type_simple ID np7AddFunction LEFTPAREN np2CreateVarsTable parameter RIGHTPAREN npGoToFunc1 block funcs_block'''
+
+def p_npGoToFunc1(p):
+    '''npGoToFunc1 : empty'''
 
 def p_funcs_block(p):
     '''funcs_block : FUNC type_simple ID np7AddFunction LEFTPAREN np2CreateVarsTable parameter RIGHTPAREN block funcs_block
@@ -184,7 +201,40 @@ def p_np17_test(p):
     '''np17Test : empty'''
 
 def p_condition(p):
-    '''condition : IF LEFTPAREN expression RIGHTPAREN block else_condition'''
+    '''condition : IF LEFTPAREN expression ifnp1 RIGHTPAREN block else_condition'''
+
+def p_else_condition(p):
+    '''else_condition : ELSE ifnp3else block ifnp2
+                      | empty ifnp2'''
+
+def p_ifnp3else(p):
+    '''ifnp3else : empty'''
+    quadruplesOutput.append(("GOTO",'empty','empty',None))
+    migaja = qg.jumpStack.pop()
+    siguienteQuad = len(quadruplesOutput)
+    qg.jumpStack.append(siguienteQuad - 1)
+    param1 = quadruplesOutput[migaja][0]
+    param2 = quadruplesOutput[migaja][1]
+    quadruplesOutput[migaja] = (param1,param2,'empty',siguienteQuad)
+
+def p_ifnp1(p):
+    '''ifnp1 : empty'''
+    expressionType = qg.typeStack.pop()
+    if (expressionType != 'bool'):
+        raise Exception("Semantic Error: Type in if function is not a bool")
+    else:
+        expressionResult = qg.operandStack.pop()
+        quadruplesOutput.append(('GOTOF', expressionResult, 'empty', None))
+        currentQuadNumber = len(quadruplesOutput) - 1
+        qg.jumpStack.append(currentQuadNumber)
+
+def p_ifnp2(p):
+    '''ifnp2 : empty'''
+    migaja = qg.jumpStack.pop()
+    siguienteQuad = len(quadruplesOutput)
+    param1 = quadruplesOutput[migaja][0]
+    param2 = quadruplesOutput[migaja][1]
+    quadruplesOutput[migaja] = (param1,param2,'empty',siguienteQuad)
 
 def p_writing(p):
     '''writing : PRINT LEFTPAREN print_val RIGHTPAREN SEMICOLON'''
@@ -193,14 +243,29 @@ def p_reading(p):
     '''reading : READ LEFTPAREN read_val RIGHTPAREN SEMICOLON'''
 
 def p_while_statement(p):
-    '''while_statement : WHILE LEFTPAREN expression RIGHTPAREN block'''
+    '''while_statement : WHILE LEFTPAREN expression whilenp1 RIGHTPAREN block whilenp2'''
+
+def p_whilenp1(p):
+    '''whilenp1 : empty'''
+    global whileOperand
+    expressionType = qg.typeStack.pop()
+    nextQuad = len(quadruplesOutput)
+    qg.jumpStack.append(nextQuad)
+    if(expressionType != 'bool'):
+        raise Exception("Sematic Error: Type in while statement is not a bool")
+    else:
+        whileOperand.append(qg.operandStack.pop())
+
+
+def p_whilenp2(p):
+    '''whilenp2 : empty'''
+    global whileOperand
+    quadnum = qg.jumpStack.pop()
+    quadruplesOutput.append(('GOTOV', whileOperand.pop(), 'empty', quadnum))
+
 
 def p_return_func(p):
     '''return_func : RETURN LEFTPAREN expression RIGHTPAREN'''
-
-def p_else_condition(p):
-    '''else_condition : ELSE block
-                      | empty'''
 
 def p_print_val(p):
     '''print_val : qnp13 ID qnp14 print_exp'''
@@ -215,8 +280,6 @@ def p_read_val(p):
 def p_read_exp(p):
     '''read_exp : COMMA read_val
                  | empty'''
-
-
 
 def p_super_expression(p):
     '''super_expression : expression super_expression_helper'''
@@ -342,9 +405,6 @@ def p_np3_add_var_to_current_table(p):
         address = mh.addVariable(currentFunc, p[-1], currentType, None, programName)
         # Add to current Var Table
         currentVarTable.insert({"name": p[-1], "type": currentType,  "address": address})
-        
-
-
 
 def p_np4_set_current_type(p):
     '''np4SetCurrentType : empty'''
@@ -476,7 +536,6 @@ def p_np16_is_on_current_vars_table(p): # Check if an ID is declared in the Glob
     else:
         currentVarTable.insert({"name": p[-1], "type": currentType})
     
-
 '''
     QUADRUPLE NEURALGIC POINTS
 '''
@@ -501,10 +560,18 @@ def p_qnp1(p):
 def p_qnp2(p):
     '''qnp2 : empty'''
     qg.operatorStack.append(p[-1])
+<<<<<<< HEAD
+=======
+    # print("operatorStack",qg.operatorStack)
+>>>>>>> cuadruplosCondicionalesTEST
 
 def p_qnp3(p):
     '''qnp3 : empty'''
     qg.operatorStack.append(p[-1])
+<<<<<<< HEAD
+=======
+    # print(qg.operatorStack)
+>>>>>>> cuadruplosCondicionalesTEST
 
 def p_qnp4(p):
     '''qnp4 : empty'''
@@ -525,6 +592,10 @@ def p_qnp4(p):
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
             qg.typeStack.append(sc.intToType(result_type))
+<<<<<<< HEAD
+=======
+            # print(quadruplesOutput)
+>>>>>>> cuadruplosCondicionalesTEST
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
 
@@ -547,6 +618,10 @@ def p_qnp5(p):
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
             qg.typeStack.append(sc.intToType(result_type))
+<<<<<<< HEAD
+=======
+            # print(quadruplesOutput)
+>>>>>>> cuadruplosCondicionalesTEST
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type)  
 
@@ -564,9 +639,15 @@ def p_qnp6(p):
             quadruplesOutput.append((operator, right_operand, '', left_operand))
             # qg.operandStack.append(result)
             # qg.typeStack.append(sc.intToType(result_type))
+<<<<<<< HEAD
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
 
+=======
+            # print(quadruplesOutput)
+        else:
+            raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
+>>>>>>> cuadruplosCondicionalesTEST
 
 def p_qnp7(p):
     '''qnp7 : empty'''
@@ -602,9 +683,15 @@ def p_qnp10(p):
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
             qg.typeStack.append(sc.intToType(result_type))
+<<<<<<< HEAD
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
 
+=======
+            # print(quadruplesOutput)
+        else:
+            raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
+>>>>>>> cuadruplosCondicionalesTEST
 
 def p_qnp11(p):
     '''qnp11 : empty'''
@@ -613,6 +700,12 @@ def p_qnp11(p):
 def p_qnp12(p):
     '''qnp12 : empty'''
     global tempCounter
+<<<<<<< HEAD
+=======
+    # print("before type",qg.typeStack)
+    # print("before operand",qg.operandStack)
+    # print("before operator",qg.operatorStack)
+>>>>>>> cuadruplosCondicionalesTEST
     if qg.operatorStack and qg.operatorStack[-1] in ['&&', '||']:
         right_operand = qg.operandStack.pop() 
         right_type = qg.typeStack.pop()
@@ -629,9 +722,15 @@ def p_qnp12(p):
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
             qg.typeStack.append(sc.intToType(result_type))
+<<<<<<< HEAD
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
 
+=======
+            # print(quadruplesOutput)
+        else:
+            raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
+>>>>>>> cuadruplosCondicionalesTEST
 
 def p_qnp13(p): # Insert PRINT to operator stack
     '''qnp13 : empty'''
@@ -676,14 +775,27 @@ lex.input(data)
 
 try:
     parser.parse(data)
+<<<<<<< HEAD
+=======
+    # dirFunc.printDirFunc()
+    # currentVarTable.printVars()
+    # currentClassDirFunc.printDirFunc()
+    # currentClassVarTable.printVars()
+>>>>>>> cuadruplosCondicionalesTEST
     print('Code passed!')
     # print(qg.operandStack)
     # print(qg.operatorStack)
     # print(qg.typeStack)
+<<<<<<< HEAD
     print(ct.constantTable)
+=======
+
+    temp = 0
+>>>>>>> cuadruplosCondicionalesTEST
     for quad in quadruplesOutput:
+        print(temp)
+        temp += 1
         print(quad)
-    # print(quadruplesOutput)
 
 except Exception as excep:
     print('Error in code!\n', excep)
