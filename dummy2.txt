@@ -40,4 +40,10 @@ Loo() {
   read(abc, a, b, c);
   print(abc, a, b, c);
 
+  if (abc) {
+    print(abc);
+    read(a);
+    a = b + c;
+  }
+
 } Lu;
