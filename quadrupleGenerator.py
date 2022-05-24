@@ -20,7 +20,7 @@ class quadrupleGenerator:
         self.tempCounter = 0
 
     def operator(self, o):
-        print(o)
+        # print(o)
         if o in ['*','/']:
             pass    
         if o in ['+','-']:

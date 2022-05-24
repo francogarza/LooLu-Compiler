@@ -183,7 +183,34 @@ def p_np17_test(p):
     '''np17Test : empty'''
 
 def p_condition(p):
-    '''condition : IF LEFTPAREN expression RIGHTPAREN block else_condition'''
+    '''condition : IF LEFTPAREN expression ifnp1 RIGHTPAREN block else_condition'''
+
+def p_else_condition(p):
+    '''else_condition : ELSE block
+                      | empty ifnp2'''
+
+def p_ifnp1(p):
+    '''ifnp1 : empty'''
+    expressionType = qg.typeStack.pop()
+    if (expressionType != 'bool'):
+        raise Exception("Semantic Error: Type in if function is not a bool")
+    else:
+        expressionResult = qg.operandStack.pop()
+        quadruplesOutput.append(('GOTOF', expressionResult, 'empty', None))
+        currentQuadNumber = len(quadruplesOutput) - 1
+        qg.jumpStack.append(currentQuadNumber)
+        # print(qg.jumpStack)
+        
+    # print(expressionType)
+
+def p_ifnp2(p):
+    '''ifnp2 : empty'''
+    migaja = qg.jumpStack.pop()
+    siguienteQuad = len(quadruplesOutput)
+    param1 = quadruplesOutput[migaja][0]
+    param2 = quadruplesOutput[migaja][1]
+    quadruplesOutput[migaja] = (param1,param2,'empty',siguienteQuad)
+
 
 def p_writing(p):
     '''writing : PRINT LEFTPAREN print_val RIGHTPAREN SEMICOLON'''
@@ -197,9 +224,6 @@ def p_while_statement(p):
 def p_return_func(p):
     '''return_func : RETURN LEFTPAREN expression RIGHTPAREN'''
 
-def p_else_condition(p):
-    '''else_condition : ELSE block
-                      | empty'''
 
 def p_print_val(p):
     '''print_val : qnp13 ID qnp14 print_exp'''
@@ -467,12 +491,12 @@ def p_qnp1(p):
 def p_qnp2(p):
     '''qnp2 : empty'''
     qg.operatorStack.append(p[-1])
-    print("operatorStack",qg.operatorStack)
+    # print("operatorStack",qg.operatorStack)
 
 def p_qnp3(p):
     '''qnp3 : empty'''
     qg.operatorStack.append(p[-1])
-    print(qg.operatorStack)
+    # print(qg.operatorStack)
 
 def p_qnp4(p):
     '''qnp4 : empty'''
@@ -493,7 +517,7 @@ def p_qnp4(p):
             quadruplesOutput.append((operator, left_operand, right_operand, result))
             qg.operandStack.append(result)
             qg.typeStack.append(sc.intToType(result_type))
-            print(quadruplesOutput)
+            # print(quadruplesOutput)
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
 
@@ -514,7 +538,7 @@ def p_qnp5(p):
             quadruplesOutput.append((operator, left_operand, right_operand, result))
             qg.operandStack.append(result)
             qg.typeStack.append(sc.intToType(result_type))
-            print(quadruplesOutput)
+            # print(quadruplesOutput)
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type)  
 
@@ -536,7 +560,7 @@ def p_qnp6(p):
             quadruplesOutput.append((operator, right_operand, '', left_operand))
             # qg.operandStack.append(result)
             # qg.typeStack.append(sc.intToType(result_type))
-            print(quadruplesOutput)
+            # print(quadruplesOutput)
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
     # print("after",qg.typeStack)
@@ -575,7 +599,7 @@ def p_qnp10(p):
             quadruplesOutput.append((operator, left_operand, right_operand, result))
             qg.operandStack.append(result)
             qg.typeStack.append(sc.intToType(result_type))
-            print(quadruplesOutput)
+            # print(quadruplesOutput)
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
     # print("after type",qg.typeStack)
@@ -589,9 +613,9 @@ def p_qnp11(p):
 def p_qnp12(p):
     '''qnp12 : empty'''
     global tempCounter
-    print("before type",qg.typeStack)
-    print("before operand",qg.operandStack)
-    print("before operator",qg.operatorStack)
+    # print("before type",qg.typeStack)
+    # print("before operand",qg.operandStack)
+    # print("before operator",qg.operatorStack)
     if qg.operatorStack and qg.operatorStack[-1] in ['&&', '||']:
         right_operand = qg.operandStack.pop() 
         right_type = qg.typeStack.pop()
@@ -605,12 +629,12 @@ def p_qnp12(p):
             quadruplesOutput.append((operator, left_operand, right_operand, result))
             qg.operandStack.append(result)
             qg.typeStack.append(sc.intToType(result_type))
-            print(quadruplesOutput)
+            # print(quadruplesOutput)
         else:
             raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
-    print("after type",qg.typeStack)
-    print("after operand",qg.operandStack)
-    print("after operator",qg.operatorStack)
+    # print("after type",qg.typeStack)
+    # print("after operand",qg.operandStack)
+    # print("after operator",qg.operatorStack)
 
 def p_qnp13(p): # Insert PRINT to operator stack
     '''qnp13 : empty'''
@@ -624,7 +648,7 @@ def p_qnp14(p):
 
     qg.operatorStack.pop()
     qg.operandStack.pop()
-    print(quadruplesOutput)
+    # print(quadruplesOutput)
 
 def p_qnp15(p): # Insert READ to operator stack
     '''qnp15 : empty'''
@@ -638,7 +662,7 @@ def p_qnp16(p):
 
     qg.operatorStack.pop()
     qg.operandStack.pop()
-    print(quadruplesOutput)
+    # print(quadruplesOutput)
 
 def p_error(t):
     print("Syntax error (parser):", t.lexer.token(), t.value)
@@ -658,15 +682,22 @@ lex.input(data)
 try:
     parser.parse(data)
     # dirFunc.printDirFunc()
-    currentVarTable.printVars()
+    # currentVarTable.printVars()
     # currentClassDirFunc.printDirFunc()
     # currentClassVarTable.printVars()
     print('Code passed!')
     # print(qg.operandStack)
     # print(qg.operatorStack)
     # print(qg.typeStack)
+
+    temp = 0
     for quad in quadruplesOutput:
+        print(temp)
+        temp += 1
         print(quad)
+    
+    
+    
     # print(quadruplesOutput)
 
 except Exception as excep:

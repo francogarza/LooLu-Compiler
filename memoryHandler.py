@@ -28,25 +28,25 @@ class memoryHandler:
 
         if funcName == programName and varType == 'int':
             address = self.globalInt[1]
-            print('var: ', varName, 'assigned at: ', address)
+            # print('var: ', varName, 'assigned at: ', address)
             self.globalInt[1] += 1
             return address
         
         if funcName == programName and varType == 'float':
             address = self.globalFloat[1]
-            print('var: ', varName, 'assigned at: ', address)
+            # print('var: ', varName, 'assigned at: ', address)
             self.globalFloat[1] += 1
             return address
         
         if funcName == programName and varType == 'char':
             address = self.globalChar[1]
-            print('var: ', varName, 'assigned at: ', address)
+            # print('var: ', varName, 'assigned at: ', address)
             self.globalChar[1] += 1
             return address
 
         if funcName == programName and varType == 'bool':
             address = self.globalChar[1]
-            print('var: ', varName, 'assigned at: ', address)
+            # print('var: ', varName, 'assigned at: ', address)
             self.globalChar[1] += 1
             return address
 
