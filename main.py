@@ -1,3 +1,4 @@
+from unittest import result
 from lexer import *
 from lexer import tokens
 import ply.yacc as yacc
@@ -38,7 +39,19 @@ mh = memoryHandler.memoryHandler()
 ##############
 
 def p_LOOLU(p):
-    '''loolu : LOOLU ID np1CreateGlobalVarsTable SEMICOLON VARS COLON np2CreateVarsTable declare_vars FUNCS COLON declare_funcs CLASSES COLON declare_classes LOO LEFTPAREN RIGHTPAREN block LU SEMICOLON'''
+    '''loolu : LOOLU ID np1CreateGlobalVarsTable npGoToMain1 SEMICOLON VARS COLON np2CreateVarsTable declare_vars FUNCS COLON declare_funcs CLASSES COLON declare_classes LOO LEFTPAREN RIGHTPAREN npGoToMain2 block LU SEMICOLON'''
+
+def p_npGoToMain1(p):
+    '''npGoToMain1 : empty'''
+    global quadruplesOutput
+    quadruplesOutput.append(("GOTOMAIN", 'empty', 'empty', None))
+
+def p_npmain2(p):
+    '''npGoToMain2 : empty'''
+    global quadruplesOutput
+    firstMainFuncQuad = len(quadruplesOutput)
+    quadruplesOutput[0] = (("GOTOMAIN", 'empty', 'empty', firstMainFuncQuad))
+
 
 def p_declare_vars(p):
     '''declare_vars : vars
