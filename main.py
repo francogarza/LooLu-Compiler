@@ -76,15 +76,25 @@ def p_declare_funcs(p):
                      | empty'''
 
 def p_funcs(p):
-    '''funcs : FUNC type_simple ID np7AddFunction LEFTPAREN np2CreateVarsTable parameter RIGHTPAREN block funcs_block'''
+    '''funcs : FUNC type_simple ID np7AddFunction LEFTPAREN np2CreateVarsTable parameter npfunc5 RIGHTPAREN block funcs_block'''
 
 def p_funcs_block(p):
-    '''funcs_block : FUNC type_simple ID np7AddFunction LEFTPAREN np2CreateVarsTable parameter RIGHTPAREN block funcs_block
+    '''funcs_block : FUNC type_simple ID np7AddFunction LEFTPAREN np2CreateVarsTable parameter npfunc5 RIGHTPAREN block funcs_block
                    | empty'''
+
+def p_npfunc5(p):
+    '''npfunc5 : empty'''
+    global currentFunc
+    global dirFunc
+    row = dirFunc.getFunctionByName(currentFunc)
+    table = row["table"]
+    row["memorySize"] = len(table.items)
+
 
 def p_parameter(p):
     '''parameter : ID COLON type_parameter np14AddParameterAsVariableToFunc parameter2'''
 
+# type for parmeter
 def p_typeParameter(p):
     '''type_parameter : type_simple_parameter'''
 
@@ -105,7 +115,7 @@ def p_addToParameterSignature(p):
     row["parameterSignature"].append(p[-1])
 
 def p_parameter2(p):
-    '''parameter2 : COMMA ID COLON type_parameter np14AddParameterAsVariableToFunc
+    '''parameter2 : COMMA ID COLON type_parameter np14AddParameterAsVariableToFunc parameter2
                   | empty'''
 
 def p_function_call(p):
@@ -442,7 +452,7 @@ def p_np7_add_function(p):
     if (row != None):
         print("redeclaration of function " + p[-1])
     else:
-        dirFunc.insert({"name": p[-1], "type": currentType, "table": None, "parameterSignature": []})
+        dirFunc.insert({"name": p[-1], "type": currentType, "table": None, "parameterSignature": [], "memorySize" : 0, "functionQuadStart" : 0})
         currentFunc = p[-1]
         dirFunc.printDirFunc()
 
