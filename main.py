@@ -1,4 +1,3 @@
-from unittest import result
 from lexer import *
 from lexer import tokens
 import ply.yacc as yacc
@@ -77,20 +76,36 @@ def p_declare_funcs(p):
                      | empty'''
 
 def p_funcs(p):
-    '''funcs : FUNC type_simple ID np7AddFunction LEFTPAREN np2CreateVarsTable parameter RIGHTPAREN npGoToFunc1 block funcs_block'''
-
-def p_npGoToFunc1(p):
-    '''npGoToFunc1 : empty'''
+    '''funcs : FUNC type_simple ID np7AddFunction LEFTPAREN np2CreateVarsTable parameter RIGHTPAREN block funcs_block'''
 
 def p_funcs_block(p):
     '''funcs_block : FUNC type_simple ID np7AddFunction LEFTPAREN np2CreateVarsTable parameter RIGHTPAREN block funcs_block
                    | empty'''
 
 def p_parameter(p):
-    '''parameter : ID COLON type np14AddParameterAsVariableToFunc parameter2'''
+    '''parameter : ID COLON type_parameter np14AddParameterAsVariableToFunc parameter2'''
+
+def p_typeParameter(p):
+    '''type_parameter : type_simple_parameter'''
+
+def p_typeSimpleParameter(p):
+    '''type_simple_parameter : INT addToParameterSignature
+                             | FLOAT addToParameterSignature
+                             | CHAR addToParameterSignature
+                             | BOOL addToParameterSignature
+                             | VOID addToParameterSignature'''
+
+def p_typeCompoundParameter(p):
+    '''type_compound_parameter : ID'''
+
+def p_addToParameterSignature(p):
+    '''addToParameterSignature : empty'''
+    global currentFunc
+    row = dirFunc.getFunctionByName(currentFunc)
+    row["parameterSignature"].append(p[-1])
 
 def p_parameter2(p):
-    '''parameter2 : COMMA ID COLON type np14AddParameterAsVariableToFunc
+    '''parameter2 : COMMA ID COLON type_parameter np14AddParameterAsVariableToFunc
                   | empty'''
 
 def p_function_call(p):
@@ -427,8 +442,9 @@ def p_np7_add_function(p):
     if (row != None):
         print("redeclaration of function " + p[-1])
     else:
-        dirFunc.insert({"name": p[-1], "type": currentType, "table": None})
+        dirFunc.insert({"name": p[-1], "type": currentType, "table": None, "parameterSignature": []})
         currentFunc = p[-1]
+        dirFunc.printDirFunc()
 
 def p_np8_add_class(p):
     '''np8AddClass : empty'''
@@ -746,6 +762,8 @@ try:
         print(temp)
         temp += 1
         print(quad)
+
+    dirFunc.printDirFunc()
 
 except Exception as excep:
     print('Error in code!\n', excep)
