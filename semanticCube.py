@@ -117,7 +117,7 @@ def typeToInt(typeInput):
     if type(response) is int:
          return response
     else:
-        print(response)
+      #   print(response)
         exit(-1)
 
 def intToType(entero):

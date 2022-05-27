@@ -56,40 +56,40 @@ class memoryHandler:
 
         if funcName == programName and varType == 'bool':
             address = self.globalBool[1]
-            print('var: ', varName, 'assigned at: ', address)
+            # print('var: ', varName, 'assigned at: ', address)
             self.globalBool[1] += 1
             return address
 
         if funcName == programName and varType == 'CTEINT':
             address = self.constAddressINT[1]
-            print('var: ', varName, 'assigned at: ', address)
+            # print('var: ', varName, 'assigned at: ', address)
             ct.insert({"address": address, "value": varName})
             self.constAddressINT[1] += 1
             return address
 
         if funcName == programName and varType == 'CTEFLOAT':
             address = self.constAddressFLOAT[1]
-            print('var: ', varName, 'assigned at: ', address)
+            # print('var: ', varName, 'assigned at: ', address)
             ct.insert({"address": address, "value": varName})
             self.constAddressFLOAT[1] += 1
             return address
 
         if funcName == programName and varType == 'CTECHAR':
             address = self.constAddressCHAR[1]
-            print('var: ', varName, 'assigned at: ', address)
+            # print('var: ', varName, 'assigned at: ', address)
             ct.insert({"address": address, "value": varName})
             self.constAddressCHAR[1] += 1
             return address
 
         if funcName == programName and varType == 'CTEBOOL':
             address = self.constAddressBOOL[1]
-            print('var: ', varName, 'assigned at: ', address)
+            # print('var: ', varName, 'assigned at: ', address)
             ct.insert({"address": address, "value": varName})
             self.constAddressBOOL[1] += 1
             return address
 
         if funcName == programName and varType == 'TEMPORAL':
             address = self.tempAddressGlobal[1]
-            print('var: ', varName, 'assigned at: ', address)
+            # print('var: ', varName, 'assigned at: ', address)
             self.tempAddressGlobal[1] += 1
             return address

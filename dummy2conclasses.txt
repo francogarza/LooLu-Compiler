@@ -12,17 +12,33 @@ FUNCS:
   func void incrementaSueldo(myInt: int, porcentaje1: float, asdfxx: float) {
     a = b + c;
   }
-  func void incrementaSueldo2(asdfxx: float, porcentaje2: float) {
-    a = b + c;
+  func void incrementaSueldo2(asdf: float, porcentaje2: float) {
   }
 
 CLASSES:
+  Class Empleado {
+    VARS:
+      var int : a;
+      var float : x, y;
+    FUNCS:
+      func void asdf3(emp: float, porcentaje3: float)  {
+      }
+  }
+  Class Persona {
+    VARS:
+      var int : a;
+      var float : x, y;
+    FUNCS:
+      func void asdf(emp: int, porcentaje: float)  {
+      }
+      func void asdf3(emp: int, porcentaje: bool)  {
+      }
+  }
 
 Loo() {
-  a = b + c;
-  f = g / k;
+  a = b;
+  f = g;
   k = j;
-
 
   myFloat = 1.0;
   myInt = 2;
