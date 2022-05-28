@@ -765,6 +765,11 @@ try:
         print(temp, "-", quad)
         file.write(' '.join(str(s) for s in quad) + '\n')
         temp += 1
+    
+    file.write('CONSTS' + '\n')
+
+    for item in ct.constantTable:
+        file.write(str(item['address'] ) + ' ' + str(item['value']) + '\n')
 
     file.close()
     vm.startMachine()

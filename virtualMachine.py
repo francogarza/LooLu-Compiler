@@ -49,18 +49,26 @@ class virtualMachine():
             quad = list(string.split(" "))
             return quad
 
-        def getQuads():
-            quads = []
+        def readObjCode():
+            isConst = False
             file = open("objCode.txt", "r")
             for line in file:
-                quads.append(strToQuad(line))
-            return quads
+                if line == 'CONSTS\n':
+                    isConst = True
+                    continue
+                if isConst:
+                    print('entra')
+                    item = strToQuad(line)
+                    self.constantsMemory.insert(item[0], item[1].strip('\n'))
+                else:
+                    self.quadruples.append(strToQuad(line.strip('\n')))
 
         dirFunc = vt.DirFunc
         constantTable = ct.constantTable
-        quadruples = getQuads()
+        readObjCode()
 
-        print(quadruples)
+        print(self.quadruples)
+        print(self.constantsMemory.getData())
 
         
 
