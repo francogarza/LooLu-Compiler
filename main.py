@@ -7,12 +7,13 @@ import memoryHandler
 import quadrupleGenerator
 import constantTable as ct
 import semanticCube as sc
+import virtualMachine
 
 # global vars
 programName = None; dirFunc = vt.DirFunc(); currentFunc = None; currentType = None
 currentVarTable = None; currentClass = None; currentClassVarTable = None; urrentClassDirFunc = None
 qg = quadrupleGenerator.quadrupleGenerator(); mh = memoryHandler.memoryHandler()
-tempCounter = 1; whileOperand = []; quadruplesOutput = []
+tempCounter = 1; whileOperand = []; quadruplesOutput = []; vm = virtualMachine.virtualMachine()
 
 # lexer
 lex.lex(); print("Lexer generated")
@@ -755,12 +756,18 @@ try:
     # print(qg.operandStack)
     # print(qg.operatorStack)
     # print(qg.typeStack)
-    # print(ct.constantTable)
+    print(ct.constantTable)
+
+    file = open("objCode.txt", "w")
 
     temp = 0
     for quad in quadruplesOutput:
         print(temp, "-", quad)
+        file.write(' '.join(str(s) for s in quad) + '\n')
         temp += 1
+
+    file.close()
+    vm.startMachine()
 
     # dirFunc.printDirFunc()
     # currentVarTable.printVars()

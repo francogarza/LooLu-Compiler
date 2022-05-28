@@ -9,12 +9,6 @@ VARS:
   var float : a, b, c, d, e, f, g, h, i, j, k, l, m;
 
 FUNCS:
-  func void incrementaSueldo(myInt: int, porcentaje1: float, asdfxx: float) {
-    a = b + c;
-  }
-  func void incrementaSueldo2(asdfxx: float, porcentaje2: float) {
-    a = b + c;
-  }
 
 CLASSES:
 
