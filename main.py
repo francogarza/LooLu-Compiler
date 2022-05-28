@@ -43,10 +43,10 @@ def p_declare_funcs(p):
                      | empty'''
 
 def p_funcs(p):
-    '''funcs : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter np_FillMemorySizeParameterForCurrentFunc RIGHTPAREN functionBlock np_CreateEndFuncQuad funcs_block'''
+    '''funcs : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter RIGHTPAREN functionBlock np_CreateEndFuncQuad funcs_block'''
 
 def p_funcs_block(p):
-    '''funcs_block : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter np_FillMemorySizeParameterForCurrentFunc RIGHTPAREN functionBlock np_CreateEndFuncQuad funcs_block
+    '''funcs_block : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter RIGHTPAREN functionBlock np_CreateEndFuncQuad funcs_block
                    | empty'''
 
 # se supone que hasta aqui hacia arriba los puntos neuralgicos se documentaron y se mandaron a su segmento que esta al final del archivo
@@ -100,7 +100,7 @@ def p_type_compound(p):
     '''type_compound : ID'''
 
 def p_function_block(p):
-    '''functionBlock : LEFTBRACKET VARS COLON declare_vars START COLON statement_block RIGHTBRACKET'''
+    '''functionBlock : LEFTBRACKET VARS COLON declare_vars np_FillMemorySizeParameterForCurrentFunc START COLON statement_block RIGHTBRACKET'''
 
 def p_vars(p):
     '''vars : VAR type COLON var_id SEMICOLON vars_block'''
@@ -783,7 +783,7 @@ try:
         print(temp, "-", quad)
         temp += 1
 
-    # dirFunc.printDirFunc()
+    dirFunc.printDirFunc()
     # currentVarTable.printVars()
 
 except Exception as excep:
