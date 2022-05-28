@@ -22,7 +22,7 @@ def p_LOOLU(p):
 
 def p_declare_vars(p):
     '''declare_vars : vars
-               | empty'''
+                    | empty'''
 
 def p_vars(p):
     '''vars : VAR type COLON var_id SEMICOLON vars_block'''
@@ -43,10 +43,10 @@ def p_declare_funcs(p):
                      | empty'''
 
 def p_funcs(p):
-    '''funcs : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter np_FillMemorySizeParameterForCurrentFunc RIGHTPAREN block np_CreateEndFuncQuad funcs_block'''
+    '''funcs : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter np_FillMemorySizeParameterForCurrentFunc RIGHTPAREN functionBlock np_CreateEndFuncQuad funcs_block'''
 
 def p_funcs_block(p):
-    '''funcs_block : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter np_FillMemorySizeParameterForCurrentFunc RIGHTPAREN block np_CreateEndFuncQuad funcs_block
+    '''funcs_block : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter np_FillMemorySizeParameterForCurrentFunc RIGHTPAREN functionBlock np_CreateEndFuncQuad funcs_block
                    | empty'''
 
 # se supone que hasta aqui hacia arriba los puntos neuralgicos se documentaron y se mandaron a su segmento que esta al final del archivo
@@ -69,8 +69,10 @@ def p_typeCompoundParameter(p):
 def p_addToParameterSignature(p):
     '''addToParameterSignature : empty'''
     global currentFunc
+    global currentType
+    currentType = p[-1]
     row = dirFunc.getFunctionByName(currentFunc)
-    row["parameterSignature"].append(p[-1])
+    row["parameterSignature"].append(currentType)
 
 def p_parameter2(p):
     '''parameter2 : COMMA ID COLON type_parameter np14AddParameterAsVariableToFunc parameter2
@@ -96,6 +98,23 @@ def p_type_simple(p):
 
 def p_type_compound(p):
     '''type_compound : ID'''
+
+def p_function_block(p):
+    '''functionBlock : LEFTBRACKET VARS COLON declare_vars START COLON statement_block RIGHTBRACKET'''
+
+def p_vars(p):
+    '''vars : VAR type COLON var_id SEMICOLON vars_block'''
+
+def p_vars_block(p):
+    '''vars_block : VAR type COLON var_id SEMICOLON vars_block
+                  | empty'''
+
+def p_var_id(p):
+    '''var_id : ID np_AddVarToCurrentTable var_id_2'''
+
+def p_var_id_2(p):
+    '''var_id_2 : COMMA ID np_AddVarToCurrentTable var_id_2
+                | empty'''
 
 def p_block(p):
     '''block : LEFTBRACKET statement_block RIGHTBRACKET'''
@@ -436,7 +455,8 @@ def p_np14_add_parameter_as_variable_to_func(p):
     if (id != None):
         raise Exception("   ERROR: Redeclaration of variable ID = " + p[-3])
     else:
-        currentVarTable.insert({"name": p[-3], "type": currentType})
+        address = mh.addVariable(currentFunc, p[-1], currentType, None, programName)
+        currentVarTable.insert({"name": p[-3], "type": currentType, "address" : address})
 
 def p_np15_add_parameter_as_variable_to_func_class(p):
     '''np15AddParameterAsVariableToFuncClass : empty'''
@@ -697,6 +717,7 @@ def p_np_add_var_to_current_table(p):
     if (id == None):
         address = mh.addVariable(currentFunc, p[-1], currentType, None, programName)
         currentVarTable.insert({"name": p[-1], "type": currentType, "address": address})
+        currentVarTable.printVars()
     else:
         raise Exception("ERROR: Redeclaration of variable ID = " + p[-1])
 

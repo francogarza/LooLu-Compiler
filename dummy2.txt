@@ -1,7 +1,7 @@
 LooLu miPrograma;
 
 VARS:
-  var int : myInt, myInt2;
+  var int : myInt, myInt4;
   var float : myFloat;
   var bool : abc, cba;
   var float : x;
@@ -9,11 +9,16 @@ VARS:
   var float : a, b, c, d, e, f, g, h, i, j, k, l, m;
 
 FUNCS:
-  func void incrementaSueldo(myInt: int, porcentaje1: float, asdfxx: float) {
-    a = b + c;
+  func void incrementaSueldo(myInt4: int, porcentaje1: float, asdfxx: float) {
+    VARS: 
+      var int : myInt;
+    START:
+      a = b + c;
   }
   func void incrementaSueldo2(asdfxx: float, porcentaje2: float) {
-    a = b + c;
+    VARS: 
+      var bool : bb;
+    START:
   }
 
 CLASSES:
