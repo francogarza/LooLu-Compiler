@@ -100,8 +100,15 @@ def p_type_compound(p):
     '''type_compound : ID'''
 
 def p_function_block(p):
-    '''functionBlock : LEFTBRACKET VARS COLON declare_vars np_FillMemorySizeParameterForCurrentFunc START COLON statement_block RIGHTBRACKET'''
+    '''functionBlock : LEFTBRACKET VARS COLON declare_vars np_FillMemorySizeParameterForCurrentFunc START COLON np_FillQuadStartParameterForFunc statement_block RIGHTBRACKET'''
 
+def p_np_fill_quad_start_parameter_for_func(p):
+    '''np_FillQuadStartParameterForFunc : empty'''
+    global dirFunc
+    global currentFunc
+    row = dirFunc.getFunctionByName(currentFunc)
+    row["functionQuadStart"] = len(quadruplesOutput)
+ 
 def p_vars(p):
     '''vars : VAR type COLON var_id SEMICOLON vars_block'''
 
