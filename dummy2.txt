@@ -9,30 +9,28 @@ VARS:
   var float : a, b, c, d, e, f, g, h, i, j, k, l, m;
 
 FUNCS:
-  func void incrementaSueldo(myInt: float, porcentaje1: int, asdfxx: int) {
+  func int incrementaSueldo(myFloat: float, porcentaje1: int, asdfxx: int) {
     VARS: 
       var int : myInt4;
     START:
       porcentaje1 = asdfxx / xy;
       print(porcentaje1);
+      return(porcentaje1);
   }
-  func void incrementaSueldo2(asdfxx: float, porcentaje2: float) {
+  func int incrementaSueldo2(asdfxx: float, porcentaje2: float) {
     VARS: 
       var bool : bb;
     START:
       porcentaje2 = asdfxx * a / b;
       print(a,asdfxx);
+      return(myInt);
   }
 
 CLASSES:
 
 Loo() {
-  print(abc);
-  a = c;
-  f = g / k;
-  k = j;
 
-  incrementaSueldo2(x,x);
+  myInt = incrementaSueldo2(x,x);
 
   myFloat = 1.0;
   myInt = 2;
