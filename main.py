@@ -249,7 +249,7 @@ def p_create_gotof_for_while(p):
 def p_fill_gotof_for_while(p):
     '''np_FillGotofForWhile : empty'''
     migaja = qg.jumpStack.pop()
-    siguienteQuad = len(quadruplesOutput)
+    siguienteQuad = len(quadruplesOutput) + 1
     param1 = quadruplesOutput[migaja][0]
     param2 = quadruplesOutput[migaja][1]
     quadruplesOutput[migaja] = (param1,param2,'empty',siguienteQuad)

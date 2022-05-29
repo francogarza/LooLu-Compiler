@@ -127,7 +127,8 @@ class virtualMachine():
             if (currentQuad[0] == '<'):# Less than id found
                 valLeft = getFromMemory(int(currentQuad[1]))
                 valRight = getFromMemory(int(currentQuad[2]))
-                addressTemp = currentQuad[3]
+                addressTemp = int(currentQuad[3])
+                # print(valLeft, ' ', valRight)
                 if (valLeft < valRight):
                     insertInMemory(addressTemp, 'true')
                 else:
@@ -212,9 +213,10 @@ class virtualMachine():
                     insertInMemory(varToBeAssigned, val)
             
             if (currentQuad[0] == 'GOTO'): # GOTO id found
-                self.ip = currentQuad[3] - 2 # -2 Because quads start at index 0 and add one more iteration
+                self.ip = int(currentQuad[3]) - 1# -2 Because quads start at index 0 and add one more iteration
             if (currentQuad[0] == 'GOTOF'):
                 val = getFromMemory(int(currentQuad[1]))
+                
                 if (val == 'false'):
                     self.ip = int(currentQuad[3]) - 1
             
