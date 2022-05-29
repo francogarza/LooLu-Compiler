@@ -16,14 +16,17 @@ Loo() {
   a = 1.0;
   b = 2.0;
   c = 3.0;
+  d = 6.0;
+  e = c * 2;
+  f = 45.5;
+  i = b * f / d;
+  j = 34.7;
+  g = 3.14;
+  h = 3.4;
+  l = h * f;
+
   myInt = 3;
 
-  c = c * myInt;
-
-
-  print(a, b, c);
-
-  d = a + c;
-
-  print(d);
+  abc = ((a * b - c * d) > c + d * e / f) && (g * h - j > l - a) && b + c > d * f;
+  print(abc);
 } Lu;

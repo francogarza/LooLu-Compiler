@@ -645,7 +645,12 @@ def p_qnp15(p): # Insert READ to operator stack
 def p_qnp16(p): 
     '''qnp16 : empty'''
 
-    qg.operandStack.append(p[-1])
+    global currentVarTable
+
+    variable = currentVarTable.getVariableByName(p[-1])
+    address = variable['address']
+
+    qg.operandStack.append(address)
     quadruplesOutput.append((qg.operatorStack[-1], '', '', qg.operandStack[-1]))
 
     qg.operatorStack.pop()

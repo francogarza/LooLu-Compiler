@@ -2,6 +2,7 @@ import quadrupleGenerator as qg
 import memoryHandler as mh
 import varsTable as vt
 import constantTable as ct
+import semanticCube as sc
 
 # Memory definition
 class Memory():
@@ -101,9 +102,6 @@ class virtualMachine():
                 # resDir = getTransformmedAddress(currentQuad[3], 3)
                 insertInMemory(int(currentQuad[3]), newVal)
             
-            if (currentQuad[0] == 'PRINT'):
-                val = getFromMemory(int(currentQuad[3]))
-                print(val)
 
             if (currentQuad[0] == '+'): # addition is founds
                 valLeft = getFromMemory(int(currentQuad[1]))
@@ -128,6 +126,89 @@ class virtualMachine():
                 valRight = getFromMemory(int(currentQuad[2]))
                 addressTemp = int(currentQuad[3])
                 insertInMemory(addressTemp, valLeft / valRight)
+
+            if (currentQuad[0] == '<'):# Less than id found
+                valLeft = getFromMemory(int(currentQuad[1]))
+                valRight = getFromMemory(int(currentQuad[2]))
+                addressTemp = currentQuad[3]
+                if (valLeft < valRight):
+                    insertInMemory(addressTemp, 'true')
+                else:
+                    insertInMemory(addressTemp, 'false')
+            if (currentQuad[0] == '>'): # Greater than is found
+                valLeft = getFromMemory(int(currentQuad[1]))
+                valRight = getFromMemory(int(currentQuad[2]))
+                addressTemp = int(currentQuad[3])
+                if (valLeft > valRight):
+                    insertInMemory(addressTemp, 'true')
+                else:
+                    insertInMemory(addressTemp, 'false')
+            if (currentQuad[0] == '>='):
+                valLeft = getFromMemory(int(currentQuad[1]))
+                valRight = getFromMemory(int(currentQuad[2]))
+                addressTemp = int(currentQuad[3])
+                if (valLeft >= valRight):
+                    insertInMemory(addressTemp, 'true')
+                else:
+                    insertInMemory(addressTemp, 'false')
+            if (currentQuad[0] == '<='):
+                valLeft = getFromMemory(int(currentQuad[1]))
+                valRight = getFromMemory(int(currentQuad[2]))
+                addressTemp = int(currentQuad[3])
+                if (valLeft <= valRight):
+                    insertInMemory(addressTemp, 'true')
+                else:
+                    insertInMemory(addressTemp, 'false')
+            if (currentQuad[0] == '!='):
+                valLeft = getFromMemory(int(currentQuad[1]))
+                valRight = getFromMemory(int(currentQuad[2]))
+                addressTemp = int(currentQuad[3])
+                if (valLeft != valRight):
+                    insertInMemory(addressTemp, 'true')
+                else:
+                    insertInMemory(addressTemp, 'false')
+            if (currentQuad[0] == '=='):
+                valLeft = getFromMemory(int(currentQuad[1]))
+                valRight = getFromMemory(int(currentQuad[2]))
+                addressTemp = int(currentQuad[3])
+                if (valLeft == valRight):
+                    insertInMemory(addressTemp, 'true')
+                else:
+                    insertInMemory(addressTemp, 'false')
+            if (currentQuad[0] == '&&'):
+                valLeft = getFromMemory(int(currentQuad[1]))
+                valRight = getFromMemory(int(currentQuad[2]))
+                addressTemp = int(currentQuad[3])
+                if (valLeft == 'true' and valRight == 'true'):
+                    insertInMemory(addressTemp, 'true')
+                else:
+                    insertInMemory(addressTemp, 'false')
+            if (currentQuad[0] == '||'):
+                valLeft = getFromMemory(int(currentQuad[1]))
+                valRight = getFromMemory(int(currentQuad[2]))
+                addressTemp = int(currentQuad[3])
+                if (valLeft == 'true' or valRight == 'true'):
+                    insertInMemory(addressTemp, 'true')
+                else:
+                    insertInMemory(addressTemp, 'false')
+            
+            if (currentQuad[0] == 'PRINT'):
+                val = getFromMemory(int(currentQuad[3]))
+                print(val)
+            
+            if (currentQuad[0] == 'READ'): # Missing semantic check
+                varToBeAssigned = int(currentQuad[3])
+                val = input()
+                # Return the type of a string that can be converted in other type 
+                try:
+                    val = int(val)
+                except ValueError:
+                    try:
+                        val = float(val)
+                    except ValueError:
+                        val = str(val)[0]
+                        return "char"
+                insertInMemory(varToBeAssigned, val)
             
             self.ip = self.ip + 1
             currentQuad = self.quadruples[self.ip]
