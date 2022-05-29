@@ -123,6 +123,12 @@ class virtualMachine():
                 valRight = getFromMemory(int(currentQuad[2]))
                 addressTemp = int(currentQuad[3])
                 insertInMemory(addressTemp, valLeft / valRight)
+            
+            if (currentQuad[0] == '%'): # addition is founds
+                valLeft = getFromMemory(int(currentQuad[1]))
+                valRight = getFromMemory(int(currentQuad[2]))
+                addressTemp = int(currentQuad[3])
+                insertInMemory(addressTemp, valLeft % valRight)
 
             if (currentQuad[0] == '<'):# Less than id found
                 valLeft = getFromMemory(int(currentQuad[1]))

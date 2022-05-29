@@ -513,7 +513,7 @@ def p_qnp3(p):
 def p_qnp4(p):
     '''qnp4 : empty'''
     global tempCounter
-    if qg.operatorStack and qg.operatorStack[-1] in ['+','-','*','/']:
+    if qg.operatorStack and qg.operatorStack[-1] in ['+','-','*','/','%']:
         right_operand = qg.operandStack.pop() 
         right_type = qg.typeStack.pop()
         left_operand = qg.operandStack.pop()
@@ -535,7 +535,7 @@ def p_qnp4(p):
 def p_qnp5(p):
     '''qnp5 : empty'''
     global tempCounter
-    if qg.operatorStack and qg.operatorStack[-1] in ['*','/']:
+    if qg.operatorStack and qg.operatorStack[-1] in ['*','/','%']:
         right_operand = qg.operandStack.pop() 
         right_type = qg.typeStack.pop()
         left_operand = qg.operandStack.pop()
