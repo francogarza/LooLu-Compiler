@@ -16,35 +16,14 @@ Loo() {
   a = 1.0;
   b = 2.0;
   c = 3.0;
-  a = b + c;
-  f = g / k;
-  k = j;
+  myInt = 3;
+
+  c = c * myInt;
 
 
-  myFloat = 1.0;
-  myInt = 2;
-  myChar = 'a';
-  abc = true;
-  cba = false;
+  print(a, b, c);
 
-	abc = ((a * b - c * d) > c + d * e / f) && (g * h - j > l - a) && b + c > d * f;
-  read(abc, a, b, c);
-  print(abc, a, b, c);  
-  print(abc);
-  a = b + c;
+  d = a + c;
 
-  while(abc){
-    if (cba) {
-      print(abc);
-      read(a);
-      a = b + c;
-    } else {
-      b = a + c;
-      read(c);
-    }
-    while(abc){
-      d = c;
-    }
-  }
-
+  print(d);
 } Lu;

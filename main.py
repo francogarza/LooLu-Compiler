@@ -627,7 +627,12 @@ def p_qnp13(p): # Insert PRINT to operator stack
 def p_qnp14(p): 
     '''qnp14 : empty'''
 
-    qg.operandStack.append(p[-1])
+    global currentVarTable
+
+    variable = currentVarTable.getVariableByName(p[-1])
+    address = variable['address']
+
+    qg.operandStack.append(address)
     quadruplesOutput.append((qg.operatorStack[-1], '', '', qg.operandStack[-1]))
 
     qg.operatorStack.pop()
@@ -766,13 +771,14 @@ try:
         file.write(' '.join(str(s) for s in quad) + '\n')
         temp += 1
     
-    file.write('CONSTS' + '\n')
+    file.write('END' + '\n')
 
     # for item in ct.constantTable:
     #     file.write(str(item[0]) + ' ' + str(item[1]) + '\n')
 
     file.close()
     vm.startMachine()
+    vm.runMachine()
 
     # dirFunc.printDirFunc()
     # currentVarTable.printVars()
