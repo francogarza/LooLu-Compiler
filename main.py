@@ -1,4 +1,6 @@
 # imports
+from operator import truediv
+from pickle import TRUE
 from lexer import *
 from lexer import tokens
 import ply.yacc as yacc
@@ -9,8 +11,8 @@ import constantTable as ct
 import semanticCube as sc
 
 # global vars
-programName = None; dirFunc = vt.DirFunc(); globalVarsTable = None; currentFunc = None; currentType = None; currentParamSignature = None
-currentVarTable = None; currentClass = None; currentClassVarTable = None; currentClassDirFunc = None; paramCounter = 0
+programName = None; dirFunc = vt.DirFunc(); globalVarsTable = None; currentFunc = None; currentType = None; currentParamSignature = None; currentFunctionReturnType = None; currentFunctionReturnOperand = None
+currentFuncHasReturnedValue = None; currentVarTable = None; currentClass = None; currentClassVarTable = None; currentClassDirFunc = None; paramCounter = 0; currentFunctionCall = None; currentFuncDeclaration = None
 qg = quadrupleGenerator.quadrupleGenerator(); mh = memoryHandler.memoryHandler()
 tempCounter = 1; whileOperand = []; quadruplesOutput = []
 
@@ -51,11 +53,20 @@ def p_declare_funcs(p):
                      | empty'''
 
 def p_funcs(p):
-    '''funcs : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter RIGHTPAREN functionBlock np_CreateEndFuncQuad funcs_block'''
+    '''funcs : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter RIGHTPAREN functionBlock np_CreateEndFuncQuad np_CheckIfFuncHasReturned funcs_block'''
 
 def p_funcs_block(p):
     '''funcs_block : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter RIGHTPAREN functionBlock np_CreateEndFuncQuad funcs_block
-                   | empty'''
+                   | empty np_CheckIfFuncHasReturned'''
+
+def p_np_CheckIfFuncHasReturned(p):
+    '''np_CheckIfFuncHasReturned : empty'''
+    global currentFuncHasReturnedValue
+    global currentFun
+    if currentFuncHasReturnedValue != 1:
+        raise Exception('function: '+currentFunc+" is missing return value")
+    else:
+        currentFuncHasReturnedValue = 0
 
 # se supone que hasta aqui hacia arriba los puntos neuralgicos se documentaron y se mandaron a su segmento que esta al final del archivo
 def p_parameter(p):
@@ -129,9 +140,11 @@ def p_verify_param_type_with_signature(p):
 def p_np_verify_func_in_dirfunc(p):
     '''np_VerifyFuncInDirFunc : empty'''
     global dirFunc
+    global currentFunctionCall
     func = dirFunc.getFunctionByName(p[-1])
     if (func == None):
         raise Exception("Could not find (",p[-1],"in the function directory")
+    currentFunctionCall = func
 
 
 def p_generate_era_quad(p):
@@ -158,7 +171,12 @@ def p_type_simple(p):
                    | FLOAT np4SetCurrentType
                    | CHAR np4SetCurrentType
                    | BOOL np4SetCurrentType
-                   | VOID np4SetCurrentType'''
+                   | VOID np4SetCurrentType np_HasReturnedType'''
+
+def p_HasReturnedType(p):
+    '''np_HasReturnedType : empty'''
+    global currentFuncHasReturnedValue
+    currentFuncHasReturnedValue = 1
 
 def p_type_compound(p):
     '''type_compound : ID'''
@@ -350,7 +368,35 @@ def p_create_goto_for_while(p):
 
 
 def p_return_func(p):
-    '''return_func : RETURN LEFTPAREN expression RIGHTPAREN'''
+    '''return_func : RETURN LEFTPAREN expression np_AddReturnValueToGlobalVars RIGHTPAREN np_ChangeHasReturnedValue
+                   | empty'''
+
+def p_np_ChangeHasReturnedValue(p):
+    '''np_ChangeHasReturnedValue : empty'''
+    global currentFuncHasReturnedValue
+    currentFuncHasReturnedValue = 1
+
+def p_np_add_return_to_global_vars(p):
+    '''np_AddReturnValueToGlobalVars : empty'''
+    global currentFunc
+    global dirFunc
+    global currentVarTable
+    global tempCounter
+    global currentFunctionReturnType
+    global currentFunctionReturnOperand
+    expressionType = qg.typeStack.pop()
+    address = qg.operandStack.pop()
+    funcRow = dirFunc.getFunctionByName(currentFunc)
+    if (funcRow["type"] == expressionType):
+        globalVarsTable.insert({"name": currentFunc, "type": expressionType, "address" : address})
+        result = 'T'+str(tempCounter)
+        tempCounter = tempCounter + 1
+        address2 = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName)
+        quadruplesOutput.append(('=',address,'',address2))
+        currentFunctionReturnType = expressionType
+        currentFunctionReturnOperand = address2
+    else:
+        raise Exception("type: '" + expressionType + "' does not match func return type: '" + funcRow["type"] + "'")
 
 def p_print_val(p):
     '''print_val : qnp13 ID qnp14 print_exp'''
@@ -410,7 +456,20 @@ def p_var_cte(p):
                | TRUE qnp_cte_bool
                | FALSE qnp_cte_bool
                | access_class_atribute
-               | class_function_call'''
+               | function_call np_FillStacksWithReturnValue
+               | class_function_call '''
+
+def p_FillStacksWithReturnValue(p):
+    '''np_FillStacksWithReturnValue : empty'''
+    global currentFunctionReturnType
+    global currentFunctionReturnOperand
+    #check if current func is not void 
+    if currentFunctionCall["type"] == 'void':
+        raise Exception("function: "+currentFunctionCall["name"]+" does not return a value")
+    qg.typeStack.append(currentFunctionReturnType)
+    qg.operandStack.append(currentFunctionReturnOperand)
+    print(qg.operandStack)    
+    print(qg.typeStack)
 
 def p_empty(p):
     '''empty :'''
@@ -876,6 +935,7 @@ codeToCompile = open('dummy2.txt','r')
 data = str(codeToCompile.read())
 lex.input(data)
 
+
 try:
     parser.parse(data)
     print('Code passed!')
@@ -889,7 +949,7 @@ try:
         print(temp, "-", quad)
         temp += 1
 
-
+    print(qg.operandStack)
     # dirFunc.printDirFunc()
     # currentVarTable.printVars()
     # print(globalVarsTable)
