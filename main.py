@@ -87,21 +87,25 @@ def p_parameter2(p):
                   | empty'''
 
 def p_function_call(p):
-    '''function_call : ID np_VerifyFuncInDirFunc LEFTPAREN expression function_call2 RIGHTPAREN'''
+    '''function_call : ID np_VerifyFuncInDirFunc np_GenerateEraQuad LEFTPAREN expression function_call2 RIGHTPAREN'''
 
 def p_function_call2(p):
     '''function_call2 : COMMA expression function_call2
                       | empty'''
 
 
-
+def p_generate_era_quad(p):
+    '''np_GenerateEraQuad : empty'''
+    global dirFunc
+    func = dirFunc.getFunctionByName(p[-2])
+    memorySize = func["memorySize"]
+    quadruplesOutput.append(("ERA",'empty','empty',memorySize))
 
 
 
 def p_np_verify_func_in_dirfunc(p):
     '''np_VerifyFuncInDirFunc : empty'''
     global dirFunc
-
     func = dirFunc.getFunctionByName(p[-1])
     if (func == None):
         raise Exception("Could not find (",p[-1],"in the function directory")
