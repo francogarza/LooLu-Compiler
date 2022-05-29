@@ -227,24 +227,38 @@ def p_reading(p):
     '''reading : READ LEFTPAREN read_val RIGHTPAREN SEMICOLON'''
 
 def p_while_statement(p):
-    '''while_statement : WHILE LEFTPAREN expression whilenp1 RIGHTPAREN block whilenp2'''
+    '''while_statement : WHILE LEFTPAREN np_SaveJumpForWhile expression np_CreateGotofForWhile RIGHTPAREN block np_FillGotofForWhile np_CreateGotoForWhile'''
 
-def p_whilenp1(p):
-    '''whilenp1 : empty'''
-    global whileOperand
+def p_save_jump_for_while(p):
+    '''np_SaveJumpForWhile : empty'''
+    global quadruplesOutput
+    qg.jumpStack.append(len(quadruplesOutput))
+
+def p_create_gotof_for_while(p):
+    '''np_CreateGotofForWhile : empty'''
     expressionType = qg.typeStack.pop()
-    nextQuad = len(quadruplesOutput)
-    qg.jumpStack.append(nextQuad)
-    if(expressionType != 'bool'):
-        raise Exception("Sematic Error: Type in while statement is not a bool")
+    if(expressionType == 'bool'):
+        expressionResult = qg.operandStack.pop()
+        quadruplesOutput.append(('GOTOF',expressionResult,'',None))
+        currentQuadNumber = len(quadruplesOutput) - 1
+        qg.jumpStack.append(currentQuadNumber)
     else:
-        whileOperand.append(qg.operandStack.pop())
+        raise Exception("Sematic Error: Type in while statement is not a bool")
 
-def p_whilenp2(p):
-    '''whilenp2 : empty'''
-    global whileOperand
-    quadnum = qg.jumpStack.pop()
-    quadruplesOutput.append(('GOTOV', whileOperand.pop(), 'empty', quadnum))
+
+def p_fill_gotof_for_while(p):
+    '''np_FillGotofForWhile : empty'''
+    migaja = qg.jumpStack.pop()
+    siguienteQuad = len(quadruplesOutput)
+    param1 = quadruplesOutput[migaja][0]
+    param2 = quadruplesOutput[migaja][1]
+    quadruplesOutput[migaja] = (param1,param2,'empty',siguienteQuad)
+
+def p_create_goto_for_while(p):
+    '''np_CreateGotoForWhile : empty'''
+    migaja = qg.jumpStack.pop()
+    quadruplesOutput.append(('GOTO','empty','empty',migaja))
+
 
 def p_return_func(p):
     '''return_func : RETURN LEFTPAREN expression RIGHTPAREN'''
