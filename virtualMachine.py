@@ -59,9 +59,6 @@ class virtualMachine():
 
         readObjCode() 
         loadConstantMemory()
-
-        print(self.quadruples)
-        print(self.constantsMemory.getData())
         
     def runMachine(self):
         def insertInMemory(address, value):
@@ -200,15 +197,26 @@ class virtualMachine():
                 varToBeAssigned = int(currentQuad[3])
                 val = input()
                 # Return the type of a string that can be converted in other type 
-                try:
-                    val = int(val)
-                except ValueError:
+                if val == 'true' or val == 'false':
+                    print('entra')
+                    insertInMemory(varToBeAssigned, val)
+                else:
                     try:
-                        val = float(val)
+                        val = int(val)
                     except ValueError:
-                        val = str(val)[0]
-                        return "char"
-                insertInMemory(varToBeAssigned, val)
+                        try:
+                            val = float(val)
+                        except ValueError:
+                            val = str(val)[0]
+                            return "char"
+                    insertInMemory(varToBeAssigned, val)
+            
+            if (currentQuad[0] == 'GOTO'): # GOTO id found
+                self.ip = currentQuad[3] - 2 # -2 Because quads start at index 0 and add one more iteration
+            if (currentQuad[0] == 'GOTOF'):
+                val = getFromMemory(int(currentQuad[1]))
+                if (val == 'false'):
+                    self.ip = int(currentQuad[3]) - 1
             
             self.ip = self.ip + 1
             currentQuad = self.quadruples[self.ip]
