@@ -8,6 +8,8 @@ class Memory():
     def __init__(self):
         self.data = {}
     def insert(self, address, value):
+        if address in self.data:
+            return
         self.data[address] = value
     def get(self, address):
         if (address in self.data):
@@ -40,35 +42,26 @@ class virtualMachine():
     currentQuad = None
     currentFunc = None
 
-    # Change keys to address to get quick access
-    # for key, obj in constantTable.items():
-    #     constantsMemory.insert(obj['address'], obj['name'])
-
     def startMachine(self):
         def strToQuad(string):
             quad = list(string.split(" "))
             return quad
 
         def readObjCode():
-            isConst = False
             file = open("objCode.txt", "r")
             for line in file:
-                if line == 'CONSTS\n':
-                    isConst = True
-                    continue
-                if isConst:
-                    print('entra')
-                    item = strToQuad(line)
-                    self.constantsMemory.insert(item[0], item[1].strip('\n'))
-                else:
-                    self.quadruples.append(strToQuad(line.strip('\n')))
+                self.quadruples.append(strToQuad(line.strip('\n')))
+        
+        def loadConstantMemory():
+            for key in self.constantTable:
+                self.constantsMemory.insert(self.constantTable[key], key)
 
-        dirFunc = vt.DirFunc
-        constantTable = ct.constantTable
-        readObjCode()
+        readObjCode() 
+        loadConstantMemory()
 
         print(self.quadruples)
         print(self.constantsMemory.getData())
+        
 
         
 

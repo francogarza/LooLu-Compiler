@@ -768,8 +768,8 @@ try:
     
     file.write('CONSTS' + '\n')
 
-    for item in ct.constantTable:
-        file.write(str(item['address'] ) + ' ' + str(item['value']) + '\n')
+    # for item in ct.constantTable:
+    #     file.write(str(item[0]) + ' ' + str(item[1]) + '\n')
 
     file.close()
     vm.startMachine()
