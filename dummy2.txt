@@ -32,7 +32,7 @@ Loo() {
   f = g / k;
   k = j;
 
-  incrementaSueldo2(myInt);
+  incrementaSueldo2(x,x);
 
   myFloat = 1.0;
   myInt = 2;
@@ -45,18 +45,8 @@ Loo() {
   print(abc, a, b, c);  
   a = b + c;
 
-  while(abc){
-    if (cba) {
-      print(abc);
-      read(a);
-      a = b + c;
-    } else {
-      b = a + c;
-      read(c);
-    }
-    while(abc){
-      d = c;
-    }
+  while(a < c){
+    print(abc);
   }
 
 } Lu;

@@ -9,8 +9,8 @@ import constantTable as ct
 import semanticCube as sc
 
 # global vars
-programName = None; dirFunc = vt.DirFunc(); globalVarsTable = None; currentFunc = None; currentType = None
-currentVarTable = None; currentClass = None; currentClassVarTable = None; urrentClassDirFunc = None
+programName = None; dirFunc = vt.DirFunc(); globalVarsTable = None; currentFunc = None; currentType = None; currentParamSignature = None
+currentVarTable = None; currentClass = None; currentClassVarTable = None; currentClassDirFunc = None; paramCounter = 0
 qg = quadrupleGenerator.quadrupleGenerator(); mh = memoryHandler.memoryHandler()
 tempCounter = 1; whileOperand = []; quadruplesOutput = []
 
@@ -87,21 +87,36 @@ def p_parameter2(p):
                   | empty'''
 
 def p_function_call(p):
-    '''function_call : ID np_VerifyFuncInDirFunc np_GenerateEraQuad LEFTPAREN expression function_call2 RIGHTPAREN'''
+    '''function_call : ID np_VerifyFuncInDirFunc np_GenerateEraQuad LEFTPAREN super_expression np_VerifyParamTypeWithSignature function_call2 RIGHTPAREN'''
 
 def p_function_call2(p):
-    '''function_call2 : COMMA expression function_call2
-                      | empty'''
+    '''function_call2 : COMMA super_expression np_VerifyParamTypeWithSignature function_call2
+                      | empty np_CheckForMissingArguments'''
 
+def p_check_for_missing_arguments(p):
+    '''np_CheckForMissingArguments : empty'''
+    global paramCounter
+    global currentParamSignature
+    print(currentParamSignature,paramCounter)
+    if (len(currentParamSignature)-1 > paramCounter-1):
+        raise Exception('Function call is missing arguments')
+    else:
+        pass
 
-def p_generate_era_quad(p):
-    '''np_GenerateEraQuad : empty'''
-    global dirFunc
-    func = dirFunc.getFunctionByName(p[-2])
-    memorySize = func["memorySize"]
-    quadruplesOutput.append(("ERA",'empty','empty',memorySize))
+def p_verify_param_type_with_signature(p):
+    '''np_VerifyParamTypeWithSignature : empty'''
+    global currentParamSignature
+    global paramCounter
 
+    param = qg.operandStack.pop()
+    paramType = qg.typeStack.pop()
+    print(param, paramType)
 
+    if (paramType == currentParamSignature[paramCounter]):
+        quadruplesOutput.append(("PARAMETER",param,'',("ARGUMENT#"+str(paramCounter))))
+        paramCounter = paramCounter + 1
+    else:
+        raise Exception("Type: '" + paramType + "' does not match excepted type: '" + currentParamSignature[paramCounter] + "' for function call")
 
 def p_np_verify_func_in_dirfunc(p):
     '''np_VerifyFuncInDirFunc : empty'''
@@ -111,7 +126,18 @@ def p_np_verify_func_in_dirfunc(p):
         raise Exception("Could not find (",p[-1],"in the function directory")
 
 
-
+def p_generate_era_quad(p):
+    '''np_GenerateEraQuad : empty'''
+    global dirFunc
+    global paramCounter
+    global currentParamSignature
+    currentParamSignature = None
+    func = dirFunc.getFunctionByName(p[-2])
+    memorySize = func["memorySize"]
+    quadruplesOutput.append(("ERA",'empty','empty',memorySize))
+    paramCounter = 0
+    currentParamSignature = func["parameterSignature"]
+    print(currentParamSignature)
 
 
 
@@ -304,7 +330,7 @@ def p_create_gotof_for_while(p):
 def p_fill_gotof_for_while(p):
     '''np_FillGotofForWhile : empty'''
     migaja = qg.jumpStack.pop()
-    siguienteQuad = len(quadruplesOutput)
+    siguienteQuad = len(quadruplesOutput) + 1
     param1 = quadruplesOutput[migaja][0]
     param2 = quadruplesOutput[migaja][1]
     quadruplesOutput[migaja] = (param1,param2,'empty',siguienteQuad)
@@ -856,9 +882,10 @@ try:
         temp += 1
 
 
-    dirFunc.printDirFunc()
+    # dirFunc.printDirFunc()
     # currentVarTable.printVars()
-    print(globalVarsTable)
+    # print(globalVarsTable)
+    globalVarsTable.printVars()
 
 except Exception as excep:
     print('Error in code!\n', excep)
