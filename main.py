@@ -87,11 +87,29 @@ def p_parameter2(p):
                   | empty'''
 
 def p_function_call(p):
-    '''function_call : ID LEFTPAREN expression function_call2 RIGHTPAREN'''
+    '''function_call : ID np_VerifyFuncInDirFunc LEFTPAREN expression function_call2 RIGHTPAREN'''
 
 def p_function_call2(p):
     '''function_call2 : COMMA expression function_call2
                       | empty'''
+
+
+
+
+
+
+def p_np_verify_func_in_dirfunc(p):
+    '''np_VerifyFuncInDirFunc : empty'''
+    global dirFunc
+
+    func = dirFunc.getFunctionByName(p[-1])
+    if (func == None):
+        raise Exception("Could not find (",p[-1],"in the function directory")
+
+
+
+
+
 
 def p_type(p):
     '''type : type_simple
@@ -809,15 +827,16 @@ lex.input(data)
 try:
     parser.parse(data)
     print('Code passed!')
-    # print(qg.operandStack)
+    # print(qg.operandStack  )
     # print(qg.operatorStack)
     # print(qg.typeStack)
-    # print(ct.constantTable)
+    # print(ct.constantTable) 
 
     temp = 0
     for quad in quadruplesOutput:
         print(temp, "-", quad)
         temp += 1
+
 
     dirFunc.printDirFunc()
     # currentVarTable.printVars()

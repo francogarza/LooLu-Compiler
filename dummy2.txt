@@ -21,6 +21,7 @@ FUNCS:
       var bool : bb;
     START:
       porcentaje2 = asdfxx * a / b;
+      print(a,asdfxx);
   }
 
 CLASSES:
@@ -31,6 +32,7 @@ Loo() {
   f = g / k;
   k = j;
 
+  incrementaSueldo2(myInt);
 
   myFloat = 1.0;
   myInt = 2;
