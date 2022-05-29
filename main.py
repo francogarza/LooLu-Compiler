@@ -87,11 +87,19 @@ def p_parameter2(p):
                   | empty'''
 
 def p_function_call(p):
-    '''function_call : ID np_VerifyFuncInDirFunc np_GenerateEraQuad LEFTPAREN super_expression np_VerifyParamTypeWithSignature function_call2 RIGHTPAREN'''
+    '''function_call : ID np_VerifyFuncInDirFunc np_GenerateEraQuad LEFTPAREN super_expression np_VerifyParamTypeWithSignature function_call2 RIGHTPAREN np_CreateGosubQuad'''
 
 def p_function_call2(p):
     '''function_call2 : COMMA super_expression np_VerifyParamTypeWithSignature function_call2
                       | empty np_CheckForMissingArguments'''
+
+def p_create_gosub_quad(p):
+    '''np_CreateGosubQuad : empty'''
+    global quadruplesOutput
+    global currentFunctionCall
+    jump = currentFunctionCall["functionQuadStart"]
+    quadruplesOutput.append(('GOSUB','','',jump))
+    print("gosub")
 
 def p_check_for_missing_arguments(p):
     '''np_CheckForMissingArguments : empty'''
