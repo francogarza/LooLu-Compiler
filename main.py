@@ -9,7 +9,7 @@ import constantTable as ct
 import semanticCube as sc
 
 # global vars
-programName = None; dirFunc = vt.DirFunc(); currentFunc = None; currentType = None
+programName = None; dirFunc = vt.DirFunc(); globalVarsTable = None; currentFunc = None; currentType = None
 currentVarTable = None; currentClass = None; currentClassVarTable = None; urrentClassDirFunc = None
 qg = quadrupleGenerator.quadrupleGenerator(); mh = memoryHandler.memoryHandler()
 tempCounter = 1; whileOperand = []; quadruplesOutput = []
@@ -18,7 +18,15 @@ tempCounter = 1; whileOperand = []; quadruplesOutput = []
 lex.lex(); print("Lexer generated")
 
 def p_LOOLU(p):
-    '''loolu : LOOLU ID np_AddGlobalFuncToDirfunc np_CreateEmptyGotomainQuadruple SEMICOLON VARS COLON np_CreateVarsTable declare_vars FUNCS COLON declare_funcs CLASSES COLON declare_classes LOO LEFTPAREN RIGHTPAREN np_FillGotomainQuadruple block LU SEMICOLON'''
+    '''loolu : LOOLU ID np_AddGlobalFuncToDirfunc np_CreateEmptyGotomainQuadruple SEMICOLON VARS COLON np_CreateVarsTable declare_vars p_AssignGlobalVarsTable FUNCS COLON declare_funcs CLASSES COLON declare_classes LOO LEFTPAREN RIGHTPAREN np_FillGotomainQuadruple block LU SEMICOLON'''
+
+def p_AssignGlobalVarsTable(p):
+    '''p_AssignGlobalVarsTable : empty'''
+    global globalVarsTable
+    global dirFunc
+    global programName
+    row = dirFunc.getFunctionByName(programName)
+    globalVarsTable = row["table"]
 
 def p_declare_vars(p):
     '''declare_vars : vars
@@ -325,7 +333,7 @@ def p_factor(p):
               | var_cte'''
 
 def p_var_cte(p):
-    '''var_cte : ID qnp1
+    '''var_cte : ID qnp1 
                | CTEINT qnp_cte_int
                | CTEFLOAT qnp_cte_float
                | CTECHAR qnp_cte_char
@@ -347,7 +355,7 @@ def p_qnp_cte_int(p):
     # print('entraCTEINT')
     global currentFunc
     global programName
-    address = mh.addVariable(currentFunc["name"], p[-1], 'CTEINT', None, programName)
+    address = mh.addVariable(currentFunc, p[-1], 'CTEINT', None, programName)
     qg.operandStack.append(address)
     qg.typeStack.append('int')
 
@@ -356,7 +364,7 @@ def p_qnp_cte_float(p):
     # print('entra FLOAT')
     global currentFunc
     global programName
-    address = mh.addVariable(currentFunc["name"], p[-1], 'CTEFLOAT', None, programName)
+    address = mh.addVariable(currentFunc, p[-1], 'CTEFLOAT', None, programName)
     qg.operandStack.append(address)
     qg.typeStack.append('float')
 
@@ -364,7 +372,7 @@ def p_qnp_cte_char(p):
     '''qnp_cte_char : empty'''
     global currentFunc
     global programName
-    address = mh.addVariable(currentFunc["name"], p[-1], 'CTECHAR', None, programName)
+    address = mh.addVariable(currentFunc, p[-1], 'CTECHAR', None, programName)
     qg.operandStack.append(address)
     qg.typeStack.append('char')
 
@@ -372,7 +380,7 @@ def p_qnp_cte_bool(p):
     '''qnp_cte_bool : empty'''
     global currentFunc
     global programName
-    address = mh.addVariable(currentFunc["name"], p[-1], 'CTEBOOL', None, programName)
+    address = mh.addVariable(currentFunc, p[-1], 'CTEBOOL', None, programName)
     qg.operandStack.append(address)
     qg.typeStack.append('bool')
 
@@ -481,17 +489,20 @@ def p_np15_add_parameter_as_variable_to_func_class(p):
 '''
 def p_np16_is_on_current_vars_table(p): # Check if an ID is declared in the Global Scope
     '''np16isOnCurrentVarsTable : empty'''
-    # print("llegue")/
     global currentVarTable
     global currentType
     global currentFunc
     global dirFunc
-    currentFunc = dirFunc.getFunctionByName(programName)
-    currentVarTable = currentFunc["table"]
+    global globalVarsTable
 
     id = currentVarTable.getVariableByName(p[-1])
     if (id == None):
-        raise Exception("   ERROR: Variable not declared on scope " + p[-1])
+        if globalVarsTable != None:
+            id = globalVarsTable.getVariableByName(p[-1])
+            if (id == None):
+                raise Exception("   ERROR: Variable not declared on scope " + p[-1])
+        else:
+            raise Exception("   ERROR: Variable not declared on scope " + p[-1])
     
 '''
     QUADRUPLE NEURALGIC POINTS
@@ -510,9 +521,18 @@ def p_qnp2_insertOperator(p):
 def p_qnp1(p):
     '''qnp1 : empty'''
     global currentVarTable
+    global globalVarsTable
     variable = currentVarTable.getVariableByName(p[-1])
-    qg.operandStack.append(variable["address"])
-    qg.typeStack.append(variable["type"])
+    if(variable != None):
+        qg.operandStack.append(variable["address"])
+        qg.typeStack.append(variable["type"])
+    else:
+        variable = globalVarsTable.getVariableByName(p[-1])
+        if(variable != None):
+            qg.operandStack.append(variable["address"])
+            qg.typeStack.append(variable["type"])
+        else:
+            raise Exception("could not find variable in scope nor global")
 
 def p_qnp2(p):
     '''qnp2 : empty'''
@@ -535,8 +555,7 @@ def p_qnp4(p):
         if result_type != -1:
             result = 'T'+str(tempCounter)
             tempCounter = tempCounter + 1
-
-            address = mh.addVariable(currentFunc['name'], result, 'TEMPORAL', None, programName)
+            address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName)
 
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
@@ -558,7 +577,7 @@ def p_qnp5(p):
             result = 'T'+str(tempCounter)
             tempCounter = tempCounter + 1
 
-            address = mh.addVariable(currentFunc['name'], result, 'TEMPORAL', None, programName)
+            address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName)
 
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
@@ -612,7 +631,7 @@ def p_qnp10(p):
             result = 'T'+str(tempCounter)
             tempCounter = tempCounter + 1
 
-            address = mh.addVariable(currentFunc['name'], result, 'TEMPORAL', None, programName)
+            address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName)
 
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
@@ -638,7 +657,7 @@ def p_qnp12(p):
             result = 'T'+str(tempCounter)
             tempCounter = tempCounter + 1
 
-            address = mh.addVariable(currentFunc['name'], result, 'TEMPORAL', None, programName)
+            address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName)
 
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
@@ -724,7 +743,7 @@ def p_np_add_var_to_current_table(p):
     if (id == None):
         address = mh.addVariable(currentFunc, p[-1], currentType, None, programName)
         currentVarTable.insert({"name": p[-1], "type": currentType, "address": address})
-        currentVarTable.printVars()
+        # currentVarTable.printVars()
     else:
         raise Exception("ERROR: Redeclaration of variable ID = " + p[-1])
 
@@ -764,9 +783,19 @@ def p_np_fill_gotomain_quadruple(p):
     # llena el cuadruplo de GOTOMAIN.
     # calculamos el cuadruplo en el que estamos que representa el primer cuadruplo del main().
     # como sabemos que es el primer cuadruplo, lo accesamos directo y meter el valor que acabamos de calcular.
+    # tambien se asigna el globalVarsTable globalVarsTable
     global quadruplesOutput
+    global currentVarTable
+    global globalVarsTable
+    global currentFunc
     firstMainFuncQuad = len(quadruplesOutput)
     quadruplesOutput[0] = (("GOTOMAIN", 'empty', 'empty', firstMainFuncQuad))
+    currentVarTable = globalVarsTable
+    currentFunc = programName
+
+def p_test(p):
+    '''test : empty'''
+    print("testestestestest")
 
 yacc.yacc()
 
@@ -792,6 +821,7 @@ try:
 
     dirFunc.printDirFunc()
     # currentVarTable.printVars()
+    print(globalVarsTable)
 
 except Exception as excep:
     print('Error in code!\n', excep)

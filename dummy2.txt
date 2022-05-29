@@ -1,7 +1,7 @@
 LooLu miPrograma;
 
 VARS:
-  var int : myInt, myInt4;
+  var int : myInt, xy;
   var float : myFloat;
   var bool : abc, cba;
   var float : x;
@@ -9,22 +9,25 @@ VARS:
   var float : a, b, c, d, e, f, g, h, i, j, k, l, m;
 
 FUNCS:
-  func void incrementaSueldo(myInt4: int, porcentaje1: float, asdfxx: float) {
+  func void incrementaSueldo(myInt: float, porcentaje1: int, asdfxx: int) {
     VARS: 
-      var int : myInt;
+      var int : myInt4;
     START:
-      a = b + c;
+      porcentaje1 = asdfxx / xy;
+      print(porcentaje1);
   }
   func void incrementaSueldo2(asdfxx: float, porcentaje2: float) {
     VARS: 
       var bool : bb;
     START:
+      porcentaje2 = asdfxx * a / b;
   }
 
 CLASSES:
 
 Loo() {
-  a = b + c;
+  print(abc);
+  a = c;
   f = g / k;
   k = j;
 
@@ -38,7 +41,6 @@ Loo() {
 	abc = ((a * b - c * d) > c + d * e / f) && (g * h - j > l - a) && b + c > d * f;
   read(abc, a, b, c);
   print(abc, a, b, c);  
-  print(abc);
   a = b + c;
 
   while(abc){
