@@ -57,8 +57,8 @@ def p_funcs(p):
     '''funcs : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter RIGHTPAREN functionBlock np_CreateEndFuncQuad np_CheckIfFuncHasReturned funcs_block'''
 
 def p_funcs_block(p):
-    '''funcs_block : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter RIGHTPAREN functionBlock np_CreateEndFuncQuad funcs_block
-                   | empty np_CheckIfFuncHasReturned'''
+    '''funcs_block : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter RIGHTPAREN functionBlock np_CreateEndFuncQuad np_CheckIfFuncHasReturned funcs_block
+                   | empty '''
 
 def p_np_CheckIfFuncHasReturned(p):
     '''np_CheckIfFuncHasReturned : empty'''
@@ -482,9 +482,9 @@ def p_empty(p):
 
 def p_qnp_cte_int(p):
     '''qnp_cte_int : empty'''
-    # print('entraCTEINT')
     global currentFunc
     global programName
+    print(currentFunc)
     address = mh.addVariable(currentFunc, p[-1], 'CTEINT', None, programName)
     qg.operandStack.append(address)
     qg.typeStack.append('int')
@@ -916,6 +916,7 @@ def p_np_create_end_func_quad(p):
     # crea el quadruplo de endfunc por que acaba de leer el fin de la funcion
     global dirFunc
     global currentFunc
+    mh.resetLocalTempMemory()
     quadruplesOutput.append(('ENDFUNC','','',''))
 
 def p_np_fill_gotomain_quadruple(p):
@@ -942,7 +943,7 @@ yacc.yacc()
 parser = yacc.yacc()
 print("Yacc has been generated!")
 
-codeToCompile = open('dummy2.txt','r')
+codeToCompile = open('main.lou','r')
 data = str(codeToCompile.read())
 lex.input(data)
 
@@ -967,16 +968,16 @@ try:
 
     # for item in ct.constantTable:
     #     file.write(str(item[0]) + ' ' + str(item[1]) + '\n')
+    # globalVarsTable.printVars()
 
     file.close()
-    vm.startMachine()
+    vm.startMachine(dirFunc)
     vm.runMachine()
 
-    print(qg.operandStack)
+    # print(qg.operandStack)
     # dirFunc.printDirFunc()
     # currentVarTable.printVars()
     # print(globalVarsTable)
-    globalVarsTable.printVars()
 
 except Exception as excep:
     print('Error in code!\n', excep)
