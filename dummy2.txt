@@ -1,51 +1,45 @@
 LooLu miPrograma;
 
 VARS:
-  var int : myInt, xy;
+  var int : myInt, myInt2, myCont, m;
   var float : myFloat;
   var bool : abc, cba;
   var float : x;
   var char : myChar;
-  var float : a, b, c, d, e, f, g, h, i, j, k, l, m;
+  var float : a, b, c, d, e, f, g, h, i, j, k, l;
 
 FUNCS:
-  func int incrementaSueldo(myFloat: float, porcentaje1: int, asdfxx: int) {
-    VARS: 
-      var int : myInt4;
-    START:
-      porcentaje1 = asdfxx / xy;
-      print(porcentaje1);
-      print(myInt);
-      return(porcentaje1);
-  }
-  func int incrementaSueldo2(asdfxx: float, porcentaje2: float) {
-    VARS: 
-      var bool : bb;
-    START:
-      porcentaje2 = asdfxx * a / b;
-      print(a,asdfxx);
-      return(myInt);
-  }
 
 CLASSES:
 
 Loo() {
+  a = 1.0;
+  b = 2.0;
+  c = 3.0;
+  d = 6.0;
+  e = c * 2;
+  f = 45.5;
+  i = b * f / d;
+  j = 34.7;
+  g = 3.14;
+  h = 3.4;
+  l = h * f;
 
-  myInt = incrementaSueldo2(x,x);
+  myInt = 0;
 
-  myFloat = 1.0;
-  myInt = 2;
-  myChar = 'a';
-  abc = true;
-  cba = false;
+  abc = ((a * b - c * d) > c + d * e / f) && (g * h - j > l - a) && b + c > d * f;
 
-	abc = ((a * b - c * d) > c + d * e / f) && (g * h - j > l - a) && b + c > d * f;
-  read(abc, a, b, c);
-  print(abc, a, b, c);  
-  a = b + c;
-
-  while(a < c){
-    print(abc);
+  myCont = 0;
+  while (myInt < 10) {
+    myInt2 = 0;
+    while (myInt2 < 10) {
+      if (myCont % 10 == 0) {
+        print(myCont);
+      }
+      myCont = myCont + 1;
+      myInt2 = myInt2 + 1;
+    }
+    myInt = myInt + 1;
   }
 
 } Lu;

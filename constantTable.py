@@ -1,10 +1,15 @@
-constantTable = []
+constantTable = {}
 
 def getConstantByName(self, name):
-        for item in constantTable:
-            if (item["name"] == name):
-                return item
+        if constantTable[name]:
+                return constantTable[name]
         return None
 
+# def getConstantByValue(self, value):
+#         for item in constantTable:
+#             if (item["value"] == value):
+#                 return item
+#         return None
+
 def insert(item):
-        constantTable.append(item)
+        constantTable[item["name"]] = item["value"]
