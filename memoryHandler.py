@@ -13,6 +13,7 @@ class memoryHandler:
     localInt = None
     localFloat = None
     localChar = None
+    localTemp = None
     tempAddressGlobal = None
     constAddressINT = None
     constAddressFLOAT = None
@@ -27,6 +28,7 @@ class memoryHandler:
         self.localInt = [6000, 6000]
         self.localFloat = [7000, 7000]
         self.localChar = [8000, 8000]
+        self.localTemp = [11000, 11000]
         self.localBool = [9000,9000]
         self.tempAddressGlobal = [10000, 10000]
         self.constAddressINT = [14000, 14000]
@@ -42,17 +44,29 @@ class memoryHandler:
             # print('var: ', varName, 'assigned at: ', address)
             self.globalInt[1] += 1
             return address
+        elif funcName != programName and varType == 'int':
+            address = self.localInt[1]
+            self.localInt[1] += 1
+            return address
         
         if funcName == programName and varType == 'float':
             address = self.globalFloat[1]
             # print('var: ', varName, 'assigned at: ', address)
             self.globalFloat[1] += 1
             return address
+        elif funcName != programName and varType == 'float':
+            address = self.localFloat[1]
+            self.localFloat[1] += 1
+            return address
         
         if funcName == programName and varType == 'char':
             address = self.globalChar[1]
             # print('var: ', varName, 'assigned at: ', address)
             self.globalChar[1] += 1
+            return address
+        elif funcName != programName and varType == 'char':
+            address = self.localChar[1]
+            self.localChar[1] += 1
             return address
 
         if funcName == programName and varType == 'bool':
@@ -101,4 +115,8 @@ class memoryHandler:
             address = self.tempAddressGlobal[1]
             # print('var: ', varName, 'assigned at: ', address)
             self.tempAddressGlobal[1] += 1
+            return address
+        elif funcName != programName and varType == 'TEMPORAL':
+            address = self.localTemp[1]
+            self.localTemp[1] += 1
             return address

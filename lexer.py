@@ -29,6 +29,7 @@ reserved = {
     'print': 'PRINT',
     'read': 'READ',
     'return': 'RETURN',
+    'START' : 'START',
     'Lu': "LU" #lo utilizamos para indicar que se acabo el main
 }
 

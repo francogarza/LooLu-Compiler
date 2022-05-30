@@ -1,7 +1,8 @@
 LooLu miPrograma;
 
 VARS:
-  var int : myInt, myInt2, myCont, m;
+  var int : myInt, xy;
+  var int : myInt2, myCont, m;
   var float : myFloat;
   var bool : abc, cba;
   var float : x;
@@ -13,6 +14,17 @@ FUNCS:
 CLASSES:
 
 Loo() {
+
+
+  myFloat = 1.0;
+  myInt = 2;
+  abc = true;
+  cba = false;
+
+  read(abc, a, b, c);
+  print(abc, a, b, c);  
+  a = b + c;
+
   a = 1.0;
   b = 2.0;
   c = 3.0;
@@ -35,6 +47,8 @@ Loo() {
     while (myInt2 < 10) {
       if (myCont % 10 == 0) {
         print(myCont);
+      } else {
+        print(myInt2);
       }
       myCont = myCont + 1;
       myInt2 = myInt2 + 1;

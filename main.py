@@ -1,4 +1,6 @@
 # imports
+from operator import truediv
+from pickle import TRUE
 from lexer import *
 from lexer import tokens
 import ply.yacc as yacc
@@ -10,8 +12,8 @@ import semanticCube as sc
 import virtualMachine
 
 # global vars
-programName = None; dirFunc = vt.DirFunc(); currentFunc = None; currentType = None
-currentVarTable = None; currentClass = None; currentClassVarTable = None; urrentClassDirFunc = None
+programName = None; dirFunc = vt.DirFunc(); globalVarsTable = None; currentFunc = None; currentType = None; currentParamSignature = None; currentFunctionReturnType = None; currentFunctionReturnOperand = None
+currentFuncHasReturnedValue = None; currentVarTable = None; currentClass = None; currentClassVarTable = None; currentClassDirFunc = None; paramCounter = 0; currentFunctionCall = None; currentFuncDeclaration = None
 qg = quadrupleGenerator.quadrupleGenerator(); mh = memoryHandler.memoryHandler()
 tempCounter = 1; whileOperand = []; quadruplesOutput = []; vm = virtualMachine.virtualMachine()
 
@@ -19,11 +21,19 @@ tempCounter = 1; whileOperand = []; quadruplesOutput = []; vm = virtualMachine.v
 lex.lex(); print("Lexer generated")
 
 def p_LOOLU(p):
-    '''loolu : LOOLU ID np_AddGlobalFuncToDirfunc np_CreateEmptyGotomainQuadruple SEMICOLON VARS COLON np_CreateVarsTable declare_vars FUNCS COLON declare_funcs CLASSES COLON declare_classes LOO LEFTPAREN RIGHTPAREN np_FillGotomainQuadruple block LU SEMICOLON'''
+    '''loolu : LOOLU ID np_AddGlobalFuncToDirfunc np_CreateEmptyGotomainQuadruple SEMICOLON VARS COLON np_CreateVarsTable declare_vars p_AssignGlobalVarsTable FUNCS COLON declare_funcs CLASSES COLON declare_classes LOO LEFTPAREN RIGHTPAREN np_FillGotomainQuadruple block LU SEMICOLON'''
+
+def p_AssignGlobalVarsTable(p):
+    '''p_AssignGlobalVarsTable : empty'''
+    global globalVarsTable
+    global dirFunc
+    global programName
+    row = dirFunc.getFunctionByName(programName)
+    globalVarsTable = row["table"]
 
 def p_declare_vars(p):
     '''declare_vars : vars
-               | empty'''
+                    | empty'''
 
 def p_vars(p):
     '''vars : VAR type COLON var_id SEMICOLON vars_block'''
@@ -44,11 +54,20 @@ def p_declare_funcs(p):
                      | empty'''
 
 def p_funcs(p):
-    '''funcs : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter np_FillMemorySizeParameterForCurrentFunc RIGHTPAREN block np_CreateEndFuncQuad funcs_block'''
+    '''funcs : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter RIGHTPAREN functionBlock np_CreateEndFuncQuad np_CheckIfFuncHasReturned funcs_block'''
 
 def p_funcs_block(p):
-    '''funcs_block : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter np_FillMemorySizeParameterForCurrentFunc RIGHTPAREN block np_CreateEndFuncQuad funcs_block
-                   | empty'''
+    '''funcs_block : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter RIGHTPAREN functionBlock np_CreateEndFuncQuad funcs_block
+                   | empty np_CheckIfFuncHasReturned'''
+
+def p_np_CheckIfFuncHasReturned(p):
+    '''np_CheckIfFuncHasReturned : empty'''
+    global currentFuncHasReturnedValue
+    global currentFun
+    if currentFuncHasReturnedValue != 1:
+        raise Exception('function: '+currentFunc+" is missing return value")
+    else:
+        currentFuncHasReturnedValue = 0
 
 # se supone que hasta aqui hacia arriba los puntos neuralgicos se documentaron y se mandaron a su segmento que esta al final del archivo
 def p_parameter(p):
@@ -70,19 +89,79 @@ def p_typeCompoundParameter(p):
 def p_addToParameterSignature(p):
     '''addToParameterSignature : empty'''
     global currentFunc
+    global currentType
+    currentType = p[-1]
     row = dirFunc.getFunctionByName(currentFunc)
-    row["parameterSignature"].append(p[-1])
+    row["parameterSignature"].append(currentType)
 
 def p_parameter2(p):
     '''parameter2 : COMMA ID COLON type_parameter np14AddParameterAsVariableToFunc parameter2
                   | empty'''
 
 def p_function_call(p):
-    '''function_call : ID LEFTPAREN expression function_call2 RIGHTPAREN'''
+    '''function_call : ID np_VerifyFuncInDirFunc np_GenerateEraQuad LEFTPAREN super_expression np_VerifyParamTypeWithSignature function_call2 RIGHTPAREN np_CreateGosubQuad'''
 
 def p_function_call2(p):
-    '''function_call2 : COMMA expression function_call2
-                      | empty'''
+    '''function_call2 : COMMA super_expression np_VerifyParamTypeWithSignature function_call2
+                      | empty np_CheckForMissingArguments'''
+
+def p_create_gosub_quad(p):
+    '''np_CreateGosubQuad : empty'''
+    global quadruplesOutput
+    global currentFunctionCall
+    jump = currentFunctionCall["functionQuadStart"]
+    quadruplesOutput.append(('GOSUB','','',jump))
+    print("gosub")
+
+def p_check_for_missing_arguments(p):
+    '''np_CheckForMissingArguments : empty'''
+    global paramCounter
+    global currentParamSignature
+    print(currentParamSignature,paramCounter)
+    if (len(currentParamSignature)-1 > paramCounter-1):
+        raise Exception('Function call is missing arguments')
+    else:
+        pass
+
+def p_verify_param_type_with_signature(p):
+    '''np_VerifyParamTypeWithSignature : empty'''
+    global currentParamSignature
+    global paramCounter
+
+    param = qg.operandStack.pop()
+    paramType = qg.typeStack.pop()
+    print(param, paramType)
+
+    if (paramType == currentParamSignature[paramCounter]):
+        quadruplesOutput.append(("PARAMETER",param,'',("ARGUMENT#"+str(paramCounter))))
+        paramCounter = paramCounter + 1
+    else:
+        raise Exception("Type: '" + paramType + "' does not match excepted type: '" + currentParamSignature[paramCounter] + "' for function call")
+
+def p_np_verify_func_in_dirfunc(p):
+    '''np_VerifyFuncInDirFunc : empty'''
+    global dirFunc
+    global currentFunctionCall
+    func = dirFunc.getFunctionByName(p[-1])
+    if (func == None):
+        raise Exception("Could not find (",p[-1],"in the function directory")
+    currentFunctionCall = func
+
+
+def p_generate_era_quad(p):
+    '''np_GenerateEraQuad : empty'''
+    global dirFunc
+    global paramCounter
+    global currentParamSignature
+    currentParamSignature = None
+    func = dirFunc.getFunctionByName(p[-2])
+    memorySize = func["memorySize"]
+    quadruplesOutput.append(("ERA",'empty','empty',memorySize))
+    paramCounter = 0
+    currentParamSignature = func["parameterSignature"]
+    print(currentParamSignature)
+
+
 
 def p_type(p):
     '''type : type_simple
@@ -93,10 +172,39 @@ def p_type_simple(p):
                    | FLOAT np4SetCurrentType
                    | CHAR np4SetCurrentType
                    | BOOL np4SetCurrentType
-                   | VOID np4SetCurrentType'''
+                   | VOID np4SetCurrentType np_HasReturnedType'''
+
+def p_HasReturnedType(p):
+    '''np_HasReturnedType : empty'''
+    global currentFuncHasReturnedValue
+    currentFuncHasReturnedValue = 1
 
 def p_type_compound(p):
     '''type_compound : ID'''
+
+def p_function_block(p):
+    '''functionBlock : LEFTBRACKET VARS COLON declare_vars np_FillMemorySizeParameterForCurrentFunc START COLON np_FillQuadStartParameterForFunc statement_block RIGHTBRACKET'''
+
+def p_np_fill_quad_start_parameter_for_func(p):
+    '''np_FillQuadStartParameterForFunc : empty'''
+    global dirFunc
+    global currentFunc
+    row = dirFunc.getFunctionByName(currentFunc)
+    row["functionQuadStart"] = len(quadruplesOutput)
+ 
+def p_vars(p):
+    '''vars : VAR type COLON var_id SEMICOLON vars_block'''
+
+def p_vars_block(p):
+    '''vars_block : VAR type COLON var_id SEMICOLON vars_block
+                  | empty'''
+
+def p_var_id(p):
+    '''var_id : ID np_AddVarToCurrentTable var_id_2'''
+
+def p_var_id_2(p):
+    '''var_id_2 : COMMA ID np_AddVarToCurrentTable var_id_2
+                | empty'''
 
 def p_block(p):
     '''block : LEFTBRACKET statement_block RIGHTBRACKET'''
@@ -261,7 +369,35 @@ def p_create_goto_for_while(p):
 
 
 def p_return_func(p):
-    '''return_func : RETURN LEFTPAREN expression RIGHTPAREN'''
+    '''return_func : RETURN LEFTPAREN expression np_AddReturnValueToGlobalVars RIGHTPAREN np_ChangeHasReturnedValue
+                   | empty'''
+
+def p_np_ChangeHasReturnedValue(p):
+    '''np_ChangeHasReturnedValue : empty'''
+    global currentFuncHasReturnedValue
+    currentFuncHasReturnedValue = 1
+
+def p_np_add_return_to_global_vars(p):
+    '''np_AddReturnValueToGlobalVars : empty'''
+    global currentFunc
+    global dirFunc
+    global currentVarTable
+    global tempCounter
+    global currentFunctionReturnType
+    global currentFunctionReturnOperand
+    expressionType = qg.typeStack.pop()
+    address = qg.operandStack.pop()
+    funcRow = dirFunc.getFunctionByName(currentFunc)
+    if (funcRow["type"] == expressionType):
+        globalVarsTable.insert({"name": currentFunc, "type": expressionType, "address" : address})
+        result = 'T'+str(tempCounter)
+        tempCounter = tempCounter + 1
+        address2 = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName)
+        quadruplesOutput.append(('=',address,'',address2))
+        currentFunctionReturnType = expressionType
+        currentFunctionReturnOperand = address2
+    else:
+        raise Exception("type: '" + expressionType + "' does not match func return type: '" + funcRow["type"] + "'")
 
 def p_print_val(p):
     '''print_val : qnp13 ID qnp14 print_exp'''
@@ -314,14 +450,27 @@ def p_factor(p):
               | var_cte'''
 
 def p_var_cte(p):
-    '''var_cte : ID qnp1
+    '''var_cte : ID qnp1 
                | CTEINT qnp_cte_int
                | CTEFLOAT qnp_cte_float
                | CTECHAR qnp_cte_char
                | TRUE qnp_cte_bool
                | FALSE qnp_cte_bool
                | access_class_atribute
-               | class_function_call'''
+               | function_call np_FillStacksWithReturnValue
+               | class_function_call '''
+
+def p_FillStacksWithReturnValue(p):
+    '''np_FillStacksWithReturnValue : empty'''
+    global currentFunctionReturnType
+    global currentFunctionReturnOperand
+    #check if current func is not void 
+    if currentFunctionCall["type"] == 'void':
+        raise Exception("function: "+currentFunctionCall["name"]+" does not return a value")
+    qg.typeStack.append(currentFunctionReturnType)
+    qg.operandStack.append(currentFunctionReturnOperand)
+    print(qg.operandStack)    
+    print(qg.typeStack)
 
 def p_empty(p):
     '''empty :'''
@@ -336,7 +485,7 @@ def p_qnp_cte_int(p):
     # print('entraCTEINT')
     global currentFunc
     global programName
-    address = mh.addVariable(currentFunc["name"], p[-1], 'CTEINT', None, programName)
+    address = mh.addVariable(currentFunc, p[-1], 'CTEINT', None, programName)
     qg.operandStack.append(address)
     qg.typeStack.append('int')
 
@@ -345,7 +494,7 @@ def p_qnp_cte_float(p):
     # print('entra FLOAT')
     global currentFunc
     global programName
-    address = mh.addVariable(currentFunc["name"], p[-1], 'CTEFLOAT', None, programName)
+    address = mh.addVariable(currentFunc, p[-1], 'CTEFLOAT', None, programName)
     qg.operandStack.append(address)
     qg.typeStack.append('float')
 
@@ -353,7 +502,7 @@ def p_qnp_cte_char(p):
     '''qnp_cte_char : empty'''
     global currentFunc
     global programName
-    address = mh.addVariable(currentFunc["name"], p[-1], 'CTECHAR', None, programName)
+    address = mh.addVariable(currentFunc, p[-1], 'CTECHAR', None, programName)
     qg.operandStack.append(address)
     qg.typeStack.append('char')
 
@@ -361,7 +510,7 @@ def p_qnp_cte_bool(p):
     '''qnp_cte_bool : empty'''
     global currentFunc
     global programName
-    address = mh.addVariable(currentFunc["name"], p[-1], 'CTEBOOL', None, programName)
+    address = mh.addVariable(currentFunc, p[-1], 'CTEBOOL', None, programName)
     qg.operandStack.append(address)
     qg.typeStack.append('bool')
 
@@ -451,7 +600,8 @@ def p_np14_add_parameter_as_variable_to_func(p):
     if (id != None):
         raise Exception("   ERROR: Redeclaration of variable ID = " + p[-3])
     else:
-        currentVarTable.insert({"name": p[-3], "type": currentType})
+        address = mh.addVariable(currentFunc, p[-1], currentType, None, programName)
+        currentVarTable.insert({"name": p[-3], "type": currentType, "address" : address})
 
 def p_np15_add_parameter_as_variable_to_func_class(p):
     '''np15AddParameterAsVariableToFuncClass : empty'''
@@ -469,17 +619,20 @@ def p_np15_add_parameter_as_variable_to_func_class(p):
 '''
 def p_np16_is_on_current_vars_table(p): # Check if an ID is declared in the Global Scope
     '''np16isOnCurrentVarsTable : empty'''
-    # print("llegue")/
     global currentVarTable
     global currentType
     global currentFunc
     global dirFunc
-    currentFunc = dirFunc.getFunctionByName(programName)
-    currentVarTable = currentFunc["table"]
+    global globalVarsTable
 
     id = currentVarTable.getVariableByName(p[-1])
     if (id == None):
-        raise Exception("   ERROR: Variable not declared on scope " + p[-1])
+        if globalVarsTable != None:
+            id = globalVarsTable.getVariableByName(p[-1])
+            if (id == None):
+                raise Exception("   ERROR: Variable not declared on scope " + p[-1])
+        else:
+            raise Exception("   ERROR: Variable not declared on scope " + p[-1])
     
 '''
     QUADRUPLE NEURALGIC POINTS
@@ -498,9 +651,18 @@ def p_qnp2_insertOperator(p):
 def p_qnp1(p):
     '''qnp1 : empty'''
     global currentVarTable
+    global globalVarsTable
     variable = currentVarTable.getVariableByName(p[-1])
-    qg.operandStack.append(variable["address"])
-    qg.typeStack.append(variable["type"])
+    if(variable != None):
+        qg.operandStack.append(variable["address"])
+        qg.typeStack.append(variable["type"])
+    else:
+        variable = globalVarsTable.getVariableByName(p[-1])
+        if(variable != None):
+            qg.operandStack.append(variable["address"])
+            qg.typeStack.append(variable["type"])
+        else:
+            raise Exception("could not find variable in scope nor global")
 
 def p_qnp2(p):
     '''qnp2 : empty'''
@@ -523,8 +685,7 @@ def p_qnp4(p):
         if result_type != -1:
             result = 'T'+str(tempCounter)
             tempCounter = tempCounter + 1
-
-            address = mh.addVariable(currentFunc['name'], result, 'TEMPORAL', None, programName)
+            address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName)
 
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
@@ -546,7 +707,7 @@ def p_qnp5(p):
             result = 'T'+str(tempCounter)
             tempCounter = tempCounter + 1
 
-            address = mh.addVariable(currentFunc['name'], result, 'TEMPORAL', None, programName)
+            address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName)
 
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
@@ -600,7 +761,7 @@ def p_qnp10(p):
             result = 'T'+str(tempCounter)
             tempCounter = tempCounter + 1
 
-            address = mh.addVariable(currentFunc['name'], result, 'TEMPORAL', None, programName)
+            address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName)
 
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
@@ -626,7 +787,7 @@ def p_qnp12(p):
             result = 'T'+str(tempCounter)
             tempCounter = tempCounter + 1
 
-            address = mh.addVariable(currentFunc['name'], result, 'TEMPORAL', None, programName)
+            address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName)
 
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
@@ -722,6 +883,7 @@ def p_np_add_var_to_current_table(p):
     if (id == None):
         address = mh.addVariable(currentFunc, p[-1], currentType, None, programName)
         currentVarTable.insert({"name": p[-1], "type": currentType, "address": address})
+        # currentVarTable.printVars()
     else:
         raise Exception("ERROR: Redeclaration of variable ID = " + p[-1])
 
@@ -761,9 +923,19 @@ def p_np_fill_gotomain_quadruple(p):
     # llena el cuadruplo de GOTOMAIN.
     # calculamos el cuadruplo en el que estamos que representa el primer cuadruplo del main().
     # como sabemos que es el primer cuadruplo, lo accesamos directo y meter el valor que acabamos de calcular.
+    # tambien se asigna el globalVarsTable globalVarsTable
     global quadruplesOutput
+    global currentVarTable
+    global globalVarsTable
+    global currentFunc
     firstMainFuncQuad = len(quadruplesOutput)
     quadruplesOutput[0] = (("GOTOMAIN", 'empty', 'empty', firstMainFuncQuad))
+    currentVarTable = globalVarsTable
+    currentFunc = programName
+
+def p_test(p):
+    '''test : empty'''
+    print("testestestestest")
 
 yacc.yacc()
 
@@ -774,10 +946,11 @@ codeToCompile = open('dummy2.txt','r')
 data = str(codeToCompile.read())
 lex.input(data)
 
+
 try:
     parser.parse(data)
     print('Code passed!')
-    # print(qg.operandStack)
+    # print(qg.operandStack  )
     # print(qg.operatorStack)
     # print(qg.typeStack)
     print(ct.constantTable)
@@ -799,8 +972,11 @@ try:
     vm.startMachine()
     vm.runMachine()
 
+    print(qg.operandStack)
     # dirFunc.printDirFunc()
     # currentVarTable.printVars()
+    # print(globalVarsTable)
+    globalVarsTable.printVars()
 
 except Exception as excep:
     print('Error in code!\n', excep)

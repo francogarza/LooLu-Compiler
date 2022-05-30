@@ -2,7 +2,7 @@ import semanticCube as sc
 
 class quadrupleGenerator:
     jumpStack = None
-    migajaStack = None # GOTOs stack
+    migajaStack = [] # GOTOs stack
     operandStack = None
     operatorStack = None
     typeStack = None
