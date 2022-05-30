@@ -28,8 +28,9 @@ class memoryHandler:
         self.localInt = [6000, 6000]
         self.localFloat = [7000, 7000]
         self.localChar = [8000, 8000]
-        self.localTemp = [9000, 9000]
-        self.tempAddressGlobal = [12000, 12000]
+        self.localTemp = [11000, 11000]
+        self.localBool = [9000,9000]
+        self.tempAddressGlobal = [10000, 10000]
         self.constAddressINT = [14000, 14000]
         self.constAddressFLOAT = [15000, 15000]
         self.constAddressCHAR = [16000, 16000]
@@ -77,28 +78,36 @@ class memoryHandler:
         if funcName == programName and varType == 'CTEINT':
             address = self.constAddressINT[1]
             # print('var: ', varName, 'assigned at: ', address)
-            ct.insert({"address": address, "value": varName})
+            if varName in ct.constantTable:
+                return ct.constantTable[varName]
+            ct.constantTable[varName] = address
             self.constAddressINT[1] += 1
             return address
 
         if funcName == programName and varType == 'CTEFLOAT':
             address = self.constAddressFLOAT[1]
             # print('var: ', varName, 'assigned at: ', address)
-            ct.insert({"address": address, "value": varName})
+            if varName in ct.constantTable:
+                return ct.constantTable[varName]
+            ct.constantTable[varName] = address
             self.constAddressFLOAT[1] += 1
             return address
 
         if funcName == programName and varType == 'CTECHAR':
             address = self.constAddressCHAR[1]
             # print('var: ', varName, 'assigned at: ', address)
-            ct.insert({"address": address, "value": varName})
+            if varName in ct.constantTable:
+                return ct.constantTable[varName]
+            ct.constantTable[varName] = address
             self.constAddressCHAR[1] += 1
             return address
 
         if funcName == programName and varType == 'CTEBOOL':
             address = self.constAddressBOOL[1]
             # print('var: ', varName, 'assigned at: ', address)
-            ct.insert({"address": address, "value": varName})
+            if varName in ct.constantTable:
+                return ct.constantTable[varName]
+            ct.constantTable[varName] = address
             self.constAddressBOOL[1] += 1
             return address
 

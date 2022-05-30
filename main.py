@@ -9,12 +9,13 @@ import memoryHandler
 import quadrupleGenerator
 import constantTable as ct
 import semanticCube as sc
+import virtualMachine
 
 # global vars
 programName = None; dirFunc = vt.DirFunc(); globalVarsTable = None; currentFunc = None; currentType = None; currentParamSignature = None; currentFunctionReturnType = None; currentFunctionReturnOperand = None
 currentFuncHasReturnedValue = None; currentVarTable = None; currentClass = None; currentClassVarTable = None; currentClassDirFunc = None; paramCounter = 0; currentFunctionCall = None; currentFuncDeclaration = None
 qg = quadrupleGenerator.quadrupleGenerator(); mh = memoryHandler.memoryHandler()
-tempCounter = 1; whileOperand = []; quadruplesOutput = []
+tempCounter = 1; whileOperand = []; quadruplesOutput = []; vm = virtualMachine.virtualMachine()
 
 # lexer
 lex.lex(); print("Lexer generated")
@@ -674,7 +675,7 @@ def p_qnp3(p):
 def p_qnp4(p):
     '''qnp4 : empty'''
     global tempCounter
-    if qg.operatorStack and qg.operatorStack[-1] in ['+','-','*','/']:
+    if qg.operatorStack and qg.operatorStack[-1] in ['+','-','*','/','%']:
         right_operand = qg.operandStack.pop() 
         right_type = qg.typeStack.pop()
         left_operand = qg.operandStack.pop()
@@ -695,7 +696,7 @@ def p_qnp4(p):
 def p_qnp5(p):
     '''qnp5 : empty'''
     global tempCounter
-    if qg.operatorStack and qg.operatorStack[-1] in ['*','/']:
+    if qg.operatorStack and qg.operatorStack[-1] in ['*','/','%']:
         right_operand = qg.operandStack.pop() 
         right_type = qg.typeStack.pop()
         left_operand = qg.operandStack.pop()
@@ -801,7 +802,12 @@ def p_qnp13(p): # Insert PRINT to operator stack
 def p_qnp14(p): 
     '''qnp14 : empty'''
 
-    qg.operandStack.append(p[-1])
+    global currentVarTable
+
+    variable = currentVarTable.getVariableByName(p[-1])
+    address = variable['address']
+
+    qg.operandStack.append(address)
     quadruplesOutput.append((qg.operatorStack[-1], '', '', qg.operandStack[-1]))
 
     qg.operatorStack.pop()
@@ -814,7 +820,12 @@ def p_qnp15(p): # Insert READ to operator stack
 def p_qnp16(p): 
     '''qnp16 : empty'''
 
-    qg.operandStack.append(p[-1])
+    global currentVarTable
+
+    variable = currentVarTable.getVariableByName(p[-1])
+    address = variable['address']
+
+    qg.operandStack.append(address)
     quadruplesOutput.append((qg.operatorStack[-1], '', '', qg.operandStack[-1]))
 
     qg.operatorStack.pop()
@@ -942,12 +953,24 @@ try:
     # print(qg.operandStack  )
     # print(qg.operatorStack)
     # print(qg.typeStack)
-    # print(ct.constantTable) 
+    print(ct.constantTable)
+
+    file = open("objCode.txt", "w")
 
     temp = 0
     for quad in quadruplesOutput:
         print(temp, "-", quad)
+        file.write(' '.join(str(s) for s in quad) + '\n')
         temp += 1
+    
+    file.write('END' + '\n')
+
+    # for item in ct.constantTable:
+    #     file.write(str(item[0]) + ' ' + str(item[1]) + '\n')
+
+    file.close()
+    vm.startMachine()
+    vm.runMachine()
 
     print(qg.operandStack)
     # dirFunc.printDirFunc()
