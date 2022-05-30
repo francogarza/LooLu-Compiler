@@ -56,8 +56,8 @@ def p_funcs(p):
     '''funcs : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter RIGHTPAREN functionBlock np_CreateEndFuncQuad np_CheckIfFuncHasReturned funcs_block'''
 
 def p_funcs_block(p):
-    '''funcs_block : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter RIGHTPAREN functionBlock np_CreateEndFuncQuad funcs_block
-                   | empty np_CheckIfFuncHasReturned'''
+    '''funcs_block : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter RIGHTPAREN functionBlock np_CreateEndFuncQuad np_CheckIfFuncHasReturned funcs_block
+                   | empty '''
 
 def p_np_CheckIfFuncHasReturned(p):
     '''np_CheckIfFuncHasReturned : empty'''
@@ -640,8 +640,16 @@ def p_qnp1_send_to_quadruples(p):
     '''qnp1sendToQuadruples : empty'''
     # print(p[-2])
     global currentVarTable
+    global globalVarsTable
     variable = currentVarTable.getVariableByName(p[-2])
-    qg.operand(variable["address"], variable["type"])
+    if (variable == None):
+        variable = globalVarsTable.getVariableByName(p[-2])
+        if (variable == None):
+            raise Exception('Could not find '+p[-2]+'in scope nor globally')
+        else:
+            qg.operand(variable["address"], variable["type"])
+    else:
+        qg.operand(variable["address"], variable["type"])
 
 def p_qnp2_insertOperator(p):
     '''qnp2insertOperator : empty'''

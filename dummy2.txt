@@ -15,6 +15,7 @@ FUNCS:
     START:
       porcentaje1 = asdfxx / xy;
       print(porcentaje1);
+      print(myInt);
       return(porcentaje1);
   }
   func int incrementaSueldo2(asdfxx: float, porcentaje2: float) {
