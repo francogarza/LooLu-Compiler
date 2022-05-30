@@ -61,6 +61,7 @@ class virtualMachine():
         loadConstantMemory()
         
     def runMachine(self):
+        print('∞Loo')
         def insertInMemory(address, value):
             if (address >= 2000 and address <= 5999):
                 self.globalMemory.insert(address, value)
@@ -228,6 +229,7 @@ class virtualMachine():
             
             self.ip = self.ip + 1
             currentQuad = self.quadruples[self.ip]
+        print('Lu∞')
         #     if (currentQuad[0] == '-'): # Substraction is found
         #         valLeft = getTransformmedAddress(currentQuad[1])
         #         valRight = getTransformmedAddress(currentQuad[2])
