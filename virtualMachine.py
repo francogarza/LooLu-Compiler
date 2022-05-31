@@ -22,7 +22,7 @@ class Memory():
     def getData(self):
         return self.data
     def printMemory(self):
-        pprint.pprint(self.data)
+        print(self.data)
 
 class StackSegment():
     def __init__(self):
@@ -32,6 +32,7 @@ class StackSegment():
         self.data.append({})
         self.tempLocalMemory.append({})
     def insertTop(self, address, val):
+        # print('entraInsert', len(self.data)-1, address, val)
         self.data[len(self.data)-1][address] = val
     def insertTopTemp(self, address, val):
         self.tempLocalMemory[len(self.tempLocalMemory)-1][address] = val
@@ -149,13 +150,21 @@ class virtualMachine():
         
         def getLocalAddress(type):
             if type == 'int':
-                return self.mh.localInt[1]
+                address = self.mh.localInt[1]
+                self.mh.localInt[1] += 1
+                return address
             if type == 'float':
-                return self.mh.localFloat[1]
+                address = self.mh.localFloat[1]
+                self.mh.localFloat[1] += 1
+                return address
             if type == 'char':
-                return self.mh.localChar[1]
+                address = self.mh.localChar[1]
+                self.mh.localChar[1] += 1
+                return address
             if type == 'bool':
-                return self.mh.localBool[1]
+                address = self.mh.localBool[1]
+                self.mh.localBool[1] += 1
+                return address
 
         currentQuad = self.quadruples[self.ip]
 
@@ -168,11 +177,14 @@ class virtualMachine():
                 newVal = getFromMemory(int(currentQuad[1]))
                 # resDir = getTransformmedAddress(currentQuad[3], 3)
                 insertInMemory(int(currentQuad[3]), newVal)
+                # self.globalMemory.printMemory()
+
             
 
             if (currentQuad[0] == '+'): # addition is founds
                 valLeft = getFromMemory(int(currentQuad[1]))
                 valRight = getFromMemory(int(currentQuad[2]))
+                # print(int(currentQuad[1]), int(currentQuad[2]))
                 addressTemp = int(currentQuad[3])
                 insertInMemory(addressTemp, valLeft + valRight)
 
@@ -275,7 +287,7 @@ class virtualMachine():
                 val = input()
                 # Return the type of a string that can be converted in other type 
                 if val == 'true' or val == 'false':
-                    print('entra')
+                    # print('entra')
                     insertInMemory(varToBeAssigned, val)
                 else:
                     try:
@@ -307,32 +319,36 @@ class virtualMachine():
                 paramType = currentQuad[2]
                 address = getLocalAddress(paramType)
                 val = getFromMemory(int(currentQuad[1]))
-                print('entra ', val)
+                # print('entra ', val, address)
                 insertInMemory(address, val)
-                self.localMemory.printMemory()
+                # self.localMemory.printMemory()
 
             if (currentQuad[0] == 'GOSUB'):
                 saveQuad = self.ip
+                self.ip = int(currentQuad[3]) - 1
                 self.checkpoints.append(saveQuad)
-                print(saveQuad)
+                # print(saveQuad)
 
-            if (currentQuad[0] == 'RETURN'):
-                if (needReturn):
-                    lastIp = checkpoints.top()
-                    checkpoints.pop()
-                    ip = lastIp - 2
-                    localMemory.popStack()
-                else:
-                    Error("Runtime Error: The function", currentFunc, "cant have a return")
+            # if (currentQuad[0] == 'RETURN'):
+            #     if (needReturn):
+            #         lastIp = checkpoints.top()
+            #         checkpoints.pop()
+            #         ip = lastIp - 2
+            #         localMemory.popStack()
+            #     else:
+            #         Error("Runtime Error: The function", currentFunc, "cant have a return")
 
             if (currentQuad[0] == 'ENDFUNC'):
-                if (needReturn):
-                    Error("Runtime Error: The function", currentFunc, "need to be exited by a return statement")
-                if (checkpoints.size() > 0):
-                    lastIp = checkpoints.top()
-                    checkpoints.pop()
-                    ip = lastIp - 2
-                    localMemory.popStack()
+
+                # print('ENTRA ENDFUNC')
+
+                # if (needReturn):
+                #     Error("Runtime Error: The function", currentFunc, "need to be exited by a return statement")
+                if (len(self.checkpoints) > 0):
+                    lastIp = self.checkpoints[-1]
+                    self.checkpoints.pop()
+                    self.localMemory.popStack()
+                    self.ip = lastIp
             
             self.ip = self.ip + 1
             currentQuad = self.quadruples[self.ip]

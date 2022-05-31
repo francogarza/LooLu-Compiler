@@ -54,10 +54,10 @@ def p_declare_funcs(p):
                      | empty'''
 
 def p_funcs(p):
-    '''funcs : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter RIGHTPAREN functionBlock np_CreateEndFuncQuad np_CheckIfFuncHasReturned funcs_block'''
+    '''funcs : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter RIGHTPAREN functionBlock np_CheckIfFuncHasReturned funcs_block'''
 
 def p_funcs_block(p):
-    '''funcs_block : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter RIGHTPAREN functionBlock np_CreateEndFuncQuad np_CheckIfFuncHasReturned funcs_block
+    '''funcs_block : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter RIGHTPAREN functionBlock np_CheckIfFuncHasReturned funcs_block
                    | empty '''
 
 def p_np_CheckIfFuncHasReturned(p):
@@ -370,7 +370,7 @@ def p_create_goto_for_while(p):
 
 
 def p_return_func(p):
-    '''return_func : RETURN LEFTPAREN expression np_AddReturnValueToGlobalVars RIGHTPAREN np_ChangeHasReturnedValue
+    '''return_func : RETURN LEFTPAREN expression np_AddReturnValueToGlobalVars RIGHTPAREN np_CreateEndFuncQuad np_ChangeHasReturnedValue
                    | empty'''
 
 def p_np_ChangeHasReturnedValue(p):
@@ -956,7 +956,7 @@ try:
     # print(qg.operandStack  )
     # print(qg.operatorStack)
     # print(qg.typeStack)
-    print(ct.constantTable)
+    # print(ct.constantTable)
 
     file = open("objCode.txt", "w")
 
@@ -969,7 +969,7 @@ try:
     file.write('END' + '\n')
 
     # for item in ct.constantTable:
-    #     file.write(str(item[0]) + ' ' + str(item[1]) + '\n')
+    #     print(item)
     # globalVarsTable.printVars()
 
     file.close()
@@ -977,7 +977,7 @@ try:
     vm.runMachine()
 
     # print(qg.operandStack)
-    dirFunc.printDirFunc()
+    # dirFunc.printDirFunc()
     # currentVarTable.printVars()
     # print(globalVarsTable)
 

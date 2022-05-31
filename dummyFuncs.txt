@@ -13,16 +13,41 @@ FUNCS:
       VARS:
         var int : suma;
       START:
+        if (a == 0) {
+            return(0);
+        }
         suma = a + b;
-        return(suma);
+        a = a - 1;
+        print(a, suma);
+        return(1 + suma(a, b));
+  }
+
+  func int rec(a : int) {
+      VARS:
+
+      START:
+        if (a == 0) {
+            return(a);
+        }
+        return(1 + rec(a - 1));
+  }
+
+  func float areaTriangulo(base : float, altura : float) {
+      VARS:
+
+      START:
+        return((base * altura) / 2);
   }
 
 CLASSES:
 
 Loo() {
 
-    myInt = suma(2, 3);
-    myCont = 0;
-    
+    a = 15.0;
+    b = 6.0;
+
+    myFloat = areaTriangulo(a, b);
+
+    print(myFloat);
 
 } Lu;
