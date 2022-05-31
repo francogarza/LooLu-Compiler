@@ -386,6 +386,7 @@ def p_np_add_return_to_global_vars(p):
     global tempCounter
     global currentFunctionReturnType
     global currentFunctionReturnOperand
+    global programName
     expressionType = qg.typeStack.pop()
     address = qg.operandStack.pop()
     funcRow = dirFunc.getFunctionByName(currentFunc)
@@ -393,7 +394,7 @@ def p_np_add_return_to_global_vars(p):
         globalVarsTable.insert({"name": currentFunc, "type": expressionType, "address" : address})
         result = 'T'+str(tempCounter)
         tempCounter = tempCounter + 1
-        address2 = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName)
+        address2 = mh.addVariable(programName,currentFunc,funcRow['type'],None,programName)
         quadruplesOutput.append(('=',address,'',address2))
         currentFunctionReturnType = expressionType
         currentFunctionReturnOperand = address2
