@@ -643,7 +643,15 @@ def p_qnp1_send_to_quadruples(p):
     '''qnp1sendToQuadruples : empty'''
     # print(p[-2])
     global currentVarTable
+    global globalVarsTable
     variable = currentVarTable.getVariableByName(p[-2])
+    if (variable == None):
+        if globalVarsTable != None:
+            variable = globalVarsTable.getVariableByName(p[-2])
+            if (variable == None):
+                raise Exception("   ERROR: Variable not declared on scope " + p[-2])
+        else:
+            raise Exception("   ERROR: Variable not declared on scope " + p[-2])
     qg.operand(variable["address"], variable["type"])
 
 def p_qnp2_insertOperator(p):
