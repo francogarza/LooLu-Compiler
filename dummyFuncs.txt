@@ -5,7 +5,7 @@ VARS:
   var float : myFloat;
   var bool : abc, cba;
   var float : x;
-  var char : myChar;
+  var char : myChar, c1, c2, c3;
   var float : a, b, c, d, e, f, g, h, i, j, k, l;
 
 FUNCS: 
@@ -34,19 +34,33 @@ FUNCS:
 
   func float areaTriangulo(base : float, altura : float) {
       VARS:
-
+        var float : area;
       START:
-        return((base * altura) / 2);
+        area = (base * altura) / 2;
+        return(area);
   }
+
+  func void printWord(c1 : char, c2 : char, c3 : char) {
+      VARS:
+        var char : c4, c5;
+      START:
+        c4 = 's';
+        c5 = 'e';
+        print(c1, c2, c3, c4, c5);
+   }
 
 CLASSES:
 
 Loo() {
 
-    a = 15.0;
+    a = 15;
     b = 6.0;
+    myChar = 'z';
 
-    myFloat = areaTriangulo(a, b);
+
+    print(myChar);
+
+    myFloat = areaTriangulo(a, b);    
 
     print(myFloat);
 

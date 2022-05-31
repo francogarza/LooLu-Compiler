@@ -455,6 +455,7 @@ def p_var_cte(p):
     '''var_cte : ID qnp1 
                | CTEINT qnp_cte_int
                | CTEFLOAT qnp_cte_float
+               | CHARACT qnp_cte_char
                | CTECHAR qnp_cte_char
                | TRUE qnp_cte_bool
                | FALSE qnp_cte_bool
@@ -502,9 +503,10 @@ def p_qnp_cte_float(p):
 
 def p_qnp_cte_char(p):
     '''qnp_cte_char : empty'''
+    print('ENTRA A CHAR')
     global currentFunc
     global programName
-    address = mh.addVariable(currentFunc, p[-1], 'CTECHAR', None, programName)
+    address = mh.addVariable(currentFunc, p[-1][1], 'CTECHAR', None, programName)
     qg.operandStack.append(address)
     qg.typeStack.append('char')
 
@@ -701,7 +703,7 @@ def p_qnp4(p):
             qg.operandStack.append(address)
             qg.typeStack.append(sc.intToType(result_type))
         else:
-            raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type) 
+            raise Exception("Semantic Error -> No baila mija con el senior. " + " Mija: " + left_type + " Senior: " + right_type) 
 
 def p_qnp5(p):
     '''qnp5 : empty'''

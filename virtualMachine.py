@@ -280,6 +280,8 @@ class virtualMachine():
             
             if (currentQuad[0] == 'PRINT'):
                 val = getFromMemory(int(currentQuad[3]))
+                if (type(val) == str):
+                    pass
                 print(val)
             
             if (currentQuad[0] == 'READ'): # Missing semantic check
@@ -329,15 +331,6 @@ class virtualMachine():
                 self.checkpoints.append(saveQuad)
                 # print(saveQuad)
 
-            # if (currentQuad[0] == 'RETURN'):
-            #     if (needReturn):
-            #         lastIp = checkpoints.top()
-            #         checkpoints.pop()
-            #         ip = lastIp - 2
-            #         localMemory.popStack()
-            #     else:
-            #         Error("Runtime Error: The function", currentFunc, "cant have a return")
-
             if (currentQuad[0] == 'ENDFUNC'):
 
                 # print('ENTRA ENDFUNC')
@@ -353,18 +346,4 @@ class virtualMachine():
             self.ip = self.ip + 1
             currentQuad = self.quadruples[self.ip]
         print('Lu∞')
-        #     if (currentQuad[0] == '-'): # Substraction is found
-        #         valLeft = getTransformmedAddress(currentQuad[1])
-        #         valRight = getTransformmedAddress(currentQuad[2])
-        #         addressTemp = currentQuad[3]
-        #         insertInMemory(addressTemp, valLeft - valRight)
-        #     if (currentQuad[0] == '*'): # Mult is found
-        #         valLeft = getTransformmedAddress(currentQuad[1])
-        #         valRight = getTransformmedAddress(currentQuad[2])
-        #         addressTemp = currentQuad[3]
-        #         insertInMemory(addressTemp, valLeft * valRight)
-        #     if (currentQuad[0] == '/'): # Division is found
-        #         valLeft = getTransformmedAddress(currentQuad[1])
-        #         valRight = getTransformmedAddress(currentQuad[2])
-        #         addressTemp = currentQuad[3]
 

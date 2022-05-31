@@ -39,7 +39,7 @@ tokens = [
     'LEFTBRACKET','RIGHTBRACKET',
     'LEFTSQUAREBRACKET', 'RIGHTSQUAREBRACKET',
     'OPERTYPE1', 'OPERTYPE2', 'LOGICOPERATOR',
-    'ID', 'CTEINT', 'CTEFLOAT', 'CTECHAR',
+    'ID', 'CTEINT', 'CTEFLOAT', 'CTECHAR', 'CHARACT',
     'RELOPER',
     'COLON', 'SEMICOLON', 'COMMA', 'EQUAL', 'DOT'
 ] + list(reserved.values())
@@ -90,6 +90,16 @@ def t_CTECHAR(t):
     r'\'[a-zA-Z]\''
     t.value = t.value
     return t
+
+def t_CHARACT(t):
+    r'\'[A-Za-z_0-9$%&/\(\)\"#=\?\¿\´\+\*\-\.\,\{\}\[\]]\''
+    t.type = 'CHARACT'
+    return t
+
+# def t_CHARAC(t):
+#     r'\'[A-Za-z_0-9$%&/\(\)\"#=\?\¿\´\+\*\-\.\,\{\}\[\]]\''
+#     t.type = 'CHARAC'
+#     return t
 
 def t_NEWLINE(t):
     r'\n'
