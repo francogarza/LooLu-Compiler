@@ -25,12 +25,15 @@ class memoryHandler:
         self.globalFloat = [3000, 3000]
         self.globalChar = [4000, 4000]
         self.globalBool = [5000, 5000]
+
         self.localInt = [6000, 6000]
         self.localFloat = [7000, 7000]
         self.localChar = [8000, 8000]
-        self.localTemp = [11000, 11000]
         self.localBool = [9000,9000]
-        self.tempAddressGlobal = [10000, 10000]
+
+        self.localTemp = [10000, 10000]
+        self.tempAddressGlobal = [12000, 12000]
+
         self.constAddressINT = [14000, 14000]
         self.constAddressFLOAT = [15000, 15000]
         self.constAddressCHAR = [16000, 16000]
@@ -40,9 +43,9 @@ class memoryHandler:
         self.localInt = [6000, 6000]
         self.localFloat = [7000, 7000]
         self.localChar = [8000, 8000]
-        self.localTemp = [11000, 11000]
         self.localBool = [9000,9000]
-    
+        self.localTemp = [10000, 10000]
+        
     def addVariable(self, funcName, varName, varType, isParameter, programName):
         address = None
 

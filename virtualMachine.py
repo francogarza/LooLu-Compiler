@@ -24,79 +24,81 @@ class Memory():
     def printMemory(self):
         pprint.pprint(self.data)
 
-# class StackSegment():
-#     def __init__(self):
-#         self.data = [{}]
-#         self.tempLocalMemory = [{}] 
-#     def insertState(self):
-#         self.data.append({})
-#         self.tempLocalMemory.append({})
-#     def insertTop(self, address, val):
-#         self.data[len(self.data)-1][address] = val
-#     def insertTopTemp(self, address, val):
-#         self.tempLocalMemory[len(self.tempLocalMemory)-1][address] = val
-#     def get(self, address):
-#         if (address in self.data):
-#             return self.data[address]
-#         else:
-#             Error("Runtime error: Variable not found")
-#     def getPreviousState(self, address):
-#         if (address in self.data[len(self.data)-2]):
-#             return self.data[len(self.data)-2][address]
-#         else:
-#             return None
-#     def getPreviousStateTemp(self, address):
-#         if (address in self.tempLocalMemory[len(self.tempLocalMemory)-2]):
-#             return self.tempLocalMemory[len(self.tempLocalMemory)-2][address]
-#         else:
-#             return None
-#     def getTop(self, address):
-#         if (address in self.data[len(self.data)-1]):
-#             return self.data[len(self.data)-1][address]
-#         else:
-#             return None
-#     def getTopTemp(self, address):
-#         if (address in self.tempLocalMemory[len(self.tempLocalMemory)-1]):
-#             return self.tempLocalMemory[len(self.tempLocalMemory)-1][address]
-#         else:
-#             return None
-#     def setData(self, val):
-#         self.data = val
-#     def getData(self):
-#         return self.data
-#     def getTempLocalMem(self):
-#         return self.tempLocalMemory
-#     def getDataPrev(self):
-#         return self.data[len(self.data)-2]
-#     def popStack(self):
-#         self.data.pop()
-#         self.tempLocalMemory.pop()
-#     def printMemory(self):
-#         for x in self.data:
-#             pprint.pprint(x)
+class StackSegment():
+    def __init__(self):
+        self.data = [{}]
+        self.tempLocalMemory = [{}] 
+    def insertState(self):
+        self.data.append({})
+        self.tempLocalMemory.append({})
+    def insertTop(self, address, val):
+        self.data[len(self.data)-1][address] = val
+    def insertTopTemp(self, address, val):
+        self.tempLocalMemory[len(self.tempLocalMemory)-1][address] = val
+    def get(self, address):
+        if (address in self.data):
+            return self.data[address]
+        else:
+            Error("Runtime error: Variable not found")
+    def getPreviousState(self, address):
+        if (address in self.data[len(self.data)-2]):
+            return self.data[len(self.data)-2][address]
+        else:
+            return None
+    def getPreviousStateTemp(self, address):
+        if (address in self.tempLocalMemory[len(self.tempLocalMemory)-2]):
+            return self.tempLocalMemory[len(self.tempLocalMemory)-2][address]
+        else:
+            return None
+    def getTop(self, address):
+        if (address in self.data[len(self.data)-1]):
+            return self.data[len(self.data)-1][address]
+        else:
+            return None
+    def getTopTemp(self, address):
+        if (address in self.tempLocalMemory[len(self.tempLocalMemory)-1]):
+            return self.tempLocalMemory[len(self.tempLocalMemory)-1][address]
+        else:
+            return None
+    def setData(self, val):
+        self.data = val
+    def getData(self):
+        return self.data
+    def getTempLocalMem(self):
+        return self.tempLocalMemory
+    def getDataPrev(self):
+        return self.data[len(self.data)-2]
+    def popStack(self):
+        self.data.pop()
+        self.tempLocalMemory.pop()
+    def printMemory(self):
+        for x in self.data:
+            print(x)
 
 
 class virtualMachine():
     dirFunc = vt.DirFunc()
+    mh = mh.memoryHandler()
     constantTable = ct.constantTable
     quadruples = []
 
     # Memory initialization
     globalMemory = Memory()
-    # localMemory = StackSegment()
-    # checkpoints = qp.Stack()
+    localMemory = StackSegment()
+    checkpoints = []
     #tempLocalMemory = Memory()
     tempGlobalMemory = Memory()
     constantsMemory = Memory()
 
     # Variables initialization
     ip = 0
-    paramsStore = []
+    parameteresCheck = []
     currentQuad = None
     currentFunc = None
 
-    def startMachine(self, df):
+    def startMachine(self, df, mh):
         self.dirFunc = df
+        self.mh = mh
         def strToQuad(string):
             quad = list(string.split(" "))
             return quad
@@ -121,10 +123,10 @@ class virtualMachine():
                 self.globalMemory.insert(address, value)
             elif (address >= 6000 and address <= 9999):
                 self.localMemory.insertTop(address, value)
-            elif (address >= 10000 and address <= 13999):
-                self.tempGlobalMemory.insert(address, value)
-            elif (address >= 8500 and address <= 9999):
+            elif (address >= 10000 and address <= 11999):
                 self.localMemory.insertTopTemp(address, value)
+            elif (address >= 12000 and address <= 13999):
+                self.tempGlobalMemory.insert(address, value)
             elif (address >= 14000 and address <= 17999):
                 self.constantsMemory.insert(address, value)
         def getFromMemory(address):
@@ -135,20 +137,33 @@ class virtualMachine():
                     return self.localMemory.getTop(address)
                 else:
                     return self.localMemory.getPreviousState(address)
-            elif (address >= 10000 and address <= 13999):
-                return self.tempGlobalMemory.get(address)
-            elif (address >= 8500 and address <= 9999):
+            elif (address >= 10000 and address <= 11999):
                 if self.localMemory.getTopTemp(address) != None:
                     return self.localMemory.getTopTemp(address)
                 else:
                     return self.localMemory.getPreviousStateTemp(address)
+            elif (address >= 12000 and address <= 13999):
+                return self.tempGlobalMemory.get(address)
             elif (address >= 14000 and address <= 17999):
                 return self.constantsMemory.get(address)
+        
+        def getLocalAddress(type):
+            if type == 'int':
+                return self.mh.localInt[1]
+            if type == 'float':
+                return self.mh.localFloat[1]
+            if type == 'char':
+                return self.mh.localChar[1]
+            if type == 'bool':
+                return self.mh.localBool[1]
 
         currentQuad = self.quadruples[self.ip]
 
         while(currentQuad[0] != 'END'): # Ends program when a END is found
              # Big switch case
+            if (currentQuad[0] == 'GOTOMAIN'):
+                self.ip = int(currentQuad[3]) - 1
+
             if (currentQuad[0] == '='): # Assignation is found
                 newVal = getFromMemory(int(currentQuad[1]))
                 # resDir = getTransformmedAddress(currentQuad[3], 3)
@@ -282,41 +297,42 @@ class virtualMachine():
                     self.ip = int(currentQuad[3]) - 1
 
 
-            # if (currentQuad[0] == 'ERA'):
-            #     #Validate space
-            #     paramsStore = []
-            #     localMemory.insertNewMemState()
-            #     for key, obj in dirFunc.getFunctionByName(currentQuad[1])['table'].getData().items():
-            #         paramsStore.append({'name': obj['name'], 'address': obj['address'], 'type': obj['type']})
-            # if (currentQuad[0] == 'PARAMETER'):
-            #     paramIndex = currentQuad[3]-1
-            #     address = paramsStore[paramIndex]['address']
-            #     val = getTransformmedAddress(currentQuad[1])
-            #     insertInMemory(address, val)
-            # if (currentQuad[0] == 'GOSUB'):
-            #     saveQuad = ip + 2
-            #     checkpoints.push(saveQuad)
-            #     currentFunc = currentQuad[1]
-            #     needReturn = True if dirFunc.getFunctionByName(currentFunc)['type'] != "void" and dirFunc.getFunctionByName(currentFunc)['name'] != dirFunc.getMainName() else False
-            #     ip = currentQuad[3] - 2
-            #     #localMemory.insertNewMemState()
-            # if (currentQuad[0] == 'RETURN'):
-            #     if (needReturn):
-            #         lastIp = checkpoints.top()
-            #         checkpoints.pop()
-            #         ip = lastIp - 2
-            #         localMemory.popStack()
-            #     else:
-            #         Error("Runtime Error: The function", currentFunc, "cant have a return")
+            if (currentQuad[0] == 'ERA'):
+                #Validate space
+                func = self.dirFunc.getFunctionByName(currentQuad[3])
+                parameteresCheck = func["parameterSignature"]
+                self.localMemory.insertState()
 
-            # if (currentQuad[0] == 'ENDFUNC'):
-            #     if (needReturn):
-            #         Error("Runtime Error: The function", currentFunc, "need to be exited by a return statement")
-            #     if (checkpoints.size() > 0):
-            #         lastIp = checkpoints.top()
-            #         checkpoints.pop()
-            #         ip = lastIp - 2
-            #         localMemory.popStack()
+            if (currentQuad[0] == 'PARAMETER'):
+                paramType = currentQuad[2]
+                address = getLocalAddress(paramType)
+                val = getFromMemory(int(currentQuad[1]))
+                print('entra ', val)
+                insertInMemory(address, val)
+                self.localMemory.printMemory()
+
+            if (currentQuad[0] == 'GOSUB'):
+                saveQuad = self.ip
+                self.checkpoints.append(saveQuad)
+                print(saveQuad)
+
+            if (currentQuad[0] == 'RETURN'):
+                if (needReturn):
+                    lastIp = checkpoints.top()
+                    checkpoints.pop()
+                    ip = lastIp - 2
+                    localMemory.popStack()
+                else:
+                    Error("Runtime Error: The function", currentFunc, "cant have a return")
+
+            if (currentQuad[0] == 'ENDFUNC'):
+                if (needReturn):
+                    Error("Runtime Error: The function", currentFunc, "need to be exited by a return statement")
+                if (checkpoints.size() > 0):
+                    lastIp = checkpoints.top()
+                    checkpoints.pop()
+                    ip = lastIp - 2
+                    localMemory.popStack()
             
             self.ip = self.ip + 1
             currentQuad = self.quadruples[self.ip]

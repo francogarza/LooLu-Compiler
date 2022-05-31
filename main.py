@@ -133,7 +133,7 @@ def p_verify_param_type_with_signature(p):
     print(param, paramType)
 
     if (paramType == currentParamSignature[paramCounter]):
-        quadruplesOutput.append(("PARAMETER",param,'',("ARGUMENT#"+str(paramCounter))))
+        quadruplesOutput.append(("PARAMETER",param,paramType,("ARGUMENT#"+str(paramCounter))))
         paramCounter = paramCounter + 1
     else:
         raise Exception("Type: '" + paramType + "' does not match excepted type: '" + currentParamSignature[paramCounter] + "' for function call")
@@ -156,7 +156,8 @@ def p_generate_era_quad(p):
     currentParamSignature = None
     func = dirFunc.getFunctionByName(p[-2])
     memorySize = func["memorySize"]
-    quadruplesOutput.append(("ERA",'empty','empty',memorySize))
+    funcName = func["name"]
+    quadruplesOutput.append(("ERA",'empty','empty',funcName))
     paramCounter = 0
     currentParamSignature = func["parameterSignature"]
     print(currentParamSignature)
@@ -943,7 +944,7 @@ yacc.yacc()
 parser = yacc.yacc()
 print("Yacc has been generated!")
 
-codeToCompile = open('main.lou','r')
+codeToCompile = open('dummyFuncs.txt','r')
 data = str(codeToCompile.read())
 lex.input(data)
 
@@ -971,11 +972,11 @@ try:
     # globalVarsTable.printVars()
 
     file.close()
-    vm.startMachine(dirFunc)
+    vm.startMachine(dirFunc, mh)
     vm.runMachine()
 
     # print(qg.operandStack)
-    # dirFunc.printDirFunc()
+    dirFunc.printDirFunc()
     # currentVarTable.printVars()
     # print(globalVarsTable)
 

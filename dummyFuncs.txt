@@ -1,0 +1,28 @@
+LooLu miPrograma;
+
+VARS:
+  var int : myInt, myInt2, myCont, m;
+  var float : myFloat;
+  var bool : abc, cba;
+  var float : x;
+  var char : myChar;
+  var float : a, b, c, d, e, f, g, h, i, j, k, l;
+
+FUNCS: 
+  func int suma(a : int, b : int) {
+      VARS:
+        var int : suma;
+      START:
+        suma = a + b;
+        return(suma);
+  }
+
+CLASSES:
+
+Loo() {
+
+    myInt = suma(2, 3);
+    myCont = 0;
+    
+
+} Lu;
