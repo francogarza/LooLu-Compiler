@@ -9,37 +9,6 @@ VARS:
   var float : a, b, c, d, e, f, g, h, i, j, k, l;
 
 FUNCS: 
-  func int suma(a : int, b : int) {
-      VARS:
-        var int : suma;
-      START:
-        if (a == 0) {
-            return(0);
-        }
-        suma = a + b;
-        a = a - 1;
-        print(a, suma);
-        return(1 + suma(a, b));
-  }
-
-  func int rec(a : int) {
-      VARS:
-
-      START:
-        if (a == 0) {
-            return(a);
-        }
-        return(1 + rec(a - 1));
-  }
-
-  func float areaTriangulo(base : float, altura : float) {
-      VARS:
-        var float : area;
-      START:
-        area = (base * altura) / 2;
-        return(area);
-  }
-
   func void printWord(c1 : char, c2 : char, c3 : char) {
       VARS:
         var char : c4, c5;
@@ -57,11 +26,6 @@ Loo() {
     b = 6.0;
     myChar = 'z';
 
-
-    print(myChar);
-
-    myFloat = areaTriangulo(a, b);    
-
-    print(myFloat);
+    printWord('h', 'o', 'u');
 
 } Lu;

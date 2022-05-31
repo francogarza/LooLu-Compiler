@@ -63,10 +63,13 @@ def p_funcs_block(p):
 def p_np_CheckIfFuncHasReturned(p):
     '''np_CheckIfFuncHasReturned : empty'''
     global currentFuncHasReturnedValue
-    global currentFun
+    global currentFunc
     if currentFuncHasReturnedValue != 1:
         raise Exception('function: '+currentFunc+" is missing return value")
     else:
+        if dirFunc.getFunctionByName(currentFunc)["type"] == 'void':
+            mh.resetLocalTempMemory()
+            quadruplesOutput.append(('ENDFUNC','','',''))
         currentFuncHasReturnedValue = 0
 
 # se supone que hasta aqui hacia arriba los puntos neuralgicos se documentaron y se mandaron a su segmento que esta al final del archivo
@@ -111,13 +114,13 @@ def p_create_gosub_quad(p):
     global currentFunctionCall
     jump = currentFunctionCall["functionQuadStart"]
     quadruplesOutput.append(('GOSUB','','',jump))
-    print("gosub")
+    # print("gosub")
 
 def p_check_for_missing_arguments(p):
     '''np_CheckForMissingArguments : empty'''
     global paramCounter
     global currentParamSignature
-    print(currentParamSignature,paramCounter)
+    # print(currentParamSignature,paramCounter)
     if (len(currentParamSignature)-1 > paramCounter-1):
         raise Exception('Function call is missing arguments')
     else:
@@ -130,7 +133,7 @@ def p_verify_param_type_with_signature(p):
 
     param = qg.operandStack.pop()
     paramType = qg.typeStack.pop()
-    print(param, paramType)
+    # print(param, paramType)
 
     if (paramType == currentParamSignature[paramCounter]):
         quadruplesOutput.append(("PARAMETER",param,paramType,("ARGUMENT#"+str(paramCounter))))
@@ -160,7 +163,7 @@ def p_generate_era_quad(p):
     quadruplesOutput.append(("ERA",'empty','empty',funcName))
     paramCounter = 0
     currentParamSignature = func["parameterSignature"]
-    print(currentParamSignature)
+    # print(currentParamSignature)
 
 
 
@@ -472,8 +475,8 @@ def p_FillStacksWithReturnValue(p):
         raise Exception("function: "+currentFunctionCall["name"]+" does not return a value")
     qg.typeStack.append(currentFunctionReturnType)
     qg.operandStack.append(currentFunctionReturnOperand)
-    print(qg.operandStack)    
-    print(qg.typeStack)
+    # print(qg.operandStack)    
+    # print(qg.typeStack)
 
 def p_empty(p):
     '''empty :'''
@@ -487,7 +490,6 @@ def p_qnp_cte_int(p):
     '''qnp_cte_int : empty'''
     global currentFunc
     global programName
-    print(currentFunc)
     address = mh.addVariable(currentFunc, p[-1], 'CTEINT', None, programName)
     qg.operandStack.append(address)
     qg.typeStack.append('int')
@@ -503,7 +505,7 @@ def p_qnp_cte_float(p):
 
 def p_qnp_cte_char(p):
     '''qnp_cte_char : empty'''
-    print('ENTRA A CHAR')
+    print('ENTRA A CHAR',  p[-1][1])
     global currentFunc
     global programName
     address = mh.addVariable(currentFunc, p[-1][1], 'CTECHAR', None, programName)
@@ -988,7 +990,7 @@ try:
 
     # print(qg.operandStack)
     # dirFunc.printDirFunc()
-    # currentVarTable.printVars()
+    currentVarTable.printVars()
     # print(globalVarsTable)
 
 except Exception as excep:
