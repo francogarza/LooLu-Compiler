@@ -1,7 +1,7 @@
 LooLu miPrograma;
 
 VARS:
-  var int : myInt;
+  var int : myArr[2], myInt, myArr[2];
 FUNCS: 
    func int fib(n : int) {
      VARS:

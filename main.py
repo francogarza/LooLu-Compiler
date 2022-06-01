@@ -43,11 +43,16 @@ def p_vars_block(p):
                   | empty'''
 
 def p_var_id(p):
-    '''var_id : ID np_AddVarToCurrentTable var_id_2'''
+    '''var_id : ID np_AddVarToCurrentTable var_id_2
+              | arr_id var_id_2'''
 
 def p_var_id_2(p):
     '''var_id_2 : COMMA ID np_AddVarToCurrentTable var_id_2
+                | COMMA arr_id var_id_2
                 | empty'''
+
+def p_arr_id(p):
+    '''arr_id : ID LEFTSQUAREBRACKET CTEINT RIGHTSQUAREBRACKET'''
 
 def p_declare_funcs(p):
     '''declare_funcs : funcs
@@ -154,7 +159,6 @@ def p_np_verify_func_in_dirfunc(p):
         raise Exception("Could not find (",p[-1],"in the function directory")
     currentFunctionCall = func
 
-
 def p_generate_era_quad(p):
     '''np_GenerateEraQuad : empty'''
     global dirFunc
@@ -168,8 +172,6 @@ def p_generate_era_quad(p):
     paramCounter = 0
     currentParamSignature = func["parameterSignature"]
     # print(currentParamSignature)
-
-
 
 def p_type(p):
     '''type : type_simple
@@ -199,20 +201,6 @@ def p_np_fill_quad_start_parameter_for_func(p):
     global currentFunc
     row = dirFunc.getFunctionByName(currentFunc)
     row["functionQuadStart"] = len(quadruplesOutput)
- 
-def p_vars(p):
-    '''vars : VAR type COLON var_id SEMICOLON vars_block'''
-
-def p_vars_block(p):
-    '''vars_block : VAR type COLON var_id SEMICOLON vars_block
-                  | empty'''
-
-def p_var_id(p):
-    '''var_id : ID np_AddVarToCurrentTable var_id_2'''
-
-def p_var_id_2(p):
-    '''var_id_2 : COMMA ID np_AddVarToCurrentTable var_id_2
-                | empty'''
 
 def p_block(p):
     '''block : LEFTBRACKET statement_block RIGHTBRACKET'''
@@ -472,7 +460,11 @@ def p_var_cte(p):
                | FALSE qnp_cte_bool
                | access_class_atribute
                | function_call np_FillStacksWithReturnValue
-               | class_function_call '''
+               | class_function_call 
+               | arr_access'''
+               
+def p_arr_access(p):
+    '''arr_access : ID LEFTSQUAREBRACKET expression RIGHTSQUAREBRACKET'''
 
 def p_FillStacksWithReturnValue(p):
     '''np_FillStacksWithReturnValue : empty'''
