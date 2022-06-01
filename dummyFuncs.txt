@@ -1,31 +1,22 @@
 LooLu miPrograma;
 
 VARS:
-  var int : myInt, myInt2, myCont, m;
-  var float : myFloat;
-  var bool : abc, cba;
-  var float : x;
-  var char : myChar, c1, c2, c3;
-  var float : a, b, c, d, e, f, g, h, i, j, k, l;
-
+  var int : myInt;
 FUNCS: 
-  func void printWord(c1 : char, c2 : char, c3 : char) {
-      VARS:
-        var char : c4, c5;
-      START:
-        c4 = 's';
-        c5 = 'e';
-        print(c1, c2, c3, c4, c5);
+
+   func int suma(n : int) {
+    VARS:
+    START:
+        if (n == 0) {
+            return(0);
+        }
+        return(suma(n-1) + 1);
    }
+
 
 CLASSES:
 
 Loo() {
-
-    a = 15;
-    b = 6.0;
-    myChar = 'z';
-
-    printWord('h', 'o', 'u');
-
+    myInt = suma(5);
+    print(myInt);
 } Lu;

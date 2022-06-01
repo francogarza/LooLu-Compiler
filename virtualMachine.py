@@ -13,6 +13,7 @@ class Memory():
         #     return
         self.data[address] = value
     def get(self, address):
+        print("test address:",address)
         if (address in self.data):
             return self.data[address]
         else:
@@ -33,9 +34,10 @@ class StackSegment():
         self.tempLocalMemory.append({})
     def insertTop(self, address, val):
         # print('entraInsert', len(self.data)-1, address, val)
-        self.data[len(self.data)-1][address] = val
+        self.data[-1][address] = val
+        # print(self.data[-1])
     def insertTopTemp(self, address, val):
-        self.tempLocalMemory[len(self.tempLocalMemory)-1][address] = val
+        self.tempLocalMemory[-1][address] = val
     def get(self, address):
         if (address in self.data):
             return self.data[address]
@@ -43,22 +45,22 @@ class StackSegment():
             Error("Runtime error: Variable not found")
     def getPreviousState(self, address):
         if (address in self.data[len(self.data)-2]):
-            return self.data[len(self.data)-2][address]
+            return self.data[-2][address]
         else:
             return None
     def getPreviousStateTemp(self, address):
-        if (address in self.tempLocalMemory[len(self.tempLocalMemory)-2]):
-            return self.tempLocalMemory[len(self.tempLocalMemory)-2][address]
+        if (address in self.tempLocalMemory[-2]):
+            return self.tempLocalMemory[-2][address]
         else:
             return None
     def getTop(self, address):
-        if (address in self.data[len(self.data)-1]):
-            return self.data[len(self.data)-1][address]
+        if (address in self.data[-1]):
+            return self.data[-1][address]
         else:
             return None
     def getTopTemp(self, address):
-        if (address in self.tempLocalMemory[len(self.tempLocalMemory)-1]):
-            return self.tempLocalMemory[len(self.tempLocalMemory)-1][address]
+        if (address in self.tempLocalMemory[-1]):
+            return self.tempLocalMemory[-1][address]
         else:
             return None
     def setData(self, val):
@@ -68,7 +70,7 @@ class StackSegment():
     def getTempLocalMem(self):
         return self.tempLocalMemory
     def getDataPrev(self):
-        return self.data[len(self.data)-2]
+        return self.data[-2]
     def popStack(self):
         self.data.pop()
         self.tempLocalMemory.pop()
@@ -117,7 +119,8 @@ class virtualMachine():
         loadConstantMemory()
         
         
-    def runMachine(self):
+    def runMachine(self, dirFunc, mh):
+        self.mh = mh
         print('∞Loo')
         def insertInMemory(address, value):
             if (address >= 2000 and address <= 5999):
@@ -165,6 +168,11 @@ class virtualMachine():
                 address = self.mh.localBool[1]
                 self.mh.localBool[1] += 1
                 return address
+            if type == 'temp':
+                address = self.mh.localTemp[1]
+                self.mh.localTemp[1] += 1
+                return address
+
 
         currentQuad = self.quadruples[self.ip]
 
@@ -192,6 +200,7 @@ class virtualMachine():
                 valLeft = getFromMemory(int(currentQuad[1]))
                 valRight = getFromMemory(int(currentQuad[2]))
                 addressTemp = int(currentQuad[3])
+                # print(int(currentQuad[2]), valRight)
                 insertInMemory(addressTemp, valLeft - valRight)
             
             if (currentQuad[0] == '*'): # addition is founds
@@ -316,12 +325,14 @@ class virtualMachine():
                 func = self.dirFunc.getFunctionByName(currentQuad[3])
                 parameteresCheck = func["parameterSignature"]
                 self.localMemory.insertState()
+                self.mh.resetLocalTempMemory()
 
             if (currentQuad[0] == 'PARAMETER'):
                 paramType = currentQuad[2]
                 address = getLocalAddress(paramType)
+                # print(address)
                 val = getFromMemory(int(currentQuad[1]))
-                # print('entra ', val, address)
+                # print('entra P', val, address)
                 insertInMemory(address, val)
                 # self.localMemory.printMemory()
 
@@ -332,7 +343,7 @@ class virtualMachine():
                 # print(saveQuad)
 
             if (currentQuad[0] == 'ENDFUNC'):
-
+                self.localMemory.printMemory()
                 # print('ENTRA ENDFUNC')
 
                 # if (needReturn):
@@ -345,5 +356,6 @@ class virtualMachine():
             
             self.ip = self.ip + 1
             currentQuad = self.quadruples[self.ip]
+        self.localMemory.printMemory()
         print('Lu∞')
 

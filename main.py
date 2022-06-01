@@ -54,11 +54,15 @@ def p_declare_funcs(p):
                      | empty'''
 
 def p_funcs(p):
-    '''funcs : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter RIGHTPAREN functionBlock np_CheckIfFuncHasReturned funcs_block'''
+    '''funcs : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter RIGHTPAREN functionBlock np_CheckIfFuncHasReturned resetLocalMemory funcs_block'''
 
 def p_funcs_block(p):
-    '''funcs_block : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter RIGHTPAREN functionBlock np_CheckIfFuncHasReturned funcs_block
+    '''funcs_block : FUNC type_simple ID np_AddFunctionToDirFunc LEFTPAREN np_CreateVarsTable parameter RIGHTPAREN functionBlock np_CheckIfFuncHasReturned resetLocalMemory funcs_block
                    | empty '''
+
+def p_resetLocalMemory(p):
+    '''resetLocalMemory : empty'''
+    mh.resetLocalTempMemory()
 
 def p_np_CheckIfFuncHasReturned(p):
     '''np_CheckIfFuncHasReturned : empty'''
@@ -68,7 +72,7 @@ def p_np_CheckIfFuncHasReturned(p):
         raise Exception('function: '+currentFunc+" is missing return value")
     else:
         if dirFunc.getFunctionByName(currentFunc)["type"] == 'void':
-            mh.resetLocalTempMemory()
+            # mh.resetLocalTempMemory()
             quadruplesOutput.append(('ENDFUNC','','',''))
         currentFuncHasReturnedValue = 0
 
@@ -393,14 +397,18 @@ def p_np_add_return_to_global_vars(p):
     expressionType = qg.typeStack.pop()
     address = qg.operandStack.pop()
     funcRow = dirFunc.getFunctionByName(currentFunc)
+    var = globalVarsTable.getVariableByName(currentFunc)
+
     if (funcRow["type"] == expressionType):
-        globalVarsTable.insert({"name": currentFunc, "type": expressionType, "address" : address})
-        result = 'T'+str(tempCounter)
-        tempCounter = tempCounter + 1
-        address2 = mh.addVariable(programName,currentFunc,funcRow['type'],None,programName)
-        quadruplesOutput.append(('=',address,'',address2))
+
+        if (var == None):
+            funcAddress = mh.addVariable(programName,currentFunc,funcRow['type'],None,programName)
+            globalVarsTable.insert({"name": currentFunc, "type": expressionType, "address" : funcAddress})
+        else:
+            funcAddress = var["address"]
+        quadruplesOutput.append(('=',address,'',funcAddress))
         currentFunctionReturnType = expressionType
-        currentFunctionReturnOperand = address2
+        currentFunctionReturnOperand = funcAddress
     else:
         raise Exception("type: '" + expressionType + "' does not match func return type: '" + funcRow["type"] + "'")
 
@@ -930,7 +938,7 @@ def p_np_create_end_func_quad(p):
     # crea el quadruplo de endfunc por que acaba de leer el fin de la funcion
     global dirFunc
     global currentFunc
-    mh.resetLocalTempMemory()
+    # mh.resetLocalTempMemory()
     quadruplesOutput.append(('ENDFUNC','','',''))
 
 def p_np_fill_gotomain_quadruple(p):
@@ -986,11 +994,13 @@ try:
 
     file.close()
     vm.startMachine(dirFunc, mh)
-    vm.runMachine()
+    vm.runMachine(dirFunc, mh)
 
     # print(qg.operandStack)
     # dirFunc.printDirFunc()
     currentVarTable.printVars()
+    globalVarsTable.printVars()
+    print(ct.constantTable)
     # print(globalVarsTable)
 
 except Exception as excep:
