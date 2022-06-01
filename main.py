@@ -478,11 +478,16 @@ def p_FillStacksWithReturnValue(p):
     '''np_FillStacksWithReturnValue : empty'''
     global currentFunctionReturnType
     global currentFunctionReturnOperand
+    global tempCounter
     #check if current func is not void 
     if currentFunctionCall["type"] == 'void':
         raise Exception("function: "+currentFunctionCall["name"]+" does not return a value")
+    result = 'T'+str(tempCounter)
+    tempCounter = tempCounter + 1
+    address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName)
+    quadruplesOutput.append(('=',currentFunctionReturnOperand,'',address))
     qg.typeStack.append(currentFunctionReturnType)
-    qg.operandStack.append(currentFunctionReturnOperand)
+    qg.operandStack.append(address)
     # print(qg.operandStack)    
     # print(qg.typeStack)
 
