@@ -1,7 +1,7 @@
 LooLu miPrograma;
 
 VARS:
-  var int : myArr[2], myInt, myArr[2];
+  var int : myArr[100], myInt, myArr2[2];
 FUNCS: 
    func int fib(n : int) {
      VARS:
@@ -16,6 +16,7 @@ FUNCS:
 CLASSES:
 
 Loo() {
-    myInt = fib(6);
+    myInt = myArr[6];
     print(myInt);
+
 } Lu;

@@ -46,44 +46,72 @@ class memoryHandler:
         self.localBool = [9000,9000]
         self.localTemp = [10000, 10000]
         
-    def addVariable(self, funcName, varName, varType, isParameter, programName):
+    def addVariable(self, funcName, varName, varType, isParameter, programName, size):
         address = None
 
         if funcName == programName and varType == 'int':
             address = self.globalInt[1]
             # print('var: ', varName, 'assigned at: ', address)
             self.globalInt[1] += 1
-            return address
+            print(size)
+            if (size == None):
+                return address
+            else:
+                self.globalInt[1] += size
+                return address
         elif funcName != programName and varType == 'int':
             address = self.localInt[1]
             self.localInt[1] += 1
-            return address
-        
+            if (size == None):
+                return address
+            else:
+                self.localInt[1] += size
+                return address
         if funcName == programName and varType == 'float':
             address = self.globalFloat[1]
             # print('var: ', varName, 'assigned at: ', address)
             self.globalFloat[1] += 1
-            return address
+            if (size == None):
+                return address
+            else:
+                self.globalFloat[1] += size
+                return address
         elif funcName != programName and varType == 'float':
             address = self.localFloat[1]
             self.localFloat[1] += 1
-            return address
+            if (size == None):
+                return address
+            else:
+                self.localFloat[1] += size
+                return address
         
         if funcName == programName and varType == 'char':
             address = self.globalChar[1]
             # print('var: ', varName, 'assigned at: ', address)
             self.globalChar[1] += 1
-            return address
+            if (size == None):
+                return address
+            else:
+                self.globalChar[1] += size
+                return address
         elif funcName != programName and varType == 'char':
             address = self.localChar[1]
             self.localChar[1] += 1
-            return address
+            if (size == None):
+                return address
+            else:
+                self.localChar[1] += size
+                return address
 
         if funcName == programName and varType == 'bool':
             address = self.globalBool[1]
             # print('var: ', varName, 'assigned at: ', address)
             self.globalBool[1] += 1
-            return address
+            if (size == None):
+                return address
+            else:
+                self.globalBool[1] += size
+                return address
 
         if  varType == 'CTEINT':
             address = self.constAddressINT[1]
@@ -125,8 +153,16 @@ class memoryHandler:
             address = self.tempAddressGlobal[1]
             # print('var: ', varName, 'assigned at: ', address)
             self.tempAddressGlobal[1] += 1
-            return address
+            if (size == None):
+                return address
+            else:
+                self.tempAddressGlobal[1] += size
+                return address
         elif funcName != programName and varType == 'TEMPORAL':
             address = self.localTemp[1]
             self.localTemp[1] += 1
-            return address
+            if (size == None):
+                return address
+            else:
+                self.localTemp[1] += size
+                return address

@@ -52,7 +52,23 @@ def p_var_id_2(p):
                 | empty'''
 
 def p_arr_id(p):
-    '''arr_id : ID LEFTSQUAREBRACKET CTEINT RIGHTSQUAREBRACKET'''
+    '''arr_id : ID  LEFTSQUAREBRACKET CTEINT qnp_cte_int np_addArrayToCurrentTable RIGHTSQUAREBRACKET'''
+
+def p_np_add_array_to_current_table(p):
+    '''np_addArrayToCurrentTable : empty'''
+    # agrega la variable que acaba de leer a la tabla de variables actual.
+    # utiliza el memory handler para asignarle una posicion en la memoria virtual.
+    global currentFunc
+    global currentVarTable
+    global currentType
+    id = currentVarTable.getVariableByName(p[-4])
+    if (id == None):
+        address = mh.addVariable(currentFunc, p[-4], currentType, None, programName, p[-2])
+        size = qg.operandStack.pop()
+        qg.typeStack.pop()
+        currentVarTable.insert({"name": p[-4], "type": currentType, "address": address, "size": size})
+    else:
+        raise Exception("ERROR: Redeclaration of variable ID = " + p[-4])
 
 def p_declare_funcs(p):
     '''declare_funcs : funcs
@@ -168,7 +184,7 @@ def p_generate_era_quad(p):
     func = dirFunc.getFunctionByName(p[-2])
     memorySize = func["memorySize"]
     funcName = func["name"]
-    quadruplesOutput.append(("ERA",'empty','empty',funcName))
+    quadruplesOutput.append(("ERA",'empty','empty',funcName,None))
     paramCounter = 0
     currentParamSignature = func["parameterSignature"]
     # print(currentParamSignature)
@@ -390,7 +406,7 @@ def p_np_add_return_to_global_vars(p):
     if (funcRow["type"] == expressionType):
 
         if (var == None):
-            funcAddress = mh.addVariable(programName,currentFunc,funcRow['type'],None,programName)
+            funcAddress = mh.addVariable(programName,currentFunc,funcRow['type'],None,programName,None)
             globalVarsTable.insert({"name": currentFunc, "type": expressionType, "address" : funcAddress})
         else:
             funcAddress = var["address"]
@@ -476,7 +492,7 @@ def p_FillStacksWithReturnValue(p):
         raise Exception("function: "+currentFunctionCall["name"]+" does not return a value")
     result = 'T'+str(tempCounter)
     tempCounter = tempCounter + 1
-    address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName)
+    address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName,None)
     quadruplesOutput.append(('=',currentFunctionReturnOperand,'',address))
     qg.typeStack.append(currentFunctionReturnType)
     qg.operandStack.append(address)
@@ -495,7 +511,7 @@ def p_qnp_cte_int(p):
     '''qnp_cte_int : empty'''
     global currentFunc
     global programName
-    address = mh.addVariable(currentFunc, p[-1], 'CTEINT', None, programName)
+    address = mh.addVariable(currentFunc, p[-1], 'CTEINT', None, programName,None)
     qg.operandStack.append(address)
     qg.typeStack.append('int')
 
@@ -504,7 +520,7 @@ def p_qnp_cte_float(p):
     # print('entra FLOAT')
     global currentFunc
     global programName
-    address = mh.addVariable(currentFunc, p[-1], 'CTEFLOAT', None, programName)
+    address = mh.addVariable(currentFunc, p[-1], 'CTEFLOAT', None, programName,None)
     qg.operandStack.append(address)
     qg.typeStack.append('float')
 
@@ -513,7 +529,7 @@ def p_qnp_cte_char(p):
     print('ENTRA A CHAR',  p[-1][1])
     global currentFunc
     global programName
-    address = mh.addVariable(currentFunc, p[-1][1], 'CTECHAR', None, programName)
+    address = mh.addVariable(currentFunc, p[-1][1], 'CTECHAR', None, programName,None)
     qg.operandStack.append(address)
     qg.typeStack.append('char')
 
@@ -521,7 +537,7 @@ def p_qnp_cte_bool(p):
     '''qnp_cte_bool : empty'''
     global currentFunc
     global programName
-    address = mh.addVariable(currentFunc, p[-1], 'CTEBOOL', None, programName)
+    address = mh.addVariable(currentFunc, p[-1], 'CTEBOOL', None, programName,None)
     qg.operandStack.append(address)
     qg.typeStack.append('bool')
 
@@ -611,7 +627,7 @@ def p_np14_add_parameter_as_variable_to_func(p):
     if (id != None):
         raise Exception("   ERROR: Redeclaration of variable ID = " + p[-3])
     else:
-        address = mh.addVariable(currentFunc, p[-1], currentType, None, programName)
+        address = mh.addVariable(currentFunc, p[-1], currentType, None, programName,None)
         currentVarTable.insert({"name": p[-3], "type": currentType, "address" : address})
 
 def p_np15_add_parameter_as_variable_to_func_class(p):
@@ -704,7 +720,7 @@ def p_qnp4(p):
         if result_type != -1:
             result = 'T'+str(tempCounter)
             tempCounter = tempCounter + 1
-            address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName)
+            address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName,None)
 
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
@@ -726,7 +742,7 @@ def p_qnp5(p):
             result = 'T'+str(tempCounter)
             tempCounter = tempCounter + 1
 
-            address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName)
+            address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName,None)
 
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
@@ -780,7 +796,7 @@ def p_qnp10(p):
             result = 'T'+str(tempCounter)
             tempCounter = tempCounter + 1
 
-            address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName)
+            address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName,None)
 
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
@@ -806,7 +822,7 @@ def p_qnp12(p):
             result = 'T'+str(tempCounter)
             tempCounter = tempCounter + 1
 
-            address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName)
+            address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName,None)
 
             quadruplesOutput.append((operator, left_operand, right_operand, address))
             qg.operandStack.append(address)
@@ -900,7 +916,7 @@ def p_np_add_var_to_current_table(p):
     global currentType
     id = currentVarTable.getVariableByName(p[-1])
     if (id == None):
-        address = mh.addVariable(currentFunc, p[-1], currentType, None, programName)
+        address = mh.addVariable(currentFunc, p[-1], currentType, None, programName,None)
         currentVarTable.insert({"name": p[-1], "type": currentType, "address": address})
         # currentVarTable.printVars()
     else:
