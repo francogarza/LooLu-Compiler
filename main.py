@@ -78,7 +78,8 @@ def p_np_CheckIfFuncHasReturned(p):
 
 # se supone que hasta aqui hacia arriba los puntos neuralgicos se documentaron y se mandaron a su segmento que esta al final del archivo
 def p_parameter(p):
-    '''parameter : ID COLON type_parameter np14AddParameterAsVariableToFunc parameter2'''
+    '''parameter : ID COLON type_parameter np14AddParameterAsVariableToFunc parameter2
+                 | empty'''
 
 def p_typeParameter(p):
     '''type_parameter : type_simple_parameter'''
@@ -106,8 +107,11 @@ def p_parameter2(p):
                   | empty'''
 
 def p_function_call(p):
-    '''function_call : ID np_VerifyFuncInDirFunc np_GenerateEraQuad LEFTPAREN super_expression np_VerifyParamTypeWithSignature function_call2 RIGHTPAREN np_CreateGosubQuad'''
+    '''function_call : ID np_VerifyFuncInDirFunc np_GenerateEraQuad LEFTPAREN func_call_param RIGHTPAREN np_CreateGosubQuad'''
 
+def p_func_call_param(p):
+    '''func_call_param : super_expression np_VerifyParamTypeWithSignature function_call2
+                       | empty'''
 def p_function_call2(p):
     '''function_call2 : COMMA super_expression np_VerifyParamTypeWithSignature function_call2
                       | empty np_CheckForMissingArguments'''
