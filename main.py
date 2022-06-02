@@ -531,7 +531,7 @@ def p_FillStacksWithReturnValue(p):
     address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName,None)
     test = globalVarsTable.getVariableByName(currentFunctionCall['name'])
     quadruplesOutput.append(('=',test['address'],'',address))
-    qg.typeStack.append(currentFunctionReturnType)
+    qg.typeStack.append(test['type'])
     qg.operandStack.append(address)
     # print(qg.operandStack)    
     # print(qg.typeStack)
