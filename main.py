@@ -1,6 +1,7 @@
 # imports
 from operator import truediv
 from pickle import TRUE
+from re import M
 from lexer import *
 from lexer import tokens
 import ply.yacc as yacc
@@ -184,7 +185,7 @@ def p_generate_era_quad(p):
     func = dirFunc.getFunctionByName(p[-2])
     memorySize = func["memorySize"]
     funcName = func["name"]
-    quadruplesOutput.append(("ERA",'empty','empty',funcName,None))
+    quadruplesOutput.append(("ERA",'empty','empty',funcName))
     paramCounter = 0
     currentParamSignature = func["parameterSignature"]
     # print(currentParamSignature)
@@ -299,7 +300,8 @@ def p_assignment(p):
                   | access_class_atribute EQUAL expression'''
 
 def p_assignment_variable(p):
-    '''assignmentVariable : ID np16isOnCurrentVarsTable qnp1sendToQuadruples EQUAL qnp2insertOperator'''
+    '''assignmentVariable : ID np16isOnCurrentVarsTable qnp1sendToQuadruples EQUAL qnp2insertOperator
+                          | ID LEFTSQUAREBRACKET CTEINT RIGHTSQUAREBRACKET'''
 
 def p_np17_test(p):
     '''np17Test : empty'''
@@ -477,10 +479,44 @@ def p_var_cte(p):
                | access_class_atribute
                | function_call np_FillStacksWithReturnValue
                | class_function_call 
-               | arr_access'''
+               | arr_access qnp1'''
                
 def p_arr_access(p):
-    '''arr_access : ID LEFTSQUAREBRACKET expression RIGHTSQUAREBRACKET'''
+    '''arr_access : ID LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET'''
+
+def p_np_verify_arr_access(p):
+    '''np_VerifyArrAccess : empty'''
+    global currentVarTable
+    global globalVarsTable
+
+    arr = currentVarTable.getVariableByName(p[-3])
+    if (arr == None):
+        globalVarsTable.getVariableByName(p[-3])
+        if (arr == None):
+            raise Exception("The array you are trying to access with name '"+p[-3]+"' has not been declared")
+
+    type = qg.typeStack.pop()
+
+    if(type != 'int'):
+        raise Exception("An in is required to access an array. You are trying to access with '"+type+"'")
+
+
+    s1 = qg.operandStack.pop()
+    dirBase = arr["address"]
+    print(s1,dirBase)
+
+    pointer = mh.addVariable(None,None,'POINTER',None,None,None)
+
+    quadruplesOutput.append(('+',dirBase,s1,pointer))
+
+    addressDestino = dirBase + s1
+    qg.operandStack.append(addressDestino)
+    qg.typeStack.append(arr["type"])
+
+
+        
+    
+    # print(s1,type)
 
 def p_FillStacksWithReturnValue(p):
     '''np_FillStacksWithReturnValue : empty'''
