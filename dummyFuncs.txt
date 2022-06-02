@@ -6,6 +6,12 @@ VARS:
   var char : myChar;
   var bool : myBool;
 FUNCS: 
+   func char charfunc(n : char) {
+     VARS:
+     START:
+      return(n);
+   }
+
    func int fib(n : int) {
      VARS:
      START:
@@ -15,58 +21,12 @@ FUNCS:
       return((fib(n-1)) + (fib(n-2)));
    }
 
-   func float fib2(n : int) {
-     VARS:
-     START:
-      return(1.0);
-   }
-
-   func int suma(n : int) {
-     VARS:
-     START:
-     if (n == 0) {
-       return(0);
-     }
-     return(suma(n - 1) + 1);
-   }
-
-   func int asdf(n : int){
-     VARS:
-     START:
-      return(n);
-   }
-
-   func float abc(c : float) {
-     VARS:
-     START:
-     return(c);
-   }
-
-   func int factorial(n : int) {
-     VARS:
-     START:
-     if (n < 2) {
-       return(1);
-     }
-     return(factorial(n - 1) * n);
-   }
-
    
 
 
 CLASSES:
 
 Loo() {
-    myInt = fib(6);
-    print(myInt);
-
-    myInt3 = fib2(45);
-    print(myInt3);
-
-    myInt4 = factorial(45);
-    print(myInt4);
-
-    myFloat = abc(6.0);
-    print(myFloat);
-
+  myChar = charfunc('a');
+  print(myChar);
 } Lu;
