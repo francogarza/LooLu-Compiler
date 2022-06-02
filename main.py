@@ -276,17 +276,60 @@ def p_declare_funcs_class(p):
                            | empty'''
 
 def p_funcs_class(p):
-    '''funcs_class : FUNC type_simple ID np13AddFunctionClass LEFTPAREN np10CreateVarsTableForClass parameter_class RIGHTPAREN block funcs_block_class'''
+    '''funcs_class : FUNC type_simple ID np13AddFunctionClass LEFTPAREN npCreateVarsTableForClassFunc parameter_class RIGHTPAREN block funcs_block_class'''
 
 def p_funcs_block_class(p):
-    '''funcs_block_class : FUNC type_simple ID np13AddFunctionClass LEFTPAREN np10CreateVarsTableForClass parameter_class RIGHTPAREN block funcs_block_class
+    '''funcs_block_class : FUNC type_simple ID np13AddFunctionClass LEFTPAREN npCreateVarsTableForClassFunc parameter_class RIGHTPAREN block funcs_block_class
                          | empty'''
 
+def p_npCreateVarsTableForClassFunc(p):
+    '''npCreateVarsTableForClassFunc : empty'''
+    # crea y agrega la tabla de variables para la funcion actual
+    # saca la fila en la que esta la funcion, busca la casilla de "table" e inicializa una tabla de variables.
+    # hace la validacion de que no se hatambien se guarda la tabla de variables actual
+    global currentClassDirFunc
+    global currentClassFunc
+    global currentClassVarTable
+    row = currentClassDirFunc.getFunctionByName(currentClassFunc)
+    if (row != None):
+        if (row["table"] == None):
+            row["table"] = vt.Vars()
+            currentClassVarTable = row["table"]
+            print(currentClassFunc,"row = ",row,"table",currentClassVarTable)
+            # currentVarTable.printVars()
+        else:
+            raise Exception("ERROR: did not create vars table because vars table for funtion(", currentClassFunc, ") already exists.")
+    else:
+        raise Exception("ERROR: could not find function (", currentClassFunc, ") in Directory Function")
+
 def p_parameter_class(p):
-    '''parameter_class : ID COLON type np15AddParameterAsVariableToFuncClass parameter2_class'''
+    '''parameter_class : ID COLON type_parameter_class np15AddParameterAsVariableToFuncClass parameter2_class'''
+
+def p_typeParameterClass(p):
+    '''type_parameter_class : type_simple_parameter_class'''
+
+def p_typeSimpleParameterClass(p):
+    '''type_simple_parameter_class : INT addToParameterSignatureClass
+                                    | FLOAT addToParameterSignatureClass
+                                    | CHAR addToParameterSignatureClass
+                                    | BOOL addToParameterSignatureClass
+                                    | VOID addToParameterSignatureClass'''
+
+def p_typeCompoundParameterClass(p):
+    '''type_compound_parameter_class : ID'''
+
+def p_addToParameterSignatureClass(p):
+    '''addToParameterSignatureClass : empty'''
+    global currentClassFunc
+    global currentType
+    global currentClassDirFunc
+    currentType = p[-1]
+    row = currentClassDirFunc.getFunctionByName(currentClassFunc)
+    row["parameterSignature"].append(currentType)
+    print("asdfasd   asd s s \n\n\n",row)
 
 def p_parameter2_class(p):
-    '''parameter2_class : COMMA ID COLON type np15AddParameterAsVariableToFuncClass
+    '''parameter2_class : COMMA ID COLON type_parameter_class np15AddParameterAsVariableToFuncClass parameter2_class
                         | empty'''
 
 def p_classes_block(p):
@@ -672,6 +715,7 @@ def p_np15_add_parameter_as_variable_to_func_class(p):
         raise Exception("   ERROR: Redeclaration of variable ID = " + p[-3])
     else:
         currentClassVarTable.insert({"name": p[-3], "type": currentType})
+    print("lol",p[-3])
 
 '''
     MAIN PROGRAM NEURALGIC POINTS

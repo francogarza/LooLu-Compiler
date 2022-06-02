@@ -9,7 +9,7 @@ CLASSES:
       var float : myFloat, myFloat2;
       var bool : myBool, myBool2;
     FUNCS:
-      func int myFunc(n : int){
+      func int myFunc(n : int, b: bool, x: float){
       }
       func int myFunc3(n : int){
       }
