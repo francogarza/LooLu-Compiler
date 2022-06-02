@@ -511,6 +511,8 @@ def p_np_verify_arr_access(p):
     dirBase = arr["address"]
     # print(s1,dirBase)
 
+    quadruplesOutput.append(('VER',s1,'',arr['size']))
+
     pointer = mh.addVariable(None,None,'POINTER',None,None,None)
     print(pointer)
 

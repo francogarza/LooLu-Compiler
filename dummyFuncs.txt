@@ -76,15 +76,7 @@ Loo() {
   myBool = istrue(1, 2);
   print(myBool);
 
-<<<<<<< Updated upstream
-  printNum(23, 24);
-  llama();
-
-  myInt = regresaNumero();
-  print(myInt); 
-=======
   myInt = myArr[4];
   print(myInt);
->>>>>>> Stashed changes
 
 } Lu;
