@@ -21,6 +21,33 @@ FUNCS:
       return((fib(n-1)) + (fib(n-2)));
    }
 
+   func bool istrue(a : int, b : int) {
+     VARS:
+     START:
+     if (a < b) {
+       return(true);
+     }
+     return(false);
+   }
+
+   func void printNum(a : int, b : int) {
+     VARS:
+      var bool : flag;
+     START:
+     flag = istrue(a, b);
+     if (flag) {
+      print(a);
+    } else {
+      print(b);
+    }
+   }
+
+   func void llama(dioquis : int) {
+     VARS:
+     START:
+     printNum(24, 25);
+   }
+
    func int fact(n : int) {
      VARS:
      START:
@@ -30,15 +57,7 @@ FUNCS:
      return(n * (fact(n - 1)));
    }
 
-   func bool istrue(b : bool) {
-     VARS:
-     START:
-     return(b);
-   }
-
-   
-
-
+  
 CLASSES:
 
 Loo() {
@@ -48,6 +67,10 @@ Loo() {
   myInt = fact(5);
   print(myInt); 
 
-  myBool = istrue(true);
+  myBool = istrue(1, 2);
   print(myBool);
+
+  printNum(23, 24);
+  llama(12);
+
 } Lu;

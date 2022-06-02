@@ -146,6 +146,7 @@ def p_check_for_missing_arguments(p):
     '''np_CheckForMissingArguments : empty'''
     global paramCounter
     global currentParamSignature
+    print(currentParamSignature)
     # print(currentParamSignature,paramCounter)
     if (len(currentParamSignature)-1 > paramCounter-1):
         raise Exception('Function call is missing arguments')
@@ -503,7 +504,7 @@ def p_np_verify_arr_access(p):
 
     s1 = qg.operandStack.pop()
     dirBase = arr["address"]
-    print(s1,dirBase)
+    # print(s1,dirBase)
 
     pointer = mh.addVariable(None,None,'POINTER',None,None,None)
 
@@ -563,7 +564,7 @@ def p_qnp_cte_float(p):
 
 def p_qnp_cte_char(p):
     '''qnp_cte_char : empty'''
-    print('ENTRA A CHAR',  p[-1][1])
+    # print('ENTRA A CHAR',  p[-1][1])
     global currentFunc
     global programName
     address = mh.addVariable(currentFunc, p[-1][1], 'CTECHAR', None, programName,None)
@@ -574,7 +575,7 @@ def p_qnp_cte_bool(p):
     '''qnp_cte_bool : empty'''
     global currentFunc
     global programName
-    print('entra bool')
+    # print('entra bool')
     address = mh.addVariable(currentFunc, p[-1], 'CTEBOOL', None, programName,None)
     qg.operandStack.append(address)
     qg.typeStack.append('bool')
@@ -666,7 +667,7 @@ def p_np14_add_parameter_as_variable_to_func(p):
         raise Exception("   ERROR: Redeclaration of variable ID = " + p[-3])
     else:
         address = mh.addVariable(currentFunc, p[-1], currentType, None, programName,None)
-        print(currentFunc, p[-1], currentType, None, programName,None)
+        # print(currentFunc, p[-1], currentType, None, programName,None)
         currentVarTable.insert({"name": p[-3], "type": currentType, "address" : address})
 
 def p_np15_add_parameter_as_variable_to_func_class(p):
@@ -727,7 +728,7 @@ def p_qnp1(p):
     global currentVarTable
     global globalVarsTable
     variable = currentVarTable.getVariableByName(p[-1])
-    print(variable, variable["type"])
+    # print(variable, variable["type"])
     if(variable != None):
         qg.operandStack.append(variable["address"])
         qg.typeStack.append(variable["type"])
@@ -1051,9 +1052,9 @@ try:
 
     # print(qg.operandStack)
     # dirFunc.printDirFunc()
-    currentVarTable.printVars()
-    globalVarsTable.printVars()
-    print(ct.constantTable)
+    # currentVarTable.printVars()
+    # globalVarsTable.printVars()
+    # print(ct.constantTable)
     # print(globalVarsTable)
 
 except Exception as excep:

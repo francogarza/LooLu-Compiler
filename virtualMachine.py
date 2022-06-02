@@ -13,7 +13,7 @@ class Memory():
         #     return
         self.data[address] = value
     def get(self, address):
-        print("test address:",address)
+        # print("test address:",address)
         if (address in self.data):
             return self.data[address]
         else:
@@ -332,7 +332,7 @@ class virtualMachine():
                 address = getLocalAddress(paramType)
                 # print(address)
                 val = getFromMemory(int(currentQuad[1]))
-                print('entra P', val, address)
+                # print('entra P', val, address)
                 insertInMemory(address, val)
                 # self.localMemory.printMemory()
 
@@ -343,7 +343,7 @@ class virtualMachine():
                 # print(saveQuad)
 
             if (currentQuad[0] == 'ENDFUNC'):
-                self.localMemory.printMemory()
+                # self.localMemory.printMemory()
                 # print('ENTRA ENDFUNC')
 
                 # if (needReturn):
@@ -356,6 +356,6 @@ class virtualMachine():
             
             self.ip = self.ip + 1
             currentQuad = self.quadruples[self.ip]
-        self.localMemory.printMemory()
+        # self.localMemory.printMemory()
         print('Lu∞')
 
