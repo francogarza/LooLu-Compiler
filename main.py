@@ -373,7 +373,6 @@ def p_create_gotof_for_while(p):
     else:
         raise Exception("Sematic Error: Type in while statement is not a bool")
 
-
 def p_fill_gotof_for_while(p):
     '''np_FillGotofForWhile : empty'''
     migaja = qg.jumpStack.pop()
@@ -494,39 +493,21 @@ def p_np_verify_arr_access(p):
     '''np_VerifyArrAccess : empty'''
     global currentVarTable
     global globalVarsTable
-
     arr = currentVarTable.getVariableByName(p[-3])
     if (arr == None):
         globalVarsTable.getVariableByName(p[-3])
         if (arr == None):
             raise Exception("The array you are trying to access with name '"+p[-3]+"' has not been declared")
-
     type = qg.typeStack.pop()
-
     if(type != 'int'):
         raise Exception("An in is required to access an array. You are trying to access with '"+type+"'")
-
-
     s1 = qg.operandStack.pop()
     dirBase = arr["address"]
-    # print(s1,dirBase)
-
     quadruplesOutput.append(('VER',s1,'',arr['size']))
-
     pointer = mh.addVariable(None,None,'POINTER',None,None,None)
-    print(pointer)
-
     quadruplesOutput.append(('+dirBase',dirBase,s1,pointer))
-    print(('+dirBase',dirBase,s1,pointer))
     qg.operandStack.append(pointer)
     qg.typeStack.append(type)
-
-
-    print(qg.typeStack,qg.operandStack)
-
-        
-    
-    # print(s1,type)
 
 def p_FillStacksWithReturnValue(p):
     '''np_FillStacksWithReturnValue : empty'''
@@ -635,7 +616,7 @@ def p_np10_create_vars_table_for_class(p):
     row = currentClassDirFunc.getFunctionByName(currentClassFunc)
     if (row["table"] == None):
         currentClassVarTable = vt.Vars()
-        currentClassDirFunc.addVarsTable(currentClassFunc, currentVarTable)
+        currentClassDirFunc.addVarsTable(currentClassFunc, currentClassVarTable)
     else:
         raise Exception("ERROR: could not find function with that name in DirFunc")
 
@@ -648,6 +629,8 @@ def p_np12_add_var_to_current_table_class(p):
     '''np12AddVarToCurrentTableClass : empty'''
     global currentClassVarTable
     global currentType
+    # print("hello",currentClassVarTable)
+
     id = currentClassVarTable.getVariableByName(p[-1])
     if (id != None):
         raise Exception("   ERROR: Redeclaration of variable ID = " + p[-1])
@@ -664,7 +647,7 @@ def p_np13_add_function_class(p):
         print("redeclaration of function " + p[-1])
     else:
         # print("else")
-        currentClassDirFunc.insert({"name": p[-1], "type": currentType, "table": None})
+        currentClassDirFunc.insert({"name": p[-1], "type": currentType, "table": None, "parameterSignature": [], "memorySize" : 0, "functionQuadStart" : 0})
         currentClassFunc = p[-1]
 
 def p_np14_add_parameter_as_variable_to_func(p):
@@ -1064,7 +1047,23 @@ try:
     # currentVarTable.printVars()
     # globalVarsTable.printVars()
     # print(ct.constantTable)
-    # print(globalVarsTable)
+
+    print('---GLOBAL DIRFUNC---') 
+    dirFunc.printDirFunc()
+    print('---') 
+    print('---GLOBAL VARS TABLE---') 
+    globalVarsTable.printVars()
+    print('---') 
+    tempClass = dirFunc.getFunctionByName('persona2')
+    classDirFunc = tempClass['DirFunc']
+    print('---CLASS DIRFUNC---') 
+    classDirFunc.printDirFunc()
+    classFuncInDirFunc = classDirFunc.getFunctionByName('persona2')
+    classVarTable = classFuncInDirFunc['table']
+    print('----')
+    print('----CLASS GLOBAL VAR TABLE---') 
+    classVarTable.printVars()
+    print('-----')
 
 except Exception as excep:
     print('Error in code!\n', excep)

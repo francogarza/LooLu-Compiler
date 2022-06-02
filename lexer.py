@@ -8,7 +8,7 @@ reserved = {
     'LooLu': 'LOOLU', #nuestro program
     'Loo': 'LOO', #nuestro inicio de main
     'CLASSES': 'CLASSES',
-    'Class': 'CLASS',
+    'class': 'CLASS',
     'VARS': 'VARS',
     'var': 'VAR',
     'int': 'INT',

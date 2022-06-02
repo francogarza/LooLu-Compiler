@@ -1,82 +1,41 @@
 LooLu miPrograma;
 
 VARS:
-  var int : myInt, myArr[100], myArr2[2], myInt3, myInt4;
-  var float : myFloat;
-  var char : myChar;
-  var bool : myBool;
 FUNCS: 
-   func char charfunc(n : char) {
-     VARS:
-     START:
-      return(n);
-   }
-
-   func int fib(n : int) {
-     VARS:
-     START:
-      if (n < 3){
-        return(1);
-      }
-      return((fib(n-1)) + (fib(n-2)));
-   }
-
-   func bool istrue(a : int, b : int) {
-     VARS:
-     START:
-     if (a < b) {
-       return(true);
-     }
-     return(false);
-   }
-
-   func void printNum(a : int, b : int) {
-     VARS:
-      var bool : flag;
-     START:
-     flag = istrue(a, b);
-     if (flag) {
-      print(a);
-    } else {
-      print(b);
-    }
-   }
-
-   func void llama() {
-     VARS:
-     START:
-     printNum(24, 25);
-   }
-
-   func int fact(n : int) {
-     VARS:
-     START:
-     if (n < 2) {
-       return(1);
-     }
-     return(n * (fact(n - 1)));
-   }
-
-   func int regresaNumero() {
-     VARS:
-     START:
-     return(100);
-   }
-
-  
 CLASSES:
+  class persona{
+    VARS:
+      var int : myInt, myInt2;
+      var float : myFloat, myFloat2;
+      var bool : myBool, myBool2;
+    FUNCS:
+      func int myFunc(n : int){
+      }
+      func int myFunc3(n : int){
+      }
+  }
+  class persona2{
+    VARS:
+      var int : myInt, myInt2;
+      var float : myFloat, myFloat2;
+      var bool : myBool, myBool2;
+    FUNCS:
+      func int myFunc(n : int){
+      }
+      func int myFunc2(n : int){
+      }
+  }
+  class persona1{
+    VARS:
+      var int : myInt, myInt2;
+      var float : myFloat, myFloat2;
+      var bool : myBool, myBool2;
+    FUNCS:
+      func int myFunc(n : int){
+      }
+      func int myFunc1(n : int){
+      }
+  }
 
 Loo() {
-  myChar = charfunc('a');
-  print(myChar);
-
-  myInt = fact(5);
-  print(myInt); 
-
-  myBool = istrue(1, 2);
-  print(myBool);
-
-  myInt = myArr[4];
-  print(myInt);
-
 } Lu;
