@@ -42,7 +42,7 @@ FUNCS:
     }
    }
 
-   func void llama(dioquis : int) {
+   func void llama() {
      VARS:
      START:
      printNum(24, 25);
@@ -55,6 +55,12 @@ FUNCS:
        return(1);
      }
      return(n * (fact(n - 1)));
+   }
+
+   func int regresaNumero() {
+     VARS:
+     START:
+     return(100);
    }
 
   
@@ -71,6 +77,9 @@ Loo() {
   print(myBool);
 
   printNum(23, 24);
-  llama(12);
+  llama();
+
+  myInt = regresaNumero();
+  print(myInt); 
 
 } Lu;
