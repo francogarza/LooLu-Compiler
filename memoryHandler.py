@@ -114,6 +114,14 @@ class memoryHandler:
             else:
                 self.globalBool[1] += size
                 return address
+        elif funcName != programName and varType == 'bool':
+            address = self.localBool[1]
+            self.localBool[1] += 1
+            if (size == None):
+                return address
+            else:
+                self.localBool[1] += size
+                return address
 
         if  varType == 'CTEINT':
             address = self.constAddressINT[1]

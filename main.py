@@ -574,6 +574,7 @@ def p_qnp_cte_bool(p):
     '''qnp_cte_bool : empty'''
     global currentFunc
     global programName
+    print('entra bool')
     address = mh.addVariable(currentFunc, p[-1], 'CTEBOOL', None, programName,None)
     qg.operandStack.append(address)
     qg.typeStack.append('bool')
@@ -665,6 +666,7 @@ def p_np14_add_parameter_as_variable_to_func(p):
         raise Exception("   ERROR: Redeclaration of variable ID = " + p[-3])
     else:
         address = mh.addVariable(currentFunc, p[-1], currentType, None, programName,None)
+        print(currentFunc, p[-1], currentType, None, programName,None)
         currentVarTable.insert({"name": p[-3], "type": currentType, "address" : address})
 
 def p_np15_add_parameter_as_variable_to_func_class(p):
@@ -725,6 +727,7 @@ def p_qnp1(p):
     global currentVarTable
     global globalVarsTable
     variable = currentVarTable.getVariableByName(p[-1])
+    print(variable, variable["type"])
     if(variable != None):
         qg.operandStack.append(variable["address"])
         qg.typeStack.append(variable["type"])

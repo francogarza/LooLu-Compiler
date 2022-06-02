@@ -332,7 +332,7 @@ class virtualMachine():
                 address = getLocalAddress(paramType)
                 # print(address)
                 val = getFromMemory(int(currentQuad[1]))
-                # print('entra P', val, address)
+                print('entra P', val, address)
                 insertInMemory(address, val)
                 # self.localMemory.printMemory()
 

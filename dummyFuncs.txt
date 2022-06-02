@@ -21,6 +21,21 @@ FUNCS:
       return((fib(n-1)) + (fib(n-2)));
    }
 
+   func int fact(n : int) {
+     VARS:
+     START:
+     if (n < 2) {
+       return(1);
+     }
+     return(n * (fact(n - 1)));
+   }
+
+   func bool istrue(b : bool) {
+     VARS:
+     START:
+     return(b);
+   }
+
    
 
 
@@ -29,4 +44,10 @@ CLASSES:
 Loo() {
   myChar = charfunc('a');
   print(myChar);
+
+  myInt = fact(5);
+  print(myInt); 
+
+  myBool = istrue(true);
+  print(myBool);
 } Lu;
