@@ -182,10 +182,13 @@ class virtualMachine():
                 self.ip = int(currentQuad[3]) - 1
 
             if (currentQuad[0] == '='): # Assignation is found
-                newVal = getFromMemory(int(currentQuad[1]))
-                # resDir = getTransformmedAddress(currentQuad[3], 3)
-                insertInMemory(int(currentQuad[3]), newVal)
-                # self.globalMemory.printMemory()
+                if (int(currentQuad[3]) >= 21000):
+                    print("asdf");
+                else:
+                    newVal = getFromMemory(int(currentQuad[1]))
+                    # resDir = getTransformmedAddress(currentQuad[3], 3)
+                    insertInMemory(int(currentQuad[3]), newVal)
+                    # self.globalMemory.printMemory()
 
             
 

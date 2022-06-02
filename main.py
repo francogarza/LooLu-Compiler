@@ -485,7 +485,7 @@ def p_var_cte(p):
                | access_class_atribute
                | function_call np_FillStacksWithReturnValue
                | class_function_call 
-               | arr_access qnp1'''
+               | arr_access'''
                
 def p_arr_access(p):
     '''arr_access : ID LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET'''
@@ -512,13 +512,15 @@ def p_np_verify_arr_access(p):
     # print(s1,dirBase)
 
     pointer = mh.addVariable(None,None,'POINTER',None,None,None)
+    print(pointer)
 
-    quadruplesOutput.append(('+',dirBase,s1,pointer))
+    quadruplesOutput.append(('+dirBase',dirBase,s1,pointer))
+    print(('+dirBase',dirBase,s1,pointer))
+    qg.operandStack.append(pointer)
+    qg.typeStack.append(type)
 
-    addressDestino = dirBase + s1
-    qg.operandStack.append(addressDestino)
-    qg.typeStack.append(arr["type"])
 
+    print(qg.typeStack,qg.operandStack)
 
         
     
