@@ -1,7 +1,7 @@
 LooLu miPrograma;
 
 VARS:
-FUNCS: 
+FUNCS:
 CLASSES:
   class persona{
     VARS:
@@ -9,9 +9,15 @@ CLASSES:
       var float : myFloat, myFloat2;
       var bool : myBool, myBool2;
     FUNCS:
-      func int myFunc(n : int, b: bool, x: float){
+      func void myFunc(n : int, b: bool, xx: float){
+        VARS: 
+          var int : x;
+        START:
       }
-      func int myFunc3(n : int){
+      func void myFunc3(n : int){
+        VARS: 
+          var int : x;
+        START:
       }
   }
   class persona2{
@@ -20,9 +26,14 @@ CLASSES:
       var float : myFloat, myFloat2;
       var bool : myBool, myBool2;
     FUNCS:
-      func int myFunc(n : int){
+      func void myFunc(n : int){
+        VARS: 
+        START:
       }
-      func int myFunc2(n : int){
+      func void myFunc2(n : int){
+        VARS: 
+          var int : x;
+        START:
       }
   }
   class persona1{
@@ -31,9 +42,13 @@ CLASSES:
       var float : myFloat, myFloat2;
       var bool : myBool, myBool2;
     FUNCS:
-      func int myFunc(n : int){
+      func void myFunc(n : int){
+        VARS: 
+        START:
       }
-      func int myFunc1(n : int){
+      func void myFunc1(n : int){
+        VARS: 
+        START:
       }
   }
 

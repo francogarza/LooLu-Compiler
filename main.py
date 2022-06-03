@@ -225,6 +225,7 @@ def p_np_fill_quad_start_parameter_for_func(p):
     row = dirFunc.getFunctionByName(currentFunc)
     row["functionQuadStart"] = len(quadruplesOutput)
 
+
 def p_block(p):
     '''block : LEFTBRACKET statement_block RIGHTBRACKET'''
 
@@ -276,11 +277,37 @@ def p_declare_funcs_class(p):
                            | empty'''
 
 def p_funcs_class(p):
-    '''funcs_class : FUNC type_simple ID np13AddFunctionClass LEFTPAREN npCreateVarsTableForClassFunc parameter_class RIGHTPAREN block funcs_block_class'''
+    '''funcs_class : FUNC type_simple ID np13AddFunctionClass LEFTPAREN npCreateVarsTableForClassFunc parameter_class np_CheckIfFuncHasReturnedClass resetLocalMemory RIGHTPAREN functionBlockClass funcs_block_class'''
 
 def p_funcs_block_class(p):
-    '''funcs_block_class : FUNC type_simple ID np13AddFunctionClass LEFTPAREN npCreateVarsTableForClassFunc parameter_class RIGHTPAREN block funcs_block_class
+    '''funcs_block_class : FUNC type_simple ID np13AddFunctionClass LEFTPAREN npCreateVarsTableForClassFunc parameter_class np_CheckIfFuncHasReturnedClass resetLocalMemory RIGHTPAREN functionBlockClass funcs_block_class
                          | empty'''
+
+
+
+def p_function_block_class(p):
+    '''functionBlockClass : LEFTBRACKET VARS COLON declare_vars_class np_FillMemorySizeParameterForCurrentFuncClass START COLON np_FillQuadStartParameterForFuncClass statement_block RIGHTBRACKET'''
+
+
+def p_np_fill_quad_start_parameter_for_func_class(p):
+    '''np_FillQuadStartParameterForFuncClass : empty'''
+    global currentClassDirFunc
+    global currentClassFunc
+    row = currentClassDirFunc.getFunctionByName(currentClassFunc)
+    row["functionQuadStart"] = len(quadruplesOutput)
+
+def p_np_CheckIfFuncHasReturnedClass(p):
+    '''np_CheckIfFuncHasReturnedClass : empty'''
+    global currentFuncHasReturnedValue
+    global currentClassFunc
+    global currentClassDirFunc
+    if currentFuncHasReturnedValue != 1:
+        raise Exception('function: '+currentClassFunc+" is missing return value")
+    else:
+        if currentClassDirFunc.getFunctionByName(currentClassFunc)["type"] == 'void':
+            # mh.resetLocalTempMemory()
+            quadruplesOutput.append(('ENDFUNC','','',''))
+        currentFuncHasReturnedValue = 0
 
 def p_npCreateVarsTableForClassFunc(p):
     '''npCreateVarsTableForClassFunc : empty'''
@@ -323,10 +350,11 @@ def p_addToParameterSignatureClass(p):
     global currentClassFunc
     global currentType
     global currentClassDirFunc
+    global currentFunc
     currentType = p[-1]
     row = currentClassDirFunc.getFunctionByName(currentClassFunc)
     row["parameterSignature"].append(currentType)
-    print("asdfasd   asd s s \n\n\n",row)
+    currentFunc = currentClassFunc
 
 def p_parameter2_class(p):
     '''parameter2_class : COMMA ID COLON type_parameter_class np15AddParameterAsVariableToFuncClass parameter2_class
@@ -1020,6 +1048,14 @@ def p_np_fill_memory_size_parameter_for_current_func(p):
     global currentFunc
     global dirFunc
     row = dirFunc.getFunctionByName(currentFunc)
+    table = row["table"]
+    row["memorySize"] = len(table.items)
+
+def p_np_fill_memory_size_parameter_for_current_func_class(p):
+    '''np_FillMemorySizeParameterForCurrentFuncClass : empty'''
+    global currentClassFunc
+    global currentClassDirFunc
+    row = currentClassDirFunc.getFunctionByName(currentClassFunc)
     table = row["table"]
     row["memorySize"] = len(table.items)
 
