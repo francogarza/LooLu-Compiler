@@ -1,0 +1,17 @@
+LooLu miPrograma;
+
+VARS:
+  var int : myInt, myArr[10];
+  var float : myFloat;
+  var char : myChar;
+  var bool : myBool;
+FUNCS:
+  
+CLASSES:
+
+Loo() {
+  myArr[4] = 5;
+  myInt = myArr[4];
+  print(myInt);
+
+} Lu;

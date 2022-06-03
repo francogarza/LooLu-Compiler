@@ -12,6 +12,7 @@ import constantTable as ct
 import semanticCube as sc
 import virtualMachine
 
+
 # global vars
 programName = None; dirFunc = vt.DirFunc(); globalVarsTable = None; currentFunc = None; currentType = None; currentParamSignature = None; currentFunctionReturnType = None; currentFunctionReturnOperand = None
 currentFuncHasReturnedValue = None; currentVarTable = None; currentClass = None; currentClassVarTable = None; currentClassDirFunc = None; paramCounter = 0; currentFunctionCall = None; currentFuncDeclaration = None
@@ -68,6 +69,7 @@ def p_np_add_array_to_current_table(p):
         size = qg.operandStack.pop()
         qg.typeStack.pop()
         currentVarTable.insert({"name": p[-4], "type": currentType, "address": address, "size": size})
+        vm.initializeArray(address, p[-2])
     else:
         raise Exception("ERROR: Redeclaration of variable ID = " + p[-4])
 
@@ -307,7 +309,7 @@ def p_assignment(p):
 
 def p_assignment_variable(p):
     '''assignmentVariable : ID np16isOnCurrentVarsTable qnp1sendToQuadruples EQUAL qnp2insertOperator
-                          | ID LEFTSQUAREBRACKET CTEINT RIGHTSQUAREBRACKET'''
+                          | ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET qnp1sendToQuadruplesARR EQUAL qnp2insertOperator'''
 
 def p_np17_test(p):
     '''np17Test : empty'''
@@ -488,23 +490,25 @@ def p_var_cte(p):
                | arr_access'''
                
 def p_arr_access(p):
-    '''arr_access : ID LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET'''
+    '''arr_access : ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET'''
 
 def p_np_verify_arr_access(p):
     '''np_VerifyArrAccess : empty'''
     global currentVarTable
     global globalVarsTable
 
-    arr = currentVarTable.getVariableByName(p[-3])
+    print(p[-4])
+
+    arr = currentVarTable.getVariableByName(p[-4])
     if (arr == None):
-        globalVarsTable.getVariableByName(p[-3])
+        globalVarsTable.getVariableByName(p[-4])
         if (arr == None):
-            raise Exception("The array you are trying to access with name '"+p[-3]+"' has not been declared")
+            raise Exception("The array you are trying to access with name ' has not been declared")
 
     type = qg.typeStack.pop()
 
     if(type != 'int'):
-        raise Exception("An in is required to access an array. You are trying to access with '"+type+"'")
+        raise Exception("An in is required to access an array. You are trying to access with")
 
 
     s1 = qg.operandStack.pop()
@@ -715,7 +719,6 @@ def p_np16_is_on_current_vars_table(p): # Check if an ID is declared in the Glob
 '''
 def p_qnp1_send_to_quadruples(p):
     '''qnp1sendToQuadruples : empty'''
-    # print(p[-2])
     global currentVarTable
     global globalVarsTable
     variable = currentVarTable.getVariableByName(p[-2])
@@ -727,6 +730,22 @@ def p_qnp1_send_to_quadruples(p):
         else:
             raise Exception("   ERROR: Variable not declared on scope " + p[-2])
     qg.operand(variable["address"], variable["type"])
+
+def p_qnp1_send_to_quadruplesARR(p):
+    '''qnp1sendToQuadruplesARR : empty'''
+    global currentVarTable
+    global globalVarsTable
+
+    variable = currentVarTable.getVariableByName(p[-6])
+    if (variable == None):
+        if globalVarsTable != None:
+            variable = globalVarsTable.getVariableByName(p[-6])
+            if (variable == None):
+                raise Exception("   ERROR: Variable not declared on scope " + p[-6])
+        else:
+            raise Exception("   ERROR: Variable not declared on scope " + p[-6])
+    print(variable)
+    qg.operand(qg.operandStack.pop(), variable["type"])
 
 def p_qnp2_insertOperator(p):
     '''qnp2insertOperator : empty'''
@@ -809,9 +828,11 @@ def p_qnp6(p):
         left_operand = qg.operandStack.pop()
         left_type = qg.typeStack.pop()
         operator = qg.operatorStack.pop()
+        print("asdfasd left f", left_operand)
         result_type = sc.cube(left_type, right_type, operator, None, None)
         if result_type != -1:
             quadruplesOutput.append((operator, right_operand, '', left_operand))
+            print("asdfasdf",(operator, right_operand, '', left_operand))
             # qg.operandStack.append(result)
             # qg.typeStack.append(sc.intToType(result_type))
         else:
@@ -1028,7 +1049,7 @@ yacc.yacc()
 parser = yacc.yacc()
 print("Yacc has been generated!")
 
-codeToCompile = open('dummyFuncs.txt','r')
+codeToCompile = open('dummyArr.txt','r')
 data = str(codeToCompile.read())
 lex.input(data)
 
@@ -1062,8 +1083,8 @@ try:
     # print(qg.operandStack)
     # dirFunc.printDirFunc()
     # currentVarTable.printVars()
-    # globalVarsTable.printVars()
-    # print(ct.constantTable)
+    globalVarsTable.printVars()
+    print(ct.constantTable)
     # print(globalVarsTable)
 
 except Exception as excep:
