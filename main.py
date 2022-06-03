@@ -501,9 +501,10 @@ def p_np_verify_arr_access(p):
 
     arr = currentVarTable.getVariableByName(p[-4])
     if (arr == None):
-        globalVarsTable.getVariableByName(p[-4])
+        arr = globalVarsTable.getVariableByName(p[-4])
+        print(globalVarsTable.getVariableByName(p[-4]))
         if (arr == None):
-            raise Exception("The array you are trying to access with name ' has not been declared")
+            raise Exception("The array you are trying to access with name" + p[-4] +"has not been declared")
 
     type = qg.typeStack.pop()
 
@@ -744,7 +745,7 @@ def p_qnp1_send_to_quadruplesARR(p):
                 raise Exception("   ERROR: Variable not declared on scope " + p[-6])
         else:
             raise Exception("   ERROR: Variable not declared on scope " + p[-6])
-    print(variable)
+    print(variable["type"], 'baina', variable['name'], p[-6])
     qg.operand(qg.operandStack.pop(), variable["type"])
 
 def p_qnp2_insertOperator(p):
@@ -829,8 +830,9 @@ def p_qnp6(p):
         left_type = qg.typeStack.pop()
         operator = qg.operatorStack.pop()
         print("asdfasd left f", left_operand)
+        print(left_type, right_type, operator, left_operand, right_operand)
         result_type = sc.cube(left_type, right_type, operator, None, None)
-        if result_type != -1:
+        if result_type != -1 or right_operand >= 21000 or left_operand >= 21000:
             quadruplesOutput.append((operator, right_operand, '', left_operand))
             print("asdfasdf",(operator, right_operand, '', left_operand))
             # qg.operandStack.append(result)
@@ -1082,7 +1084,7 @@ try:
 
     # print(qg.operandStack)
     # dirFunc.printDirFunc()
-    # currentVarTable.printVars()
+    currentVarTable.printVars()
     globalVarsTable.printVars()
     print(ct.constantTable)
     # print(globalVarsTable)

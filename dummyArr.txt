@@ -3,15 +3,53 @@ LooLu miPrograma;
 VARS:
   var int : myInt, myArr[10];
   var float : myFloat;
-  var char : myChar;
+  var char : myChar, string[10];
   var bool : myBool;
 FUNCS:
+
+func int fib(n : int) {
+     VARS:
+     START:
+      if (n < 3){
+        return(1);
+      }
+      return((fib(n-1)) + (fib(n-2)));
+   }
+
+func void makeString(size : int) {
+    VARS:
+    var int : i;
+    var char : ch;
+    START:
+    i = 0;
+
+    while (i < size) {
+        read(ch);
+        string[i] = ch;
+        i = i + 1;
+    }
+}
+
+func void printString(size : int) {
+    VARS:
+    var int : i;
+    var char : ch;
+    START:
+    i = 0;
+
+    while (i < size) {
+        ch = string[i];
+        print(ch);
+        i = i + 1;
+    }
+}
   
 CLASSES:
 
 Loo() {
-  myArr[4] = 5;
-  myInt = myArr[4];
-  print(myInt);
+
+
+  makeString(10);
+  printString(10);
 
 } Lu;

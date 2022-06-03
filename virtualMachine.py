@@ -1,4 +1,6 @@
+from curses.ascii import isalpha
 from cv2 import add
+from pyrsistent import v
 import quadrupleGenerator as qg
 import memoryHandler as mh
 import varsTable as vt
@@ -10,12 +12,12 @@ class Memory():
     def __init__(self):
         self.data = {}
     def insert(self, address, value):
-        print('entra insert', address, value)
+        # print('entra insert', address, value)
         # if address in self.data:
         #     return
         self.data[address] = value
     def get(self, address):
-        print("get address:",address, self.data[address])
+        # print("get address:",address, self.data[address])
 
         if (address in self.data):
             return self.data[address]
@@ -160,7 +162,7 @@ class virtualMachine():
             elif (address >= 14000 and address <= 17999):
                 return self.constantsMemory.get(address)
             elif (address >= 21000 and address <= 21999):
-                print(self.globalMemory.get(address), ' cague')
+                # print(self.globalMemory.get(address), ' cague')
                 self.globalMemory.get(address)
                 return self.globalMemory.get(address)
         
@@ -318,19 +320,16 @@ class virtualMachine():
             if (currentQuad[0] == 'READ'): # Missing semantic check
                 varToBeAssigned = int(currentQuad[3])
                 val = input()
-                # Return the type of a string that can be converted in other type 
+                
+                # BOOL
                 if val == 'true' or val == 'false':
                     # print('entra')
                     insertInMemory(varToBeAssigned, val)
+                elif isalpha(val):
+                    insertInMemory(varToBeAssigned, val)
+                elif type(val) == int:
+                    insertInMemory(varToBeAssigned, val)
                 else:
-                    try:
-                        val = int(val)
-                    except ValueError:
-                        try:
-                            val = float(val)
-                        except ValueError:
-                            val = str(val)[0]
-                            return "char"
                     insertInMemory(varToBeAssigned, val)
             
             if (currentQuad[0] == 'GOTO'): # GOTO id found
@@ -390,7 +389,7 @@ class virtualMachine():
                 requestedIndex = getFromMemory(int(currentQuad[2])) #index
                 pointerAddress = int(currentQuad[3]) #21000s
                 insertInMemory(pointerAddress, dirBase + requestedIndex)
-                print(getFromMemory(pointerAddress))
+                # print(getFromMemory(pointerAddress))
         
             self.ip = self.ip + 1
             currentQuad = self.quadruples[self.ip]
