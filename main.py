@@ -1111,21 +1111,16 @@ def p_parameter2_class(p):
                         | empty'''
 #--------------------------------
 
-
 #--------------------------------
 # CLASSES - FUNCS CALL
 #--------------------------------
-
 def p_class_function_call(p):
     '''class_function_call : ID DOT function_call'''
-
 #--------------------------------
-
 
 #--------------------------------
 # CLASSES - STATEMENTS
 #--------------------------------
-
 def p_statement_blockClass(p):
     '''statement_blockClass : statementClass statement_blockClass
                             | empty'''
@@ -1139,14 +1134,11 @@ def p_statement_class(p):
                       | return_func SEMICOLON
                       | function_call SEMICOLON
                       | class_function_call SEMICOLON'''
-
 #--------------------------------
-
 
 #--------------------------------
 # CLASSES - EXPRESSIONS
 #--------------------------------
-
 def p_assignmentClass(p):
     '''assignmentClass : assignmentVariableClass super_expression qnp6
                         | assignmentVariable class_function_call
@@ -1180,9 +1172,7 @@ def p_sendToQuadruplesClass(p):
 
 def p_access_class_atribute(p):
     '''access_class_atribute : ID DOT ID '''
-
 #--------------------------------
-
 
 #--------------------------------
 # CLASSES - UNCATEGORIZED
@@ -1190,11 +1180,11 @@ def p_access_class_atribute(p):
 
 #--------------------------------
 
-
 #--------------------------------
 # CLASSES - PUNTOS NEURALGICOS
 #--------------------------------
-
+def p_np_class(p):
+    '''np_class : empty'''
 #--------------------------------
 
 #--------------------------------
