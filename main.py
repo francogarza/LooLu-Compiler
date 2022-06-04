@@ -999,6 +999,10 @@ def p_declare_classes(p):
 def p_classes(p):
     '''classes : CLASS ID np8AddClass np9CreateGlobalVarsTableForClass LEFTBRACKET VARS COLON np10CreateVarsTableForClass declare_vars_class FUNCS COLON declare_funcs_class RIGHTBRACKET classes_block'''
 
+def p_classes_block(p):
+    '''classes_block : CLASS ID np8AddClass np9CreateGlobalVarsTableForClass LEFTBRACKET VARS COLON np10CreateVarsTableForClass declare_vars_class FUNCS COLON declare_funcs_class RIGHTBRACKET classes_block
+                  | empty'''
+
 def p_declare_vars_class(p):
     '''declare_vars_class : vars_class
                           | empty'''
@@ -1112,34 +1116,14 @@ def p_parameter2_class(p):
 # CLASSES - FUNCS CALL
 #--------------------------------
 
+def p_class_function_call(p):
+    '''class_function_call : ID DOT function_call'''
+
 #--------------------------------
 
 
 #--------------------------------
 # CLASSES - STATEMENTS
-#--------------------------------
-
-#--------------------------------
-
-
-#--------------------------------
-# CLASSES - EXPRESSIONS
-#--------------------------------
-
-#--------------------------------
-
-
-#--------------------------------
-# CLASSES - UNCATEGORIZED
-#--------------------------------
-
-#--------------------------------
-
-
-#--------------------------------
-# CLASSES - PUNTOS NEURALGICOS
-#--------------------------------
-
 #--------------------------------
 
 def p_statement_blockClass(p):
@@ -1155,6 +1139,13 @@ def p_statement_class(p):
                       | return_func SEMICOLON
                       | function_call SEMICOLON
                       | class_function_call SEMICOLON'''
+
+#--------------------------------
+
+
+#--------------------------------
+# CLASSES - EXPRESSIONS
+#--------------------------------
 
 def p_assignmentClass(p):
     '''assignmentClass : assignmentVariableClass super_expression qnp6
@@ -1187,17 +1178,24 @@ def p_isOnCurrentVarsTableClass(p):
 def p_sendToQuadruplesClass(p):
     '''sendToQuadruplesClass : '''
 
-def p_classes_block(p):
-    '''classes_block : CLASS ID np8AddClass np9CreateGlobalVarsTableForClass LEFTBRACKET VARS COLON np10CreateVarsTableForClass declare_vars_class FUNCS COLON declare_funcs_class RIGHTBRACKET classes_block
-                  | empty'''
-
 def p_access_class_atribute(p):
     '''access_class_atribute : ID DOT ID '''
 
-def p_class_function_call(p):
-    '''class_function_call : ID DOT function_call'''
 #--------------------------------
 
+
+#--------------------------------
+# CLASSES - UNCATEGORIZED
+#--------------------------------
+
+#--------------------------------
+
+
+#--------------------------------
+# CLASSES - PUNTOS NEURALGICOS
+#--------------------------------
+
+#--------------------------------
 
 #--------------------------------
 # EJECUCION
