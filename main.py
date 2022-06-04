@@ -445,6 +445,7 @@ def p_super_expression(p):
 
 def p_super_expression_helper(p):
     '''super_expression_helper : LOGICOPERATOR qnp11 super_expression qnp12
+                               | RELOPER qnp11 super_expression qnp12
                                | expression qnp12
                                | empty'''
 
@@ -1084,9 +1085,9 @@ try:
 
     # print(qg.operandStack)
     # dirFunc.printDirFunc()
-    currentVarTable.printVars()
-    globalVarsTable.printVars()
-    print(ct.constantTable)
+    # currentVarTable.printVars()
+    # globalVarsTable.printVars()
+    # print(ct.constantTable)
     # print(globalVarsTable)
 
 except Exception as excep:

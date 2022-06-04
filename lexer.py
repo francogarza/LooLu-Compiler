@@ -53,7 +53,7 @@ t_FLOAT = r'float'
 t_PRINT = r'print'
 t_TRUE = r'true'
 t_FALSE = r'false'
-t_RELOPER = r'\<\>|\<|\>|\=\='
+# t_RELOPER = r'\<\>|\<|\>|\=\='
 t_LEFTBRACKET = r'\{'
 t_RIGHTBRACKET = r'\}'
 t_LEFTPAREN = r'\('
@@ -100,6 +100,10 @@ def t_CHARACT(t):
 #     r'\'[A-Za-z_0-9$%&/\(\)\"#=\?\¿\´\+\*\-\.\,\{\}\[\]]\''
 #     t.type = 'CHARAC'
 #     return t
+def t_RELOPER(t):
+    r'<= | >= | <> | < | > | =='
+    t.type = 'RELOPER'
+    return t
 
 def t_NEWLINE(t):
     r'\n'
