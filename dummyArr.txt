@@ -84,6 +84,23 @@ func bool binarySearch(left : int, right : int, target : int) {
 }
   
 CLASSES:
+    class persona{
+        VARS:
+        var int : myInt, myInt2;
+        var float : myFloat, myFloat2;
+        var bool : myBool, myBool2;
+        FUNCS:
+        func void myFunc(n : int, b: bool, xx: float){
+            VARS: 
+            var int : x;
+            START:
+        }
+        func void myFunc3(n : int){
+            VARS: 
+            var int : x;
+            START:
+        }
+    }
 
 Loo() {
 
