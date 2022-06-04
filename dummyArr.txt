@@ -57,7 +57,6 @@ func void fillArr(size : int) {
         myArr[i] = n;
         i = i + 1;
     }
-
 }
 
 func bool binarySearch(left : int, right : int, target : int) {
@@ -66,11 +65,8 @@ func bool binarySearch(left : int, right : int, target : int) {
     var int : act;
     var char : flag, flag2;
     START:
-
     while (left <= right) {
-        
         mid = (left + right) / 2;
-
         if (myArr[mid] == target) {
             return(true);
         }
@@ -97,16 +93,12 @@ CLASSES:
         }
         func void myFunc3(n : int){
             VARS: 
-            var int : x;
+                var int : x;
             START:
+
         }
     }
 
 Loo() {
-
-  fillArr(10);
-  myBool = binarySearch(0, 9, 7);
-
-  print(myBool);
 
 } Lu;

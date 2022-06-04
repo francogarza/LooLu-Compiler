@@ -224,7 +224,6 @@ def p_np_fill_quad_start_parameter_for_func(p):
     row["functionQuadStart"] = len(quadruplesOutput)
 #--------------------------------
 
-
 #--------------------------------
 # FUNCS CALL
 #--------------------------------
@@ -294,29 +293,6 @@ def p_generate_era_quad(p):
     paramCounter = 0
     currentParamSignature = func["parameterSignature"]
 #--------------------------------
-
-
-#--------------------------------
-# UNCATEGORIZED
-#--------------------------------
-def p_type(p):
-    '''type : type_simple
-            | type_compound'''
-
-def p_type_simple(p):
-    '''type_simple : INT np4SetCurrentType
-                   | FLOAT np4SetCurrentType
-                   | CHAR np4SetCurrentType
-                   | BOOL np4SetCurrentType
-                   | VOID np4SetCurrentType np_HasReturnedType'''
-
-def p_type_compound(p):
-    '''type_compound : ID'''
-
-def p_block(p):
-    '''block : LEFTBRACKET statement_block RIGHTBRACKET'''
-#--------------------------------
-
 
 #--------------------------------
 # STATEMENTS
@@ -433,7 +409,6 @@ def p_read_exp(p):
                  | empty'''
 #--------------------------------
 
-
 #--------------------------------
 # EXPRESSIONS
 #--------------------------------
@@ -538,6 +513,26 @@ def p_empty(p):
     pass
 #--------------------------------
 
+#--------------------------------
+# UNCATEGORIZED
+#--------------------------------
+def p_type(p):
+    '''type : type_simple
+            | type_compound'''
+
+def p_type_simple(p):
+    '''type_simple : INT np4SetCurrentType
+                   | FLOAT np4SetCurrentType
+                   | CHAR np4SetCurrentType
+                   | BOOL np4SetCurrentType
+                   | VOID np4SetCurrentType np_HasReturnedType'''
+
+def p_type_compound(p):
+    '''type_compound : ID'''
+
+def p_block(p):
+    '''block : LEFTBRACKET statement_block RIGHTBRACKET'''
+#--------------------------------
 
 #--------------------------------
 # PUNTOS NEURALGICOS
@@ -732,6 +727,76 @@ def p_qnp2_insertOperator(p):
     '''qnp2insertOperator : empty'''
     qg.operator(p[-1])
 
+def p_np_add_var_to_current_table(p):
+    '''np_AddVarToCurrentTable : empty'''
+    # agrega la variable que acaba de leer a la tabla de variables actual.
+    # utiliza el memory handler para asignarle una posicion en la memoria virtual.
+    global currentFunc
+    global currentVarTable
+    global currentType
+    id = currentVarTable.getVariableByName(p[-1])
+    if (id == None):
+        address = mh.addVariable(currentFunc, p[-1], currentType, None, programName,None)
+        currentVarTable.insert({"name": p[-1], "type": currentType, "address": address})
+        # currentVarTable.printVars()
+    else:
+        raise Exception("ERROR: Redeclaration of variable ID = " + p[-1])
+
+def p_np_add_function_to_dirfunc(p):
+    '''np_AddFunctionToDirFunc : empty'''
+    # agrega la funcion que acaba de leer al directorio de funciones
+    # valida que no se haya declarado previamente el nombre de la funcion
+    # se crea con nombre y tipo y con el resto de los parametros vacios 
+    # se rellenan los parametros mas adelante
+    global dirFunc
+    global currentFunc
+    global currentType
+    row = dirFunc.getFunctionByName(p[-1])
+    if (row == None):
+        dirFunc.insert({"name": p[-1], "type": currentType, "table": None, "parameterSignature": [], "memorySize" : 0, "functionQuadStart" : 0})
+        currentFunc = p[-1]
+    else:
+        print("redeclaration of function " + p[-1])
+
+def p_np_fill_memory_size_parameter_for_current_func(p):
+    '''np_FillMemorySizeParameterForCurrentFunc : empty'''
+    global currentFunc
+    global dirFunc
+    row = dirFunc.getFunctionByName(currentFunc)
+    table = row["table"]
+    row["memorySize"] = len(table.items)
+
+def p_np_fill_memory_size_parameter_for_current_func_class(p):
+    '''np_FillMemorySizeParameterForCurrentFuncClass : empty'''
+    global currentClassFunc
+    global currentClassDirFunc
+    row = currentClassDirFunc.getFunctionByName(currentClassFunc)
+    table = row["table"]
+    row["memorySize"] = len(table.items)
+
+def p_np_create_end_func_quad(p):
+    '''np_CreateEndFuncQuad : empty'''
+    # crea el quadruplo de endfunc por que acaba de leer el fin de la funcion
+    global dirFunc
+    global currentFunc
+    # mh.resetLocalTempMemory()
+    quadruplesOutput.append(('ENDFUNC','','',''))
+
+def p_np_fill_gotomain_quadruple(p):
+    '''np_FillGotomainQuadruple : empty'''
+    # llena el cuadruplo de GOTOMAIN.
+    # calculamos el cuadruplo en el que estamos que representa el primer cuadruplo del main().
+    # como sabemos que es el primer cuadruplo, lo accesamos directo y meter el valor que acabamos de calcular.
+    # tambien se asigna el globalVarsTable globalVarsTable
+    global quadruplesOutput
+    global currentVarTable
+    global globalVarsTable
+    global currentFunc
+    firstMainFuncQuad = len(quadruplesOutput)
+    quadruplesOutput[0] = (("GOTOMAIN", 'empty', 'empty', firstMainFuncQuad))
+    currentVarTable = globalVarsTable
+    currentFunc = programName
+
 def p_qnp1(p):
     '''qnp1 : empty'''
     global currentVarTable
@@ -922,127 +987,11 @@ def p_qnp16(p):
 def p_error(t):
     print("Syntax error (parser):", t.lexer.token(), t.value)
     raise Exception("Syntax error")
-
-def p_np_add_var_to_current_table(p):
-    '''np_AddVarToCurrentTable : empty'''
-    # agrega la variable que acaba de leer a la tabla de variables actual.
-    # utiliza el memory handler para asignarle una posicion en la memoria virtual.
-    global currentFunc
-    global currentVarTable
-    global currentType
-    id = currentVarTable.getVariableByName(p[-1])
-    if (id == None):
-        address = mh.addVariable(currentFunc, p[-1], currentType, None, programName,None)
-        currentVarTable.insert({"name": p[-1], "type": currentType, "address": address})
-        # currentVarTable.printVars()
-    else:
-        raise Exception("ERROR: Redeclaration of variable ID = " + p[-1])
-
-def p_np_add_function_to_dirfunc(p):
-    '''np_AddFunctionToDirFunc : empty'''
-    # agrega la funcion que acaba de leer al directorio de funciones
-    # valida que no se haya declarado previamente el nombre de la funcion
-    # se crea con nombre y tipo y con el resto de los parametros vacios 
-    # se rellenan los parametros mas adelante
-    global dirFunc
-    global currentFunc
-    global currentType
-    row = dirFunc.getFunctionByName(p[-1])
-    if (row == None):
-        dirFunc.insert({"name": p[-1], "type": currentType, "table": None, "parameterSignature": [], "memorySize" : 0, "functionQuadStart" : 0})
-        currentFunc = p[-1]
-    else:
-        print("redeclaration of function " + p[-1])
-
-def p_np_fill_memory_size_parameter_for_current_func(p):
-    '''np_FillMemorySizeParameterForCurrentFunc : empty'''
-    global currentFunc
-    global dirFunc
-    row = dirFunc.getFunctionByName(currentFunc)
-    table = row["table"]
-    row["memorySize"] = len(table.items)
-
-def p_np_fill_memory_size_parameter_for_current_func_class(p):
-    '''np_FillMemorySizeParameterForCurrentFuncClass : empty'''
-    global currentClassFunc
-    global currentClassDirFunc
-    row = currentClassDirFunc.getFunctionByName(currentClassFunc)
-    table = row["table"]
-    row["memorySize"] = len(table.items)
-
-def p_np_create_end_func_quad(p):
-    '''np_CreateEndFuncQuad : empty'''
-    # crea el quadruplo de endfunc por que acaba de leer el fin de la funcion
-    global dirFunc
-    global currentFunc
-    # mh.resetLocalTempMemory()
-    quadruplesOutput.append(('ENDFUNC','','',''))
-
-def p_np_fill_gotomain_quadruple(p):
-    '''np_FillGotomainQuadruple : empty'''
-    # llena el cuadruplo de GOTOMAIN.
-    # calculamos el cuadruplo en el que estamos que representa el primer cuadruplo del main().
-    # como sabemos que es el primer cuadruplo, lo accesamos directo y meter el valor que acabamos de calcular.
-    # tambien se asigna el globalVarsTable globalVarsTable
-    global quadruplesOutput
-    global currentVarTable
-    global globalVarsTable
-    global currentFunc
-    firstMainFuncQuad = len(quadruplesOutput)
-    quadruplesOutput[0] = (("GOTOMAIN", 'empty', 'empty', firstMainFuncQuad))
-    currentVarTable = globalVarsTable
-    currentFunc = programName
 #--------------------------------
 
-
 #--------------------------------
-# CLASSES
+# CLASSES - MAIN STRUCTURE
 #--------------------------------
-def p_statement_blockClass(p):
-    '''statement_blockClass : statementClass statement_blockClass
-                            | empty'''
-
-def p_statement_class(p):
-    '''statementClass : assignmentClass SEMICOLON
-                      | condition
-                      | while_statement
-                      | writing
-                      | reading
-                      | return_func SEMICOLON
-                      | function_call SEMICOLON
-                      | class_function_call SEMICOLON'''
-
-def p_assignmentClass(p):
-    '''assignmentClass : assignmentVariableClass super_expression qnp6
-                        | assignmentVariable class_function_call
-                        | access_class_atribute EQUAL expression'''
-
-def p_assignment_variable_Class(p):
-    '''assignmentVariableClass : ID isOnCurrentVarsTableClass qnp1sendToQuadruples EQUAL qnp2insertOperator
-                                | ID LEFTSQUAREBRACKET CTEINT RIGHTSQUAREBRACKET'''
-
-def p_isOnCurrentVarsTableClass(p):
-    '''isOnCurrentVarsTableClass : empty'''
-    global currentClassVarTable
-    global currentClassFunc
-    global currentClassDirFunc
-
-    currentFuncVarTable = currentClassDirFunc.getFunctionByName(currentClassFunc)
-    currentFuncVarTable = currentFuncVarTable['table']
-
-    print("asdfasdf")
-    id = currentFuncVarTable.getVariableByName(p[-1])
-    if (id == None):
-        if currentClassVarTable != None:
-            id = currentClassVarTable.getVariableByName(p[-1])
-            if (id == None):
-                raise Exception("   ERROR: Variable not declared on scope " + p[-1])
-        else:
-            raise Exception("   ERROR: Variable not declared on scope " + p[-1])
-
-def p_sendToQuadruplesClass(p):
-    '''sendToQuadruplesClass : '''
-
 def p_declare_classes(p):
     '''declare_classes : classes
                | empty'''
@@ -1067,7 +1016,11 @@ def p_var_id_class(p):
 def p_var_id_class_2(p):
     '''var_id_class_2 : COMMA ID np12AddVarToCurrentTableClass var_id_class_2
                       | empty'''
+#--------------------------------
 
+#--------------------------------
+# CLASSES - FUNCS DECLARATION
+#--------------------------------
 def p_declare_funcs_class(p):
     '''declare_funcs_class : funcs_class
                            | empty'''
@@ -1152,6 +1105,87 @@ def p_addToParameterSignatureClass(p):
 def p_parameter2_class(p):
     '''parameter2_class : COMMA ID COLON type_parameter_class np15AddParameterAsVariableToFuncClass parameter2_class
                         | empty'''
+#--------------------------------
+
+
+#--------------------------------
+# CLASSES - FUNCS CALL
+#--------------------------------
+
+#--------------------------------
+
+
+#--------------------------------
+# CLASSES - STATEMENTS
+#--------------------------------
+
+#--------------------------------
+
+
+#--------------------------------
+# CLASSES - EXPRESSIONS
+#--------------------------------
+
+#--------------------------------
+
+
+#--------------------------------
+# CLASSES - UNCATEGORIZED
+#--------------------------------
+
+#--------------------------------
+
+
+#--------------------------------
+# CLASSES - PUNTOS NEURALGICOS
+#--------------------------------
+
+#--------------------------------
+
+def p_statement_blockClass(p):
+    '''statement_blockClass : statementClass statement_blockClass
+                            | empty'''
+
+def p_statement_class(p):
+    '''statementClass : assignmentClass SEMICOLON
+                      | condition
+                      | while_statement
+                      | writing
+                      | reading
+                      | return_func SEMICOLON
+                      | function_call SEMICOLON
+                      | class_function_call SEMICOLON'''
+
+def p_assignmentClass(p):
+    '''assignmentClass : assignmentVariableClass super_expression qnp6
+                        | assignmentVariable class_function_call
+                        | access_class_atribute EQUAL expression'''
+
+def p_assignment_variable_Class(p):
+    '''assignmentVariableClass : ID isOnCurrentVarsTableClass qnp1sendToQuadruples EQUAL qnp2insertOperator
+                                | ID LEFTSQUAREBRACKET CTEINT RIGHTSQUAREBRACKET'''
+
+def p_isOnCurrentVarsTableClass(p):
+    '''isOnCurrentVarsTableClass : empty'''
+    global currentClassVarTable
+    global currentClassFunc
+    global currentClassDirFunc
+
+    currentFuncVarTable = currentClassDirFunc.getFunctionByName(currentClassFunc)
+    currentFuncVarTable = currentFuncVarTable['table']
+
+    print("asdfasdf")
+    id = currentFuncVarTable.getVariableByName(p[-1])
+    if (id == None):
+        if currentClassVarTable != None:
+            id = currentClassVarTable.getVariableByName(p[-1])
+            if (id == None):
+                raise Exception("   ERROR: Variable not declared on scope " + p[-1])
+        else:
+            raise Exception("   ERROR: Variable not declared on scope " + p[-1])
+
+def p_sendToQuadruplesClass(p):
+    '''sendToQuadruplesClass : '''
 
 def p_classes_block(p):
     '''classes_block : CLASS ID np8AddClass np9CreateGlobalVarsTableForClass LEFTBRACKET VARS COLON np10CreateVarsTableForClass declare_vars_class FUNCS COLON declare_funcs_class RIGHTBRACKET classes_block
