@@ -1134,44 +1134,154 @@ def p_statement_class(p):
                       | return_func SEMICOLON
                       | function_call SEMICOLON
                       | class_function_call SEMICOLON'''
+
+def p_assignmentClass(p):
+    '''assignmentClass : assignmentVariableClass super_expressionClass qnp6
+                        | assignmentVariable class_function_call
+                        | access_class_atribute EQUAL expression'''
+
+def p_assignment_variable_Class(p):
+    '''assignmentVariableClass : ID isOnCurrentVarsTableClass sendToQuadruplesClass EQUAL qnp2insertOperator
+                                | ID LEFTSQUAREBRACKET CTEINT RIGHTSQUAREBRACKET'''
+
+def p_isOnCurrentVarsTableClass(p):
+    '''isOnCurrentVarsTableClass : empty'''
+    global currentClass
+    global currentClassDirFunc
+    global currentClassFunc
+    global currentClassVarTable
+    global globalVarsTable
+
+    currentClassFuncVarTable = currentClassDirFunc.getFunctionByName(currentClassFunc)
+    currentClassFuncVarTable = currentClassFuncVarTable['table']
+
+    id = currentClassFuncVarTable.getVariableByName(p[-1])
+    if (id == None):
+        id = currentClassVarTable.getVariableByName(p[-1])
+        if (id == None):
+            id = globalVarsTable.getVaribleByName(p[-1])
+            if (id == None):
+                raise Exception("   ERROR: Variable not declared on scope " + p[-1])
+
+def p_sendToQuadruplesClass(p):
+    '''sendToQuadruplesClass : empty'''
+    global currentClassVarTable
+    global currentClassDirFunc
+    global globalVarsTable
+    variable = currentVarTable.getVariableByName(p[-2])
+    if (variable == None):
+        if globalVarsTable != None:
+            variable = globalVarsTable.getVariableByName(p[-2])
+            if (variable == None):
+                raise Exception("   ERROR: Variable not declared on scope " + p[-2])
+        else:
+            raise Exception("   ERROR: Variable not declared on scope " + p[-2])
+    qg.operand(variable["address"], variable["type"])
+
+
+def p_access_class_atribute(p):
+    '''access_class_atribute : ID DOT ID '''
 #--------------------------------
 
 #--------------------------------
 # CLASSES - EXPRESSIONS
 #--------------------------------
-def p_assignmentClass(p):
-    '''assignmentClass : assignmentVariableClass super_expression qnp6
-                        | assignmentVariable class_function_call
-                        | access_class_atribute EQUAL expression'''
+def p_super_expression_class(p):
+    '''super_expressionClass : expressionClass super_expression_helperClass'''
 
-def p_assignment_variable_Class(p):
-    '''assignmentVariableClass : ID isOnCurrentVarsTableClass qnp1sendToQuadruples EQUAL qnp2insertOperator
-                                | ID LEFTSQUAREBRACKET CTEINT RIGHTSQUAREBRACKET'''
+def p_super_expression_helper_class(p):
+    '''super_expression_helperClass : LOGICOPERATOR qnp11 super_expressionClass qnp12
+                               | RELOPER qnp11 super_expression qnp12
+                               | expression qnp12
+                               | empty'''
 
-def p_isOnCurrentVarsTableClass(p):
-    '''isOnCurrentVarsTableClass : empty'''
-    global currentClassVarTable
-    global currentClassFunc
-    global currentClassDirFunc
+def p_expression_class(p):
+    '''expressionClass : expClass comparationClass qnp12'''
 
-    currentFuncVarTable = currentClassDirFunc.getFunctionByName(currentClassFunc)
-    currentFuncVarTable = currentFuncVarTable['table']
+def p_comparation_class(p):
+    '''comparationClass : RELOPER qnp9 comparation_expClass 
+                        | empty'''
 
-    print("asdfasdf")
-    id = currentFuncVarTable.getVariableByName(p[-1])
-    if (id == None):
-        if currentClassVarTable != None:
-            id = currentClassVarTable.getVariableByName(p[-1])
-            if (id == None):
-                raise Exception("   ERROR: Variable not declared on scope " + p[-1])
-        else:
-            raise Exception("   ERROR: Variable not declared on scope " + p[-1])
+def p_comparation_exp_class(p):
+    '''comparation_expClass : expClass qnp10'''
 
-def p_sendToQuadruplesClass(p):
-    '''sendToQuadruplesClass : '''
+def p_exp_class(p):
+    '''expClass : termClass qnp4 operatorClass'''
 
-def p_access_class_atribute(p):
-    '''access_class_atribute : ID DOT ID '''
+def p_operator_class(p):
+    '''operatorClass : OPERTYPE1 qnp3 termClass qnp4 operatorClass
+                     | empty'''
+
+def p_term_class(p):
+    '''termClass : factorClass qnp5 term_operatorClass'''
+
+def p_term_operator_class(p):
+    '''term_operatorClass : OPERTYPE2 qnp2 factorClass qnp5 term_operatorClass
+                          | empty'''
+
+def p_factor_class(p):
+    '''factorClass : LEFTPAREN qnp7 expressionClass RIGHTPAREN qnp8
+                   | var_cteClass'''
+
+def p_var_cte_class(p):
+    '''var_cteClass : ID qnp1 
+                    | CTEINT qnp_cte_int
+                    | CTEFLOAT qnp_cte_float
+                    | CHARACT qnp_cte_char
+                    | CTECHAR qnp_cte_char
+                    | TRUE qnp_cte_bool
+                    | FALSE qnp_cte_bool
+                    | access_class_atribute
+                    | function_call np_FillStacksWithReturnValue
+                    | class_function_call 
+                    | arr_accessClass'''
+               
+def p_arr_access_class(p):
+    '''arr_accessClass : ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET'''
+
+def p_np_verify_arr_access_class(p):
+    '''np_VerifyArrAccessClass : empty'''
+    global currentVarTable
+    global globalVarsTable
+
+    print(p[-4])
+
+    arr = currentVarTable.getVariableByName(p[-4])
+    if (arr == None):
+        arr = globalVarsTable.getVariableByName(p[-4])
+        print(globalVarsTable.getVariableByName(p[-4]))
+        if (arr == None):
+            raise Exception("The array you are trying to access with name" + p[-4] +"has not been declared")
+
+    type = qg.typeStack.pop()
+    if(type != 'int'):
+        raise Exception("An in is required to access an array. You are trying to access with")
+
+
+    s1 = qg.operandStack.pop()
+    dirBase = arr["address"]
+    quadruplesOutput.append(('VER',s1,'',arr['size']))
+    pointer = mh.addVariable(None,None,'POINTER',None,None,None)
+    quadruplesOutput.append(('+dirBase',dirBase,s1,pointer))
+    qg.operandStack.append(pointer)
+    qg.typeStack.append(type)
+
+def p_FillStacksWithReturnValue_class(p):
+    '''np_FillStacksWithReturnValueClass : empty'''
+    global currentFunctionReturnType
+    global currentFunctionReturnOperand
+    global tempCounter
+    #check if current func is not void 
+    if currentFunctionCall["type"] == 'void':
+        raise Exception("function: "+currentFunctionCall["name"]+" does not return a value")
+    result = 'T'+str(tempCounter)
+    tempCounter = tempCounter + 1
+    address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName,None)
+    test = globalVarsTable.getVariableByName(currentFunctionCall['name'])
+    quadruplesOutput.append(('=',test['address'],'',address))
+    qg.typeStack.append(test['type'])
+    qg.operandStack.append(address)
+
 #--------------------------------
 
 #--------------------------------
