@@ -10,6 +10,27 @@ VARS:
 
 FUNCS:
 
+func bool binarySearch(left : int, right : int, target : int, arr : int) {
+    VARS:
+    var int : mid;
+    START:
+
+    while (left < right) {
+        mid = (left + right) / 2;
+
+        if (arr[mid] == target) {
+            return(true);
+        }
+
+        if (arr[mid] > target) {
+            right = mid - 1;
+        } else {
+            left = mid + 1;
+        }
+    }
+    return(false);
+}
+
 CLASSES:
 
 Loo() {
