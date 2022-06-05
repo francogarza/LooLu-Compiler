@@ -26,7 +26,7 @@ lex.lex(); print("Lexer generated")
 # MAIN STRUCTURE
 #--------------------------------
 def p_LOOLU(p):
-    '''loolu : LOOLU ID np_AddGlobalFuncToDirfunc np_CreateEmptyGotomainQuadruple SEMICOLON VARS COLON np_CreateVarsTable declare_vars FUNCS COLON declare_funcs CLASSES COLON declare_classes LOO LEFTPAREN RIGHTPAREN np_FillGotomainQuadruple block LU SEMICOLON'''
+    '''loolu : LOOLU ID np_AddGlobalFuncToDirfunc np_CreateEmptyGotomainQuadruple SEMICOLON VARS COLON np_CreateVarsTable np_AssignGlobalVarsTable declare_vars FUNCS COLON declare_funcs CLASSES COLON declare_classes LOO LEFTPAREN RIGHTPAREN np_FillGotomainQuadruple block LU SEMICOLON'''
 
 def p_np_add_global_func_to_dirfunc(p):
     '''np_AddGlobalFuncToDirfunc : empty'''
@@ -66,7 +66,7 @@ def p_np_create_vars_table(p):
 
 def p_declare_vars(p):
     '''declare_vars : vars
-                    | empty np_AssignGlobalVarsTable'''
+                    | empty'''
 
 def p_vars(p):
     '''vars : VAR type COLON var_id SEMICOLON vars_block'''
