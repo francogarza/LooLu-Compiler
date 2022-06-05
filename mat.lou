@@ -1,0 +1,14 @@
+LooLu miPrograma;
+
+VARS:
+  var int : myArr[10], myMat[10][10], myMat2[2][5], myMat3[3][4];
+  var int : myInt;
+FUNCS:
+  
+CLASSES:
+
+Loo() {
+
+  
+
+} Lu;

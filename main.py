@@ -77,17 +77,15 @@ def p_vars_block(p):
 
 def p_var_id(p):
     '''var_id : ID np_AddVarToCurrentTable var_id_2
-              | arr_id var_id_2
-              | mat_id var_id_2'''
+              | arr_id var_id_2'''
 
 def p_var_id_2(p):
     '''var_id_2 : COMMA ID np_AddVarToCurrentTable var_id_2
                 | COMMA arr_id var_id_2
-                | COMMA mat_id var_id_2
                 | empty'''
 
 def p_arr_id(p):
-    '''arr_id : ID  LEFTSQUAREBRACKET CTEINT qnp_cte_int np_addArrayToCurrentTable RIGHTSQUAREBRACKET matrix'''
+    '''arr_id : ID LEFTSQUAREBRACKET CTEINT qnp_cte_int np_addArrayToCurrentTable RIGHTSQUAREBRACKET matrix'''
 
 def p_matrix(p):
     '''matrix : LEFTSQUAREBRACKET CTEINT qnp_cte_int RIGHTSQUAREBRACKET np_matrix
@@ -98,16 +96,10 @@ def p_np_matrix(p):
     global currentFunc
     global currentVarTable
     global currentType
-    print('entra matrix', p[-10], p[-3], p[-8])
-    mh.updateVariable(currentFunc, p[-10], currentType, programName, p[-3], p[-8])
-    address = mh.addVariable(currentFunc, p[-10], currentType, None, programName, p[-3] * p[-8])
-    id = currentVarTable.getVariableByName(p[-10])
-    print(id)
-
-def p_mat_id(p):
-    '''mat_id : ID  LEFTSQUAREBRACKET CTEINT qnp_cte_int np_addArrayToCurrentTable RIGHTSQUAREBRACKET LEFTSQUAREBRACKET CTEINT qnp_cte_int np_addArrayToCurrentTable RIGHTSQUAREBRACKET'''
-    print('entra matrix')
-
+    mat = currentVarTable.getVariableByName(p[-10])
+    mat['dimension'] += 1
+    dirBase = mat['address']
+    mh.updateVariable(currentFunc, p[-10], currentType, programName, p[-3], p[-8], dirBase)
 
 def p_np_add_array_to_current_table(p):
     '''np_addArrayToCurrentTable : empty'''
@@ -121,7 +113,7 @@ def p_np_add_array_to_current_table(p):
         address = mh.addVariable(currentFunc, p[-4], currentType, None, programName, p[-2])
         size = qg.operandStack.pop()
         qg.typeStack.pop()
-        currentVarTable.insert({"name": p[-4], "type": currentType, "address": address, "size": size})
+        currentVarTable.insert({"name": p[-4], "type": currentType, "address": address, "size": size, "dimension": 1})
         vm.initializeArray(address, p[-2])
     elif (currentVarTable.getVariableByName(p[-9]) != None):
         print(p[-2], p[-7])
@@ -359,6 +351,7 @@ def p_assignment(p):
 
 def p_assignment_variable(p):
     '''assignmentVariable : ID np16isOnCurrentVarsTable qnp1sendToQuadruples EQUAL qnp2insertOperator
+                          | ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyMatAccess RIGHTSQUAREBRACKET LEFTSQUAREBRACKET expression np_VerifyMatAccess RIGHTSQUAREBRACKET qnp1sendToQuadruplesARR EQUAL qnp2insertOperator
                           | ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET qnp1sendToQuadruplesARR EQUAL qnp2insertOperator'''
 
 def p_condition(p):
@@ -506,11 +499,18 @@ def p_var_cte(p):
 def p_arr_access(p):
     '''arr_access : ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET'''
 
+def p_np_verify_mat_access(p):
+    '''np_VerifyMatAccess : empty'''
+    if (p[-4]):
+        print('entra ver mat', p[-4])
+    elif (p[-8]):
+        print('entra ver mat')
+
 def p_np_verify_arr_access(p):
     '''np_VerifyArrAccess : empty'''
     global currentVarTable
     global globalVarsTable
-
+    
     print(p[-4])
 
     arr = currentVarTable.getVariableByName(p[-4])
