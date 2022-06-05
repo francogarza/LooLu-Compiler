@@ -47,6 +47,50 @@ class memoryHandler:
         self.localChar = [8000, 8000]
         self.localBool = [9000,9000]
         self.localTemp = [10000, 10000]
+
+    def updateVariable(self, funcName, varName, varType, programName, s1, s2):
+        if funcName == programName and varType == 'int':
+            address = self.globalInt[1]
+            actSize = self.globalInt[1] - s1
+            newSize = actSize + (s1 * s2)
+            self.globalInt[1] = newSize
+        elif funcName != programName and varType == 'int':
+            address = self.localInt[1]
+            actSize = self.localInt[1] - s1
+            newSize = actSize + (s1 * s2)
+            self.localInt[1] = newSize
+        if funcName == programName and varType == 'float':
+            address = self.globalFloat[1]
+            actSize = self.globalFloat[1] - s1
+            newSize = actSize + (s1 * s2)
+            self.globalFloat[1] = newSize
+        elif funcName != programName and varType == 'float':
+            address = self.localFloat[1]
+            actSize = self.localFloat[1] - s1
+            newSize = actSize + (s1 * s2)
+            self.localFloat[1] = newSize
+        if funcName == programName and varType == 'char':
+            address = self.globalChar[1]
+            actSize = self.globalChar[1] - s1
+            newSize = actSize + (s1 * s2)
+            self.globalChar[1] = newSize
+        elif funcName != programName and varType == 'char':
+            address = self.localChar[1]
+            actSize = self.localChar[1] - s1
+            newSize = actSize + (s1 * s2)
+            self.localChar[1] = newSize
+        if funcName == programName and varType == 'bool':
+            address = self.globalBool[1]
+            actSize = self.globalBool[1] - s1
+            newSize = actSize + (s1 * s2)
+            self.globalBool[1] = newSize
+        elif funcName != programName and varType == 'bool':
+            address = self.localBool[1]
+            actSize = self.localBool[1] - s1
+            newSize = actSize + (s1 * s2)
+            self.localBool[1] = newSize
+
+
         
     def addVariable(self, funcName, varName, varType, isParameter, programName, size):
         address = None
@@ -54,17 +98,17 @@ class memoryHandler:
         if funcName == programName and varType == 'int':
             address = self.globalInt[1]
             # print('var: ', varName, 'assigned at: ', address)
-            self.globalInt[1] += 1
             # print(size)
             if (size == None):
+                self.globalInt[1] += 1
                 return address
             else:
                 self.globalInt[1] += size
                 return address
         elif funcName != programName and varType == 'int':
             address = self.localInt[1]
-            self.localInt[1] += 1
             if (size == None):
+                self.localInt[1] += 1
                 return address
             else:
                 self.localInt[1] += size
@@ -72,16 +116,16 @@ class memoryHandler:
         if funcName == programName and varType == 'float':
             address = self.globalFloat[1]
             # print('var: ', varName, 'assigned at: ', address)
-            self.globalFloat[1] += 1
             if (size == None):
+                self.globalFloat[1] += 1
                 return address
             else:
                 self.globalFloat[1] += size
                 return address
         elif funcName != programName and varType == 'float':
             address = self.localFloat[1]
-            self.localFloat[1] += 1
             if (size == None):
+                self.localFloat[1] += 1
                 return address
             else:
                 self.localFloat[1] += size
@@ -90,16 +134,16 @@ class memoryHandler:
         if funcName == programName and varType == 'char':
             address = self.globalChar[1]
             # print('var: ', varName, 'assigned at: ', address)
-            self.globalChar[1] += 1
             if (size == None):
+                self.globalChar[1] += 1
                 return address
             else:
                 self.globalChar[1] += size
                 return address
         elif funcName != programName and varType == 'char':
             address = self.localChar[1]
-            self.localChar[1] += 1
             if (size == None):
+                self.localChar[1] += 1
                 return address
             else:
                 self.localChar[1] += size
@@ -108,16 +152,16 @@ class memoryHandler:
         if funcName == programName and varType == 'bool':
             address = self.globalBool[1]
             # print('var: ', varName, 'assigned at: ', address)
-            self.globalBool[1] += 1
             if (size == None):
+                self.globalBool[1] += 1
                 return address
             else:
                 self.globalBool[1] += size
                 return address
         elif funcName != programName and varType == 'bool':
             address = self.localBool[1]
-            self.localBool[1] += 1
             if (size == None):
+                self.localBool[1] += 1
                 return address
             else:
                 self.localBool[1] += size
@@ -162,16 +206,16 @@ class memoryHandler:
         if funcName == programName and varType == 'TEMPORAL':
             address = self.tempAddressGlobal[1]
             # print('var: ', varName, 'assigned at: ', address)
-            self.tempAddressGlobal[1] += 1
             if (size == None):
+                self.tempAddressGlobal[1] += 1
                 return address
             else:
                 self.tempAddressGlobal[1] += size
                 return address
         elif funcName != programName and varType == 'TEMPORAL':
             address = self.localTemp[1]
-            self.localTemp[1] += 1
             if (size == None):
+                self.localTemp[1] += 1
                 return address
             else:
                 self.localTemp[1] += size

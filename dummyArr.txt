@@ -101,4 +101,8 @@ CLASSES:
 
 Loo() {
 
+    fillArr(10);
+    myBool = binarySearch(0, 9, 7);
+    print(myBool);
+
 } Lu;
