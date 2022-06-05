@@ -15,7 +15,10 @@ import virtualMachine
 
 # global vars
 programName = None; dirFunc = vt.DirFunc(); globalVarsTable = None; currentFunc = None; currentType = None; currentParamSignature = None; currentFunctionReturnType = None; currentFunctionReturnOperand = None
-currentFuncHasReturnedValue = None; currentVarTable = None; currentClass = None; currentClassVarTable = None; currentClassDirFunc = None; paramCounter = 0; currentFunctionCall = None; currentFuncDeclaration = None
+currentFuncHasReturnedValue = None; currentVarTable = None; cparamCounter = 0; currentFunctionCall = None; currentFuncDeclaration = None
+#classes global vars
+currentClass = None; currentClassDirFunc = None; currentClassGlobalVarsTable = None; currentClassFuncVarTable = None; 
+
 qg = quadrupleGenerator.quadrupleGenerator(); mh = memoryHandler.memoryHandler()
 tempCounter = 1; whileOperand = []; quadruplesOutput = []; vm = virtualMachine.virtualMachine()
 
@@ -577,81 +580,6 @@ def p_np4_set_current_type(p):
     global currentType
     currentType = p[-1]
 
-def p_np5_delete_dirfunc_and_current_vartable(p):
-    '''np5DeleteDirfuncAndCurrentVartable : empty'''
-
-def p_np6_set_current_type_void(p):
-    '''np6SetCurrentTypeVoid : empty'''
-    currentType = p[-1]
-
-def p_np8_add_class(p):
-    '''np8AddClass : empty'''
-    global currentClass
-    global dirFunc
-    currentClass = p[-1]
-    row = dirFunc.getFunctionByName(currentClass)
-    if (row != None):
-        raise Exception("redeclaration of class " + currentClass)
-    else:
-        dirFunc.insert({"name": currentClass, "type": "class", "DirFunc": None})
-
-def p_np9_create_global_vars_table_for_class(p):
-    '''np9CreateGlobalVarsTableForClass : empty'''
-    global currentClassDirFunc
-    global currentClassFunc
-    global currentClass
-    global dirFunc
-    row = dirFunc.getFunctionByName(currentClass)
-    if (row["DirFunc"] == None):
-        row["DirFunc"] = vt.DirFunc()
-        currentClassDirFunc = row["DirFunc"]
-        currentClassDirFunc.insert({"name": currentClass, "type": "global", "table": None})
-        currentClassFunc = currentClass
-    else:
-        raise Exception("ERROR: could not find function with that name in DirFunc")
-
-def p_np10_create_vars_table_for_class(p):
-    '''np10CreateVarsTableForClass : empty'''
-    global currentClassDirFunc
-    global currentClassVarTable
-    global currentClassFunc
-    row = currentClassDirFunc.getFunctionByName(currentClassFunc)
-    if (row["table"] == None):
-        currentClassVarTable = vt.Vars()
-        currentClassDirFunc.addVarsTable(currentClassFunc, currentClassVarTable)
-    else:
-        raise Exception("ERROR: could not find function with that name in DirFunc")
-
-def p_np11_delete_current_vars_table(p):
-    '''np11DeleteCurrentVarsTable : empty'''
-    global currentVarTable
-    currentVarTable = None
-
-def p_np12_add_var_to_current_table_class(p):
-    '''np12AddVarToCurrentTableClass : empty'''
-    global currentClassVarTable
-    global currentType
-    # print("hello",currentClassVarTable)
-
-    id = currentClassVarTable.getVariableByName(p[-1])
-    if (id != None):
-        raise Exception("   ERROR: Redeclaration of variable ID = " + p[-1])
-    else:
-        currentClassVarTable.insert({"name": p[-1], "type": currentType})
-
-def p_np13_add_function_class(p):
-    '''np13AddFunctionClass : empty'''
-    global currentType
-    global currentClassFunc
-    global currentClassDirFunc
-    row = currentClassDirFunc.getFunctionByName(p[-1])
-    if (row != None):
-        print("redeclaration of function " + p[-1])
-    else:
-        # print("else")
-        currentClassDirFunc.insert({"name": p[-1], "type": currentType, "table": None, "parameterSignature": [], "memorySize" : 0, "functionQuadStart" : 0})
-        currentClassFunc = p[-1]
-
 def p_np14_add_parameter_as_variable_to_func(p):
     '''np14AddParameterAsVariableToFunc : empty'''
     global currentVarTable
@@ -663,18 +591,6 @@ def p_np14_add_parameter_as_variable_to_func(p):
         address = mh.addVariable(currentFunc, p[-1], currentType, None, programName,None)
         # print(currentFunc, p[-1], currentType, None, programName,None)
         currentVarTable.insert({"name": p[-3], "type": currentType, "address" : address})
-
-def p_np15_add_parameter_as_variable_to_func_class(p):
-    '''np15AddParameterAsVariableToFuncClass : empty'''
-    global currentClassVarTable
-    global currentType
-    # currentVarTable.printVars()
-    id = currentClassVarTable.getVariableByName(p[-3])
-    if (id != None):
-        raise Exception("   ERROR: Redeclaration of variable ID = " + p[-3])
-    else:
-        currentClassVarTable.insert({"name": p[-3], "type": currentType})
-    print("lol",p[-3])
 
 def p_np16_is_on_current_vars_table(p):
     '''np16isOnCurrentVarsTable : empty'''
@@ -691,7 +607,7 @@ def p_np16_is_on_current_vars_table(p):
             if (id == None):
                 raise Exception("   ERROR: Variable not declared on scope " + p[-1])
         else:
-            raise Exception("   ERROR: Variable not declared on scope " + p[-1])
+            raise Exception("   ERROR: Variable not declared oscope " + p[-1])
     
 def p_qnp1_send_to_quadruples(p):
     '''qnp1sendToQuadruples : empty'''
@@ -702,9 +618,9 @@ def p_qnp1_send_to_quadruples(p):
         if globalVarsTable != None:
             variable = globalVarsTable.getVariableByName(p[-2])
             if (variable == None):
-                raise Exception("   ERROR: Variable not declared on scope " + p[-2])
+                raise Exception("   ERROR: Variable not declared oscope " + p[-2])
         else:
-            raise Exception("   ERROR: Variable not declared on scope " + p[-2])
+            raise Exception("   ERROR: Variable not declared oscope " + p[-2])
     qg.operand(variable["address"], variable["type"])
 
 def p_qnp1_send_to_quadruplesARR(p):
@@ -717,9 +633,9 @@ def p_qnp1_send_to_quadruplesARR(p):
         if globalVarsTable != None:
             variable = globalVarsTable.getVariableByName(p[-6])
             if (variable == None):
-                raise Exception("   ERROR: Variable not declared on scope " + p[-6])
+                raise Exception("   ERROR: Variable not declared oscope " + p[-6])
         else:
-            raise Exception("   ERROR: Variable not declared on scope " + p[-6])
+            raise Exception("   ERROR: Variable not declared oscope " + p[-6])
     print(variable["type"], 'baina', variable['name'], p[-6])
     qg.operand(qg.operandStack.pop(), variable["type"])
 
@@ -763,14 +679,6 @@ def p_np_fill_memory_size_parameter_for_current_func(p):
     global currentFunc
     global dirFunc
     row = dirFunc.getFunctionByName(currentFunc)
-    table = row["table"]
-    row["memorySize"] = len(table.items)
-
-def p_np_fill_memory_size_parameter_for_current_func_class(p):
-    '''np_FillMemorySizeParameterForCurrentFuncClass : empty'''
-    global currentClassFunc
-    global currentClassDirFunc
-    row = currentClassDirFunc.getFunctionByName(currentClassFunc)
     table = row["table"]
     row["memorySize"] = len(table.items)
 
@@ -997,11 +905,58 @@ def p_declare_classes(p):
                | empty'''
 
 def p_classes(p):
-    '''classes : CLASS ID np8AddClass np9CreateGlobalVarsTableForClass LEFTBRACKET VARS COLON np10CreateVarsTableForClass declare_vars_class FUNCS COLON declare_funcs_class RIGHTBRACKET classes_block'''
+    '''classes : CLASS ID np_AddClassToProgramDirFunc np_CreateGlobalVarsTableForClass LEFTBRACKET VARS COLON np_CreateVarsTableForClass np_AssignGlobalVarsTableForClass declare_vars_class FUNCS COLON declare_funcs_class RIGHTBRACKET classes_block'''
 
 def p_classes_block(p):
-    '''classes_block : CLASS ID np8AddClass np9CreateGlobalVarsTableForClass LEFTBRACKET VARS COLON np10CreateVarsTableForClass declare_vars_class FUNCS COLON declare_funcs_class RIGHTBRACKET classes_block
+    '''classes_block : CLASS ID np_AddClassToProgramDirFunc np_CreateGlobalVarsTableForClass LEFTBRACKET VARS COLON np_CreateVarsTableForClass np_AssignGlobalVarsTableForClass declare_vars_class FUNCS COLON declare_funcs_class RIGHTBRACKET classes_block
                   | empty'''
+
+def p_np_addClassToDirFunc(p):
+    '''np_AddClassToProgramDirFunc : empty'''
+    global dirFunc
+    global currentClass
+    global currentClassDirFunc
+    currentClass = p[-1]
+    row = dirFunc.getFunctionByName(currentClass)
+    if (row == None):
+        dirFunc.insert({"name": currentClass, "type": "class", "DirFunc": None})
+    else:
+        raise Exception("redeclaration of class " + currentClass)
+
+def p_np_createGlobalVarsTableForClass(p):
+    '''np_CreateGlobalVarsTableForClass : empty'''
+    global dirFunc
+    global currentClass
+    global currentClassDirFunc
+    global currentClassFunc
+    row = dirFunc.getFunctionByName(currentClass)
+    if (row["DirFunc"] == None):
+        row["DirFunc"] = vt.DirFunc()
+        currentClassDirFunc = row["DirFunc"]
+        currentClassDirFunc.insert({"name": currentClass, "type": "global", "table": None})
+        currentClassFunc = currentClass
+    else:
+        raise Exception("ERROR: could not find function with that name in DirFunc")
+
+def p_np_createVarsTableForClass(p):
+    '''np_CreateVarsTableForClass : empty'''
+    global currentClassDirFunc
+    global currentClassFuncVarTable
+    global currentClassFunc
+    global currentClassGlobalVarTable
+    row = currentClassDirFunc.getFunctionByName(currentClassFunc)
+    if (row["table"] == None):
+        currentClassFuncVarTable = vt.Vars()
+        currentClassDirFunc.addVarsTable(currentClassFunc, currentClassFuncVarTable)
+    else:
+        raise Exception("ERROR: could not find function with that name in DirFunc")
+
+def p_np_AssignGlobalVarsTableForClass(p):
+    '''np_AssignGlobalVarsTableForClass : empty'''
+    global currentClassGlobalVarsTable
+    global currentClass
+    row = currentClassDirFunc.getFunctionByName(currentClass)
+    currentClassGlobalVarsTable = row['table']
 
 def p_declare_vars_class(p):
     '''declare_vars_class : vars_class
@@ -1015,11 +970,26 @@ def p_vars_block_class(p):
                         | empty'''
 
 def p_var_id_class(p):
-    '''var_id_class : ID np12AddVarToCurrentTableClass var_id_class_2'''
+    '''var_id_class : ID np_AddVarToCurrentTableClass var_id_class_2'''
 
 def p_var_id_class_2(p):
-    '''var_id_class_2 : COMMA ID np12AddVarToCurrentTableClass var_id_class_2
+    '''var_id_class_2 : COMMA ID np_AddVarToCurrentTableClass var_id_class_2
                       | empty'''
+
+def p_np_add_var_to_current_table_class(p):
+    '''np_AddVarToCurrentTableClass : empty'''
+    global currentClassFuncVarTable
+    global currentType
+    global currentClassGlobalVarsTable
+
+    id = currentClassFuncVarTable.getVariableByName(p[-1])
+    if (id == None):
+        id = currentClassGlobalVarsTable.getVariableByName(p[-1])
+        if (id == None):
+            currentClassFuncVarTable.insert({"name": p[-1], "type": currentType})
+    else:
+        raise Exception("   ERROR: Redeclaration of variable ID = " + p[-1])
+
 #--------------------------------
 
 #--------------------------------
@@ -1030,21 +1000,44 @@ def p_declare_funcs_class(p):
                            | empty'''
 
 def p_funcs_class(p):
-    '''funcs_class : FUNC type_simple ID np13AddFunctionClass LEFTPAREN npCreateVarsTableForClassFunc parameter_class np_CheckIfFuncHasReturnedClass resetLocalMemory RIGHTPAREN functionBlockClass funcs_block_class'''
+    '''funcs_class : FUNC type_simple ID np_AddFunctionToClass LEFTPAREN np_CreateVarsTableForFuncInClass parameter_class np_CheckIfFuncHasReturnedClass resetLocalMemory RIGHTPAREN functionBlockClass funcs_block_class'''
 
 def p_funcs_block_class(p):
-    '''funcs_block_class : FUNC type_simple ID np13AddFunctionClass LEFTPAREN npCreateVarsTableForClassFunc parameter_class np_CheckIfFuncHasReturnedClass resetLocalMemory RIGHTPAREN functionBlockClass funcs_block_class
+    '''funcs_block_class : FUNC type_simple ID np_AddFunctionToClass LEFTPAREN np_CreateVarsTableForFuncInClass parameter_class np_CheckIfFuncHasReturnedClass resetLocalMemory RIGHTPAREN functionBlockClass funcs_block_class
                          | empty'''
 
-def p_function_block_class(p):
-    '''functionBlockClass : LEFTBRACKET VARS COLON declare_vars_class np_FillMemorySizeParameterForCurrentFuncClass START COLON np_FillQuadStartParameterForFuncClass statement_blockClass RIGHTBRACKET'''
+def p_np_AddFunctionToClass(p):
+    '''np_AddFunctionToClass : empty'''
+    global currentType
+    global currentClassFunc
+    global currentClassDirFunc
+    row = currentClassDirFunc.getFunctionByName(p[-1])
+    if (row != None):
+        print("redeclaration of function " + p[-1])
+    else:
+        # print("else")
+        currentClassDirFunc.insert({"name": p[-1], "type": currentType, "table": None, "parameterSignature": [], "memorySize" : 0, "functionQuadStart" : 0})
+        currentClassFunc = p[-1]
 
-def p_np_fill_quad_start_parameter_for_func_class(p):
-    '''np_FillQuadStartParameterForFuncClass : empty'''
+def p_np_CreateVarsTableForFuncInClass(p):
+    '''np_CreateVarsTableForFuncInClass : empty'''
+    # crea y agrega la tabla de variables para la funcion actual
+    # saca la fila en la que esta la funcion, busca la casilla de "table" e inicializa una tabla de variables.
+    # hace la validacion de que no se hatambien se guarda la tabla de variables actual
     global currentClassDirFunc
     global currentClassFunc
+    global currentClassFuncVarTable
     row = currentClassDirFunc.getFunctionByName(currentClassFunc)
-    row["functionQuadStart"] = len(quadruplesOutput)
+    if (row != None):
+        if (row["table"] == None):
+            row["table"] = vt.Vars()
+            currentClassFuncVarTable = row["table"]
+            print(currentClassFunc,"row = ",row,"table",currentClassFuncVarTable)
+            # currentVarTable.printVars()
+        else:
+            raise Exception("ERROR: did not create vars table because vars table for funtion(", currentClassFunc, ") already exists.")
+    else:
+        raise Exception("ERROR: could not find function (", currentClassFunc, ") in Directory Function")
 
 def p_np_CheckIfFuncHasReturnedClass(p):
     '''np_CheckIfFuncHasReturnedClass : empty'''
@@ -1058,26 +1051,6 @@ def p_np_CheckIfFuncHasReturnedClass(p):
             # mh.resetLocalTempMemory()
             quadruplesOutput.append(('ENDFUNC','','',''))
         currentFuncHasReturnedValue = 0
-
-def p_npCreateVarsTableForClassFunc(p):
-    '''npCreateVarsTableForClassFunc : empty'''
-    # crea y agrega la tabla de variables para la funcion actual
-    # saca la fila en la que esta la funcion, busca la casilla de "table" e inicializa una tabla de variables.
-    # hace la validacion de que no se hatambien se guarda la tabla de variables actual
-    global currentClassDirFunc
-    global currentClassFunc
-    global currentClassVarTable
-    row = currentClassDirFunc.getFunctionByName(currentClassFunc)
-    if (row != None):
-        if (row["table"] == None):
-            row["table"] = vt.Vars()
-            currentClassVarTable = row["table"]
-            print(currentClassFunc,"row = ",row,"table",currentClassVarTable)
-            # currentVarTable.printVars()
-        else:
-            raise Exception("ERROR: did not create vars table because vars table for funtion(", currentClassFunc, ") already exists.")
-    else:
-        raise Exception("ERROR: could not find function (", currentClassFunc, ") in Directory Function")
 
 def p_parameter_class(p):
     '''parameter_class : ID COLON type_parameter_class np15AddParameterAsVariableToFuncClass parameter2_class'''
@@ -1109,6 +1082,37 @@ def p_addToParameterSignatureClass(p):
 def p_parameter2_class(p):
     '''parameter2_class : COMMA ID COLON type_parameter_class np15AddParameterAsVariableToFuncClass parameter2_class
                         | empty'''
+
+def p_function_block_class(p):
+    '''functionBlockClass : LEFTBRACKET VARS COLON declare_vars_class np_FillMemorySizeParameterForCurrentFuncClass START COLON np_FillQuadStartParameterForFuncClass statement_blockClass RIGHTBRACKET'''
+
+def p_np_fill_quad_start_parameter_for_func_class(p):
+    '''np_FillQuadStartParameterForFuncClass : empty'''
+    global currentClassDirFunc
+    global currentClassFunc
+    row = currentClassDirFunc.getFunctionByName(currentClassFunc)
+    row["functionQuadStart"] = len(quadruplesOutput)
+
+def p_np_fill_memory_size_parameter_for_current_func_class(p):
+    '''np_FillMemorySizeParameterForCurrentFuncClass : empty'''
+    global currentClassFunc
+    global currentClassDirFunc
+    row = currentClassDirFunc.getFunctionByName(currentClassFunc)
+    table = row["table"]
+    row["memorySize"] = len(table.items)
+
+def p_np15_add_parameter_as_variable_to_func_class(p):
+    '''np15AddParameterAsVariableToFuncClass : empty'''
+    global currentClassFuncVarTable
+    global currentType
+    # currentVarTable.printVars()
+    id = currentClassFuncVarTable.getVariableByName(p[-3])
+    if (id != None):
+        raise Exception("   ERROR: Redeclaration of variable ID = " + p[-3])
+    else:
+        currentClassFuncVarTable.insert({"name": p[-3], "type": currentType})
+    print("lol",p[-3])
+
 #--------------------------------
 
 #--------------------------------
@@ -1124,6 +1128,7 @@ def p_class_function_call(p):
 def p_statement_blockClass(p):
     '''statement_blockClass : statementClass statement_blockClass
                             | empty'''
+    print("entra statement_blockClass")
 
 def p_statement_class(p):
     '''statementClass : assignmentClass SEMICOLON
@@ -1134,49 +1139,35 @@ def p_statement_class(p):
                       | return_func SEMICOLON
                       | function_call SEMICOLON
                       | class_function_call SEMICOLON'''
+    print("entra statementclass entro")
 
 def p_assignmentClass(p):
-    '''assignmentClass : assignmentVariableClass super_expressionClass qnp6
-                        | assignmentVariable class_function_call
-                        | access_class_atribute EQUAL expression'''
+    '''assignmentClass : assignmentVariableClass super_expressionClass qnp6'''
+    print("entro assignmentClass")
 
 def p_assignment_variable_Class(p):
-    '''assignmentVariableClass : ID isOnCurrentVarsTableClass sendToQuadruplesClass EQUAL qnp2insertOperator
+    '''assignmentVariableClass : ID isOnCurrentVarsTableClass EQUAL qnp2insertOperator
                                 | ID LEFTSQUAREBRACKET CTEINT RIGHTSQUAREBRACKET'''
+    print("entro a assignmentVariableClass")
 
 def p_isOnCurrentVarsTableClass(p):
     '''isOnCurrentVarsTableClass : empty'''
-    global currentClass
-    global currentClassDirFunc
-    global currentClassFunc
-    global currentClassVarTable
+    global currentClassFuncVarTable
+    global currentClassGlobalVarsTable
     global globalVarsTable
 
-    currentClassFuncVarTable = currentClassDirFunc.getFunctionByName(currentClassFunc)
-    currentClassFuncVarTable = currentClassFuncVarTable['table']
-
+    print("asdfasdfasdf",p[-1])
+    currentClassFuncVarTable.printVars()
+    currentClassGlobalVarsTable.printVars()
     id = currentClassFuncVarTable.getVariableByName(p[-1])
     if (id == None):
-        id = currentClassVarTable.getVariableByName(p[-1])
+        id = currentClassGlobalVarsTable.getVariableByName(p[-1])
+        print(id)
         if (id == None):
             id = globalVarsTable.getVaribleByName(p[-1])
             if (id == None):
                 raise Exception("   ERROR: Variable not declared on scope " + p[-1])
-
-def p_sendToQuadruplesClass(p):
-    '''sendToQuadruplesClass : empty'''
-    global currentClassVarTable
-    global currentClassDirFunc
-    global globalVarsTable
-    variable = currentVarTable.getVariableByName(p[-2])
-    if (variable == None):
-        if globalVarsTable != None:
-            variable = globalVarsTable.getVariableByName(p[-2])
-            if (variable == None):
-                raise Exception("   ERROR: Variable not declared on scope " + p[-2])
-        else:
-            raise Exception("   ERROR: Variable not declared on scope " + p[-2])
-    qg.operand(variable["address"], variable["type"])
+    qg.operand(id["name"], id["type"])
 
 
 def p_access_class_atribute(p):

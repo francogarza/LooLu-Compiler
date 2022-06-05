@@ -95,6 +95,7 @@ CLASSES:
             VARS: 
                 var int : x;
             START:
+                x = 0;
         }
     }
 
