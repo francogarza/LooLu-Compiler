@@ -1,88 +1,88 @@
 LooLu miPrograma;
 
 VARS:
-  var int : myInt, myArr[10];
-  var float : myFloat;
-  var char : myChar, string[10];
-  var bool : myBool;
+    var int : myInt2, myArr[10];
+    var float : myFloat;
+    var char : myChar, string[10];
+    var bool : myBool;
+
 FUNCS:
-
-func int fib(n : int) {
-     VARS:
-     START:
-      if (n < 3){
-        return(1);
-      }
-      return((fib(n-1)) + (fib(n-2)));
-   }
-
-func void makeString(size : int) {
-    VARS:
-    var int : i;
-    var char : ch;
-    START:
-    i = 0;
-
-    while (i < size) {
-        read(ch);
-        string[i] = ch;
-        i = i + 1;
-    }
-}
-
-func void printString(size : int) {
-    VARS:
-    var int : i;
-    var char : ch;
-    START:
-    i = 0;
-
-    while (i < size) {
-        ch = string[i];
-        print(ch);
-        i = i + 1;
-    }
-}
-
-
-func void fillArr(size : int) {
-    VARS:
-    var int : i;
-    var int : n;
-    START:
-    i = 0;
-
-    while (i < size) {
-        read(n);
-        myArr[i] = n;
-        i = i + 1;
-    }
-}
-
-func bool binarySearch(left : int, right : int, target : int) {
-    VARS:
-    var int : mid;
-    var int : act;
-    var char : flag, flag2;
-    START:
-    while (left <= right) {
-        mid = (left + right) / 2;
-        if (myArr[mid] == target) {
-            return(true);
+    func int fib(n : int) {
+        VARS:
+        START:
+        if (n < 3){
+            return(1);
         }
-        if (myArr[mid] < target) {
-            left = mid + 1;
-        } else {
-            right = mid - 1;
+        return((fib(n-1)) + (fib(n-2)));
+    }
+
+    func void makeString(size : int) {
+        VARS:
+        var int : i;
+        var char : ch;
+        START:
+        i = 0;
+
+        while (i < size) {
+            read(ch);
+            string[i] = ch;
+            i = i + 1;
         }
     }
-    return(false);
-}
+
+    func void printString(size : int) {
+        VARS:
+        var int : i;
+        var char : ch;
+        START:
+        i = 0;
+
+        while (i < size) {
+            ch = string[i];
+            print(ch);
+            i = i + 1;
+        }
+    }
+
+
+    func void fillArr(size : int) {
+        VARS:
+        var int : i;
+        var int : n;
+        START:
+        i = 0;
+
+        while (i < size) {
+            read(n);
+            myArr[i] = n;
+            i = i + 1;
+        }
+    }
+
+    func bool binarySearch(left : int, right : int, target : int) {
+        VARS:
+        var int : mid;
+        var int : act;
+        var char : flag, flag2;
+        START:
+        while (left <= right) {
+            mid = (left + right) / 2;
+            if (myArr[mid] == target) {
+                return(true);
+            }
+            if (myArr[mid] < target) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+        return(false);
+    }
   
 CLASSES:
     class persona{
         VARS:
-        var int : myInt, myInt2;
+        var int : myInt;
         var float : myFloat, myFloat2;
         var bool : myBool, myBool2;
         FUNCS:
@@ -95,10 +95,30 @@ CLASSES:
             VARS: 
                 var int : x;
             START:
-                x = 0;
+                myInt2 = 0;
+        }
+    }
+
+    class persona2{
+        VARS:
+        var int : myInt;
+        var float : myFloat, myFloat2;
+        var bool : myBool, myBool2;
+        FUNCS:
+        func void myFunc(n : int, b: bool, xx: float){
+            VARS: 
+            var int : x;
+            START:
+                myInt2 = 10;
+        }
+        func void myFunc3(n : int){
+            VARS: 
+                var int : x;
+            START:
         }
     }
 
 Loo() {
+    
 
 } Lu;

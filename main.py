@@ -782,12 +782,10 @@ def p_qnp6(p):
         left_operand = qg.operandStack.pop()
         left_type = qg.typeStack.pop()
         operator = qg.operatorStack.pop()
-        print("asdfasd left f", left_operand)
-        print(left_type, right_type, operator, left_operand, right_operand)
+        print(left_type, left_operand, operator, right_type, right_operand)
         result_type = sc.cube(left_type, right_type, operator, None, None)
         if result_type != -1 or right_operand >= 21000 or left_operand >= 21000:
             quadruplesOutput.append((operator, right_operand, '', left_operand))
-            print("asdfasdf",(operator, right_operand, '', left_operand))
             # qg.operandStack.append(result)
             # qg.typeStack.append(sc.intToType(result_type))
         else:
@@ -981,12 +979,18 @@ def p_np_add_var_to_current_table_class(p):
     global currentClassFuncVarTable
     global currentType
     global currentClassGlobalVarsTable
+    global currentClassFunc
+    global currentClass
 
     id = currentClassFuncVarTable.getVariableByName(p[-1])
     if (id == None):
         id = currentClassGlobalVarsTable.getVariableByName(p[-1])
         if (id == None):
-            currentClassFuncVarTable.insert({"name": p[-1], "type": currentType})
+            address = mh.addVariable(currentClassFunc, p[-1], currentType, None, currentClass, None)
+            print("heloooooo",address)
+            currentClassFuncVarTable.insert({"name": p[-1], "type": currentType, 'address': address})
+        else:
+            raise Exception("   ERROR: Redeclaration of variable ID = " + p[-1])
     else:
         raise Exception("   ERROR: Redeclaration of variable ID = " + p[-1])
 
@@ -1000,10 +1004,10 @@ def p_declare_funcs_class(p):
                            | empty'''
 
 def p_funcs_class(p):
-    '''funcs_class : FUNC type_simple ID np_AddFunctionToClass LEFTPAREN np_CreateVarsTableForFuncInClass parameter_class np_CheckIfFuncHasReturnedClass resetLocalMemory RIGHTPAREN functionBlockClass funcs_block_class'''
+    '''funcs_class : FUNC type_simple ID np_AddFunctionToClass LEFTPAREN np_CreateVarsTableForFuncInClass parameter_class RIGHTPAREN functionBlockClass np_CheckIfFuncHasReturnedClass resetLocalMemory funcs_block_class'''
 
 def p_funcs_block_class(p):
-    '''funcs_block_class : FUNC type_simple ID np_AddFunctionToClass LEFTPAREN np_CreateVarsTableForFuncInClass parameter_class np_CheckIfFuncHasReturnedClass resetLocalMemory RIGHTPAREN functionBlockClass funcs_block_class
+    '''funcs_block_class : FUNC type_simple ID np_AddFunctionToClass LEFTPAREN np_CreateVarsTableForFuncInClass parameter_class RIGHTPAREN functionBlockClass np_CheckIfFuncHasReturnedClass resetLocalMemory funcs_block_class
                          | empty'''
 
 def p_np_AddFunctionToClass(p):
@@ -1143,12 +1147,10 @@ def p_statement_class(p):
 
 def p_assignmentClass(p):
     '''assignmentClass : assignmentVariableClass super_expressionClass qnp6'''
-    print("entro assignmentClass")
 
 def p_assignment_variable_Class(p):
     '''assignmentVariableClass : ID isOnCurrentVarsTableClass EQUAL qnp2insertOperator
                                 | ID LEFTSQUAREBRACKET CTEINT RIGHTSQUAREBRACKET'''
-    print("entro a assignmentVariableClass")
 
 def p_isOnCurrentVarsTableClass(p):
     '''isOnCurrentVarsTableClass : empty'''
@@ -1164,7 +1166,7 @@ def p_isOnCurrentVarsTableClass(p):
         id = currentClassGlobalVarsTable.getVariableByName(p[-1])
         print(id)
         if (id == None):
-            id = globalVarsTable.getVaribleByName(p[-1])
+            id = globalVarsTable.getVariableByName(p[-1])
             if (id == None):
                 raise Exception("   ERROR: Variable not declared on scope " + p[-1])
     qg.operand(id["name"], id["type"])
@@ -1215,8 +1217,8 @@ def p_factor_class(p):
                    | var_cteClass'''
 
 def p_var_cte_class(p):
-    '''var_cteClass : ID qnp1 
-                    | CTEINT qnp_cte_int
+    '''var_cteClass : ID np_AddIDToStacks 
+                    | CTEINT np_INTGetAddressAndAddToStacks
                     | CTEFLOAT qnp_cte_float
                     | CHARACT qnp_cte_char
                     | CTECHAR qnp_cte_char
@@ -1226,7 +1228,41 @@ def p_var_cte_class(p):
                     | function_call np_FillStacksWithReturnValue
                     | class_function_call 
                     | arr_accessClass'''
-               
+
+def p_np_AddIDToStacks(p):
+    '''np_AddIDToStacks : empty'''
+    global currentClassFuncVarTable
+    global currentClassGlobalVarsTable
+    global globalVarsTable
+    print("helsldkjfsoooo", p[-1])
+    variable = currentClassFuncVarTable.getVariableByName(p[-1])
+    if(variable != None):
+        qg.operandStack.append(variable["address"])
+        qg.typeStack.append(variable["type"])
+    else:
+        variable = currentClassGlobalVarsTable.getVariableByName(p[-1])
+        if(variable != None):
+            qg.operandStack.append(variable["address"])
+            qg.typeStack.append(variable["type"])
+        else:
+            variable = globalVarsTable.getVariableByName(p[-1])
+            print("global variable", variable)
+            if (variable != None):
+                qg.operandStack.append(variable["address"])
+                qg.typeStack.append(variable["type"])
+            else:
+                raise Exception("could not find variable in scope nor global")
+
+
+def p_np_INTGetAddressAndAddToStacks(p):
+    '''np_INTGetAddressAndAddToStacks : empty'''
+    global currentClassFunc
+    global currentClass
+    address = mh.addVariable(currentClassFunc, p[-1], 'CTEINT', None, currentClass,None)
+    qg.operandStack.append(address)
+    qg.typeStack.append('int')
+
+
 def p_arr_access_class(p):
     '''arr_accessClass : ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET'''
 
