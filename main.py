@@ -295,12 +295,6 @@ def p_np_ChangeHasReturnedValue(p):
 def p_function_call(p):
     '''function_call : ID np_VerifyFuncInDirFunc np_GenerateEraQuad LEFTPAREN function_call_params RIGHTPAREN np_CreateGosubQuad'''
 # - function call: nps
-def p_create_gosub_quad(p):
-    '''np_CreateGosubQuad : empty'''
-    global quadruplesOutput
-    global currentFunctionCall
-    jump = currentFunctionCall["functionQuadStart"]
-    quadruplesOutput.append(('GOSUB','','',jump))
 def p_np_verify_func_in_dirfunc(p):
     '''np_VerifyFuncInDirFunc : empty'''
     global dirFunc
@@ -318,9 +312,15 @@ def p_generate_era_quad(p):
     func = dirFunc.getFunctionByName(p[-2])
     memorySize = func["memorySize"]
     funcName = func["name"]
-    quadruplesOutput.append(("ERA",'empty','empty',funcName))
+    quadruplesOutput.append(("ERA",'','',funcName))
     paramCounter = 0
     currentParamSignature = func["parameterSignature"]
+def p_create_gosub_quad(p):
+    '''np_CreateGosubQuad : empty'''
+    global quadruplesOutput
+    global currentFunctionCall
+    jump = currentFunctionCall["functionQuadStart"]
+    quadruplesOutput.append(('GOSUB','','',jump))
 # - function call params
 def p_function_call_params(p):
     '''function_call_params : super_expression np_VerifyParamTypeWithSignature function_call_params_2
@@ -375,7 +375,6 @@ def p_statement(p):
 # - assignment
 def p_assignment(p):
     '''assignment : assignmentVariable super_expression np_CheckOperStackForEqual
-                  | assignmentVariable class_function_call
                   | access_class_atribute EQUAL qnp2insertOperator expression np_CheckOperStackForEqual'''
 def p_assignment_variable(p):
     '''assignmentVariable : ID np16isOnCurrentVarsTable qnp1sendToQuadruples EQUAL qnp2insertOperator
@@ -746,7 +745,6 @@ def p_var_cte(p):
                | FALSE qnp_cte_bool
                | access_class_atribute 
                | function_call np_FillStacksWithReturnValue
-               | class_function_call 
                | arr_access'''
 # - vars and constants: nps
 def p_np_AddOperandToStack(p):
@@ -840,12 +838,11 @@ def p_np_verify_arr_access(p):
 # - access class atribute
 def p_access_class_atribute(p):
     '''access_class_atribute : ID DOT ID np_CheckForVariableInClassVarTable'''
-
+# - access class atribute: nps
 def p_np_CheckForVariableInClassVarTable(p):
     '''np_CheckForVariableInClassVarTable : empty'''
     global globalVarsTable
     global dirFunc
-
     globalVarsTable.printVars()
     dirFunc.printDirFunc()
     objVar = globalVarsTable.getVariableByName(p[-3])
@@ -862,48 +859,6 @@ def p_np_CheckForVariableInClassVarTable(p):
     else:
         raise Exception("could not find var"+p[-1]+"in class"+p[-3])
     print(objVarDirFunc)
-    # exit(-1)
-
-    # objVarInGlobalVarsTable = globalVarsTable.getVariableByName(p[-3])
-    # # objVarDirFunc = objVarInGlobalVarsTable['DirFunc']
-    # # objVarDirFunc.printDirFunc()
-    # # objVarGlobalVarsTable = objVarDirFunc.getGlobalVarsTable()
-    # # # print("test2393")
-    # # # objVarGlobalVarsTable.printVars()
-    # # # print(objVarInGlobalVarsTable)
-    # # exit(-1)
-
-    # objVarDirFunc = objVarInGlobalVarsTable['DirFunc']
-    # print("test333")
-    # print(objVarDirFunc)
-    # objVarDirFunc.printDirFunc()
-    # # exit(-1)
-
-
-
-
-    # objectInDirFunc = globalVarsTable.getVariableByName(p[-3])
-
-
-
-    # # if (var != None):
-    # objectDirFunc = objectInDirFunc['DirFunc']
-
-    # # objectGlobalFunc = objectDirFunc[-1]
-    # type = objectInDirFunc['type']
-    # # print("type",type)
-    # # print(type)
-    # # exit(-1)
-    # objectGlobalFunc = objectDirFunc.getFunctionByName(type)
-    # varsTable = objectGlobalFunc['table']
-    # var = varsTable.getVariableByName(p[-1])
-    # if (var != None):
-    #     qg.operand(var['address'], var['type'])
-    #     print("testnmil",var['address'], var['type'])
-    # else:
-    #     raise Exception("could not find var"+p[-1]+"in class"+p[-3])
-    # # exit(-1)
-
 #--------------------------------
 
 #--------------------------------
@@ -1181,8 +1136,26 @@ def p_np_create_end_func_quadClass(p):
 #--------------------------------
 # CLASSES - FUNCS CALL
 #--------------------------------
-def p_class_function_call(p):
-    '''class_function_call : ID DOT ID LEFTPAREN RIGHTPAREN'''
+# - function call class
+def p_function_callClass(p):
+    '''class_function_call : ID DOT ID np_VerifyFuncClass LEFTPAREN RIGHTPAREN'''
+# - function call class: nps
+def p_np_VerifyFuncClass(p):
+    '''np_VerifyFuncClass : empty'''
+    global currentParamSignature
+    global paramCounter
+    objVarInDirFunc = globalVarsTable.getVariableByName(p[-3])
+    objVarDirFunc = objVarInDirFunc['DirFunc']
+    func = objVarDirFunc.getFunctionByName(p[-1])
+    funcName = func["name"]
+    quadruplesOutput.append(("ERA",'','',funcName))
+    paramCounter = 0
+    currentParamSignature = func["parameterSignature"]
+# - function call params class
+def p_paramsClass(p):
+    '''paramsClass : empty'''
+
+# - function call params class: nps
 #--------------------------------
 
 #--------------------------------
@@ -1199,8 +1172,7 @@ def p_statement_class(p):
                       | writingClass
                       | readingClass
                       | return_funcClass SEMICOLON
-                      | function_call SEMICOLON
-                      | class_function_call SEMICOLON'''
+                      | function_call SEMICOLON'''
 # - assignment
 def p_assignmentClass(p):
     '''assignmentClass : assignmentVariableClass super_expressionClass np_CheckOperStackForEqual'''
@@ -1342,8 +1314,7 @@ def p_var_cte_class(p):
                     | TRUE np_BOOLGetAddressAndAddToStacks
                     | FALSE np_BOOLGetAddressAndAddToStacks
                     | access_class_atribute
-                    | function_call np_FillStacksWithReturnValue
-                    | class_function_call'''
+                    | function_call np_FillStacksWithReturnValue'''
 # - vars and constants class: nps
 def p_np_AddIDToStacks(p):
     '''np_AddIDToStacks : empty'''

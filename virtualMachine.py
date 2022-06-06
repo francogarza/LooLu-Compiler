@@ -391,8 +391,6 @@ class virtualMachine():
 
             if (currentQuad[0] == 'ERA'):
                 #Validate space
-                func = self.dirFunc.getFunctionByName(currentQuad[3])
-                parameteresCheck = func["parameterSignature"]
                 self.localMemory.insertState()
                 self.mh.resetLocalTempMemory()
 
