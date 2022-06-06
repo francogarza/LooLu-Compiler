@@ -466,9 +466,9 @@ def p_ifnp2(p):
 def p_writing(p):
     '''writing : PRINT LEFTPAREN print_val RIGHTPAREN SEMICOLON'''
 def p_print_val(p):
-    '''print_val : np_AddPrintToStack ID np_CreatePrintQuad print_exp'''
+    '''print_val : expression np_CreatePrintQuad print_exp'''
 def p_print_exp(p):
-    '''print_exp : COMMA  print_val
+    '''print_exp : COMMA print_val
                  | empty'''
 # - writing: nps
 def p_np_AddPrintToStack(p):
@@ -476,18 +476,9 @@ def p_np_AddPrintToStack(p):
     qg.operatorStack.append('PRINT')
 def p_np_CreatePrintQuad(p): 
     '''np_CreatePrintQuad : empty'''
-    global currentVarTable
-    global globalVarsTable
-    variable = currentVarTable.getVariableByName(p[-1])
-    if (variable == None):
-        variable = globalVarsTable.getVariableByName(p[-1])
-        if (variable == None):
-            raise Exception("Could not find variable for print: " + p[-1])
-    address = variable['address']
-    qg.operandStack.append(address)
-    quadruplesOutput.append((qg.operatorStack[-1], '', '', qg.operandStack[-1]))
-    qg.operatorStack.pop()
-    qg.operandStack.pop()
+
+    quadruplesOutput.append(('PRINT', '', '', qg.operandStack.pop()))
+    qg.typeStack.pop()
 # - reading
 def p_reading(p):
     '''reading : READ LEFTPAREN read_val RIGHTPAREN SEMICOLON'''
@@ -1191,28 +1182,10 @@ def p_np_FillGoto(p):
 def p_writingClass(p):
     '''writingClass : PRINT LEFTPAREN print_valClass RIGHTPAREN SEMICOLON'''
 def p_print_valClass(p):
-    '''print_valClass : np_AddPrintToStack ID np_CreatePrintQuadClass print_expClass'''
+    '''print_valClass : expressionClass np_CreatePrintQuad print_expClass'''
 def p_print_expClass(p):
     '''print_expClass : COMMA print_valClass
                       | empty'''
-# - writing class: nps
-def p_np_CreatePrintQuadClass(p): 
-    '''np_CreatePrintQuadClass : empty'''
-    global currentClassFuncVarTable
-    global currentClassGlobalVarsTable
-    global globalVarsTable
-    variable = currentClassFuncVarTable.getVariableByName(p[-1])
-    if (variable == None):
-        variable = currentClassGlobalVarsTable.getVariableByName(p[-1])
-        if (variable == None):
-            variable = globalVarsTable.getVariableByName(p[-1])
-            if (variable == None):
-                raise Exception("Could not find variable for print: " + p[-1])
-    address = variable['address']
-    qg.operandStack.append(address)
-    quadruplesOutput.append((qg.operatorStack[-1], '', '', qg.operandStack[-1]))
-    qg.operatorStack.pop()
-    qg.operandStack.pop()
 # - reading class 
 def p_readingClass(p):
     '''readingClass : READ LEFTPAREN read_valClass RIGHTPAREN SEMICOLON'''
