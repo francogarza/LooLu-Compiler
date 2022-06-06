@@ -1,7 +1,7 @@
 LooLu miPrograma;
 
 VARS:
-    var int : myInt2, myArr[10];
+    var int : myInt, myInt2, myArr[10];
     var float : myFloat;
     var char : myChar, string[10];
     var bool : myBool;
@@ -105,11 +105,10 @@ CLASSES:
         var float : myFloat, myFloat2;
         var bool : myBool, myBool2;
         FUNCS:
-        func void myFunc(n : int, b: bool, xx: float){
+        func int returnNum(n : int){
             VARS: 
-            var int : x;
             START:
-                myInt2 = 10;
+                return(n);
         }
         func int myFunc3(n : int){
             VARS: 
@@ -130,9 +129,6 @@ CLASSES:
 
 Loo() {
     var franco = persona2();
-    var alvaro = persona2();
-    franco.myInt = 4;
-    alvaro.myInt = 5;
-    print(franco.myInt);
-    print(alvaro.myInt);
+    franco.returnNum();
+
 } Lu;

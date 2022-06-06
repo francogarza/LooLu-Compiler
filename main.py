@@ -308,13 +308,12 @@ def p_generate_era_quad(p):
     global dirFunc
     global paramCounter
     global currentParamSignature
+    global currentFunctionCall
     currentParamSignature = None
-    func = dirFunc.getFunctionByName(p[-2])
-    memorySize = func["memorySize"]
-    funcName = func["name"]
+    funcName = currentFunctionCall["name"]
     quadruplesOutput.append(("ERA",'','',funcName))
     paramCounter = 0
-    currentParamSignature = func["parameterSignature"]
+    currentParamSignature = currentFunctionCall["parameterSignature"]
 def p_create_gosub_quad(p):
     '''np_CreateGosubQuad : empty'''
     global quadruplesOutput
@@ -1138,12 +1137,13 @@ def p_np_create_end_func_quadClass(p):
 #--------------------------------
 # - function call class
 def p_function_callClass(p):
-    '''class_function_call : ID DOT ID np_VerifyFuncClass LEFTPAREN RIGHTPAREN'''
+    '''class_function_call : ID DOT ID np_VerifyFuncClass np_GenerateEraQuad LEFTPAREN RIGHTPAREN np_CreateGosubQuad'''
 # - function call class: nps
 def p_np_VerifyFuncClass(p):
     '''np_VerifyFuncClass : empty'''
     global currentParamSignature
     global paramCounter
+    global currentFunctionCall
     objVarInDirFunc = globalVarsTable.getVariableByName(p[-3])
     objVarDirFunc = objVarInDirFunc['DirFunc']
     func = objVarDirFunc.getFunctionByName(p[-1])
@@ -1151,6 +1151,7 @@ def p_np_VerifyFuncClass(p):
     quadruplesOutput.append(("ERA",'','',funcName))
     paramCounter = 0
     currentParamSignature = func["parameterSignature"]
+    currentFunctionCall = func
 # - function call params class
 def p_paramsClass(p):
     '''paramsClass : empty'''
