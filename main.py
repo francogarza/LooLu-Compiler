@@ -545,34 +545,29 @@ def p_create_goto_for_while(p):
     quadruplesOutput.append(('GOTO','empty','empty',migaja))
 # - init class
 def p_init_class(p):
-    '''init_class : VAR ID np_addObjectToGlobalVarsTable     EQUAL ID LEFTPAREN RIGHTPAREN'''
+    '''init_class : VAR ID np_addObjectToGlobalVarsTable EQUAL ID np_FillDirFuncForObject LEFTPAREN RIGHTPAREN'''
 # - init class: nps
 def p_np_addObjectToGlobalVarsTable(p):
     '''np_addObjectToGlobalVarsTable : empty'''
     global globalVarsTable
-    global currentVarTable
+    global dirFunc
     var = globalVarsTable.getVariableByName(p[-1])
     if (var == None):
-        globalVarsTable.addVariable()
         address = mh.addVariable(programName, p[-1], 'class', None, programName, None)
-        currentVarTable.insert({"name": p[-1], "type": currentType, "address": address})
+        globalVarsTable.insert({"name": p[-1], "type": 'class', "address": address, 'DirFunc': None})
     else:
         raise Exception("ERROR: Redeclaration of variable ID = " + p[-1])
-
-
-    # agrega la variable que acaba de leer a la tabla de variables actual.
-    # utiliza el memory handler para asignarle una posicion en la memoria virtual.
-    global currentFunc
-    global currentVarTable
-    global currentType
-    id = currentVarTable.getVariableByName(p[-1])
-    if (id == None):
-        address = mh.addVariable(currentFunc, p[-1], currentType, None, programName,None)
-        currentVarTable.insert({"name": p[-1], "type": currentType, "address": address})
-        # currentVarTable.printVars()
-    else:
-        raise Exception("ERROR: Redeclaration of variable ID = " + p[-1])
-
+    globalVarsTable.printVars()
+def p_np_FillDirFuncForObject(p):
+    '''np_FillDirFuncForObject : empty'''
+    global globalVarsTable
+    global dirFunc
+    object = dirFunc.getFunctionByName(p[-1])
+    var = globalVarsTable.getVariableByName(p[-4])
+    var['DirFunc'] = object['DirFunc'] 
+    varDirFunc = var['DirFunc']
+    print("lets go",var)
+    varDirFunc.printDirFunc()
 #--------------------------------
 
 #--------------------------------
