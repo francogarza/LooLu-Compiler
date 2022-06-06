@@ -323,7 +323,7 @@ def p_create_gosub_quad(p):
 # - function call params
 def p_function_call_params(p):
     '''function_call_params : super_expression np_VerifyParamTypeWithSignature function_call_params_2
-                            | empty'''
+                            | empty np_CheckForMissingArguments'''
 def p_function_call_params_2(p):
     '''function_call_params_2 : COMMA function_call_params function_call_params_2
                               | empty np_CheckForMissingArguments'''
@@ -743,6 +743,7 @@ def p_var_cte(p):
                | TRUE qnp_cte_bool
                | FALSE qnp_cte_bool
                | access_class_atribute 
+               | class_function_call np_FillStacksWithReturnValue
                | function_call np_FillStacksWithReturnValue
                | arr_access'''
 # - vars and constants: nps
@@ -1137,7 +1138,7 @@ def p_np_create_end_func_quadClass(p):
 #--------------------------------
 # - function call class
 def p_function_callClass(p):
-    '''class_function_call : ID DOT ID np_VerifyFuncClass np_GenerateEraQuad LEFTPAREN RIGHTPAREN np_CreateGosubQuad'''
+    '''class_function_call : ID DOT ID np_VerifyFuncClass np_GenerateEraQuad LEFTPAREN function_call_params RIGHTPAREN np_CreateGosubQuad'''
 # - function call class: nps
 def p_np_VerifyFuncClass(p):
     '''np_VerifyFuncClass : empty'''
@@ -1153,8 +1154,7 @@ def p_np_VerifyFuncClass(p):
     currentParamSignature = func["parameterSignature"]
     currentFunctionCall = func
 # - function call params class
-def p_paramsClass(p):
-    '''paramsClass : empty'''
+
 
 # - function call params class: nps
 #--------------------------------

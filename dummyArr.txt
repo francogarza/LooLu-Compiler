@@ -129,6 +129,6 @@ CLASSES:
 
 Loo() {
     var franco = persona2();
-    franco.returnNum();
+    franco.returnNum(4);
 
 } Lu;
