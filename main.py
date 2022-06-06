@@ -97,6 +97,7 @@ def p_np_matrix(p):
     global currentVarTable
     global currentType
     mat = currentVarTable.getVariableByName(p[-10])
+    mat['dimensiones'] = [p[-3], p[-8]]
     mat['dimension'] += 1
     dirBase = mat['address']
     mh.updateVariable(currentFunc, p[-10], currentType, programName, p[-3], p[-8], dirBase)
@@ -349,10 +350,22 @@ def p_assignment(p):
                   | assignmentVariable class_function_call
                   | access_class_atribute EQUAL expression'''
 
+
+# def p_assignment_var_all(p):
+#     '''assignmentAll : ID np16isOnCurrentVarsTable natureCheck'''
+
+
 def p_assignment_variable(p):
     '''assignmentVariable : ID np16isOnCurrentVarsTable qnp1sendToQuadruples EQUAL qnp2insertOperator
-                          | ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyMatAccess RIGHTSQUAREBRACKET LEFTSQUAREBRACKET expression np_VerifyMatAccess RIGHTSQUAREBRACKET qnp1sendToQuadruplesARR EQUAL qnp2insertOperator
-                          | ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET qnp1sendToQuadruplesARR EQUAL qnp2insertOperator'''
+                          | ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET assignmentMatrix'''
+
+def p_assignment_matrix(p):
+    '''assignmentMatrix : LEFTSQUAREBRACKET expression np_VerifyMatAccess RIGHTSQUAREBRACKET qnp1sendToQuadruplesMat EQUAL qnp2insertOperator
+                        | qnp1sendToQuadruplesARR EQUAL qnp2insertOperator'''
+
+# def p_assignment_variable(p):
+#     '''assignmentVariable : ID np16isOnCurrentVarsTable qnp1sendToQuadruples EQUAL qnp2insertOperator
+#                           | ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET qnp1sendToQuadruplesARR EQUAL qnp2insertOperator'''
 
 def p_condition(p):
     '''condition : IF LEFTPAREN expression ifnp1 RIGHTPAREN block else_condition'''
@@ -494,26 +507,68 @@ def p_var_cte(p):
                | access_class_atribute
                | function_call np_FillStacksWithReturnValue
                | class_function_call 
-               | arr_access'''
+               | arr_access
+               | mat_access'''
                
 def p_arr_access(p):
     '''arr_access : ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET'''
 
+def p_mat_access(p):
+    '''mat_access : ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET LEFTSQUAREBRACKET expression np_VerifyMatAccess RIGHTSQUAREBRACKET'''
+
 def p_np_verify_mat_access(p):
     '''np_VerifyMatAccess : empty'''
-    if (p[-4]):
-        print('entra ver mat', p[-4])
-    elif (p[-8]):
-        print('entra ver mat')
+    global currentVarTable
+    global tempCounter
+
+    mat = currentVarTable.getVariableByName(p[-8])
+
+    type = qg.typeStack.pop()
+    if(type != 'int'):
+        raise Exception("An in is required to access an array. You are trying to access with")
+    s2 = qg.operandStack.pop()
+
+    type = qg.typeStack.pop()
+    if(type != 'int'):
+        raise Exception("An in is required to access an array. You are trying to access with")
+    s1 = qg.operandStack.pop()
+    print('s1', s1, 's2', s2)
+
+    dirBase = mat["address"]
+    d1 = ct.constantTable[mat['dimensiones'][0]]
+    d2 = ct.constantTable[mat['dimensiones'][1]]
+
+    result = 'T'+str(tempCounter)
+    tempCounter = tempCounter + 1
+    address1 = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName,None)
+
+    result = 'T'+str(tempCounter)
+    tempCounter = tempCounter + 1
+    address2 = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName,None)
+
+    pointer = mh.addVariable(None,None,'POINTER',None,None,None)
+
+    quadruplesOutput.append(('VER',s1,'', d1))
+    quadruplesOutput.append(('VER',s2,'', d2))
+
+    quadruplesOutput.append(('*', s1, d2, address1)) # s1 * d2
+    
+    quadruplesOutput.append(('+', address1, s2, address2)) # s1 * d2 + s2
+    
+    quadruplesOutput.append(('+dirBase', dirBase, address2, pointer)) # dirBase + s1 * d2 + s2
+    qg.operandStack.append(pointer)
+    qg.typeStack.append(type)
 
 def p_np_verify_arr_access(p):
     '''np_VerifyArrAccess : empty'''
     global currentVarTable
     global globalVarsTable
     
-    print(p[-4])
-
     arr = currentVarTable.getVariableByName(p[-4])
+
+    if (arr['dimension'] == 2): # exit the function if you encounter a matrix
+        return
+
     if (arr == None):
         arr = globalVarsTable.getVariableByName(p[-4])
         print(globalVarsTable.getVariableByName(p[-4]))
@@ -582,6 +637,7 @@ def p_qnp_cte_int(p):
     '''qnp_cte_int : empty'''
     global currentFunc
     global programName
+    # print('entra cte',  p[-1])
     address = mh.addVariable(currentFunc, p[-1], 'CTEINT', None, programName,None)
     qg.operandStack.append(address)
     qg.typeStack.append('int')
@@ -739,6 +795,7 @@ def p_qnp1_send_to_quadruples(p):
     global currentVarTable
     global globalVarsTable
     variable = currentVarTable.getVariableByName(p[-2])
+    print(variable, 'QNP1')
     if (variable == None):
         if globalVarsTable != None:
             variable = globalVarsTable.getVariableByName(p[-2])
@@ -763,6 +820,10 @@ def p_qnp1_send_to_quadruplesARR(p):
             raise Exception("   ERROR: Variable not declared on scope " + p[-6])
     print(variable["type"], 'baina', variable['name'], p[-6])
     qg.operand(qg.operandStack.pop(), variable["type"])
+
+def p_qnp1_send_to_quadruplesMat(p):
+    '''qnp1sendToQuadruplesMat : empty'''
+    print('WIP')
 
 def p_qnp2_insertOperator(p):
     '''qnp2insertOperator : empty'''
@@ -1244,7 +1305,7 @@ try:
     # print(qg.operandStack  )
     # print(qg.operatorStack)
     # print(qg.typeStack)
-    # print(ct.constantTable)
+    print(ct.constantTable)
     file = open("objCode.txt", "w")
     temp = 0
     for quad in quadruplesOutput:
