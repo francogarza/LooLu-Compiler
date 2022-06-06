@@ -95,7 +95,7 @@ CLASSES:
             VARS: 
                 var int : x;
             START:
-                myInt2 = 0;
+                n = 0;
         }
     }
 
@@ -111,14 +111,25 @@ CLASSES:
             START:
                 myInt2 = 10;
         }
-        func void myFunc3(n : int){
+        func int myFunc3(n : int){
             VARS: 
                 var int : x;
             START:
+                if(myBool){
+                    x = 0;
+                }
+                print(x);
+                read(x);
+
+                while(x < 4) {
+                    print(x);
+                    x = x - 1;
+                }
+                return(x);
         }
     }
 
 Loo() {
-    
+    var franco = persona();
 
 } Lu;
