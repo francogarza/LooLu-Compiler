@@ -1,4 +1,4 @@
-LooLu miPrograma;
+LooLu bs;
 
 VARS:
   var int : myArr[10], myMat[10][10];
@@ -38,36 +38,24 @@ func bool binarySearch(left : int, right : int, target : int) {
         return(false);
 }
 
-func void fillMat(s1 : int, s2 : int) {
+func bool binarySearchRec(left : int, right : int, target : int) {
     VARS:
-      var int : i, j, cont, act;
+        var int : mid;
     START:
-        i = 0;
-        cont = 0;
-
-      while (i < s1) {
-        j = 0;
-        while (j < s2) {
-          myMat[i][j] = cont;
-          cont = cont + 1;
-          j = j + 1;
+        if (left > right) {
+            return(false);
         }
-        i = i + 1;
-      }
 
-      i = 0;
+        mid = (left + right) / 2;
 
-      while (i < s1) {
-        j = 0;
-        while (j < s2) {
-          act = myMat[i][j];
-          print(act);
-          j = j + 1;
+        if (myArr[mid] == target) {
+            return(true);
         }
-        print();
-        i = i + 1;
-      }
-     
+        if (myArr[mid] < target) {
+            return(binarySearchRec(mid + 1, right, target));
+        } else {
+            return(binarySearchRec(left, right - 1, target));
+        }
 }
   
 CLASSES:
@@ -77,7 +65,7 @@ Loo() {
     fillArr(10);
     myBool = binarySearch(0, 9, 7);
     print(myBool);
-
-    fillMat(10, 10);
+    myBool = binarySearchRec(0, 9, 7);
+    print(myBool);
 
 } Lu;
