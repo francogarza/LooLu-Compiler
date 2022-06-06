@@ -43,7 +43,7 @@ class memoryHandler:
         self.constAddressBOOL = [17000, 17000]
 
         self.tempPointer = [21000, 21000]
-        self.globalClass = [22000, 22000]
+        self.globalClass = [18000, 18000]
     
     def resetLocalTempMemory(self):
         self.localInt = [6000, 6000]

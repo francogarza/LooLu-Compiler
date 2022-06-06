@@ -10,6 +10,10 @@ class Vars:
         return None
     def printVars(self):
         print(self.items)
+    def length(self):
+        return len(self.items)
+    def accessIndex(self,index):
+        return self.items[index]
 
 class DirFunc:
     def __init__(self):
@@ -31,6 +35,12 @@ class DirFunc:
         return None
     def printDirFunc(self):
         print(self.dirFuncData)
+    def length(self):
+        return len(self.dirFuncData)
+    def accessIndex(self,index):
+        return self.dirFuncData[index]
+    def getGlobalVarsTable(self):
+        return self.dirFuncData[0]['table']
 
 def getFunctionByName(arr, value):
     for item in arr:

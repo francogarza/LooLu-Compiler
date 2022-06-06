@@ -376,7 +376,7 @@ def p_statement(p):
 def p_assignment(p):
     '''assignment : assignmentVariable super_expression np_CheckOperStackForEqual
                   | assignmentVariable class_function_call
-                  | access_class_atribute EQUAL expression'''
+                  | access_class_atribute EQUAL qnp2insertOperator expression np_CheckOperStackForEqual'''
 def p_assignment_variable(p):
     '''assignmentVariable : ID np16isOnCurrentVarsTable qnp1sendToQuadruples EQUAL qnp2insertOperator
                           | ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET qnp1sendToQuadruplesARR EQUAL qnp2insertOperator'''
@@ -415,6 +415,7 @@ def p_qnp2_insertOperator(p):
 def p_np_CheckOperStackForEqual(p):
     '''np_CheckOperStackForEqual : empty'''
     global tempCounter
+    print("hello",qg.operandStack,qg.typeStack,qg.operatorStack)
     if qg.operatorStack and qg.operatorStack[-1] in ['=']:
         right_operand = qg.operandStack.pop() 
         right_type = qg.typeStack.pop()
@@ -552,10 +553,48 @@ def p_np_FillDirFuncForObject(p):
     '''np_FillDirFuncForObject : empty'''
     global globalVarsTable
     global dirFunc
-    object = dirFunc.getFunctionByName(p[-1])
-    var = globalVarsTable.getVariableByName(p[-4])
-    var['DirFunc'] = object['DirFunc']
-    var['type'] = p[-1]
+
+    
+    objectFunc = dirFunc.getFunctionByName(p[-1])
+
+    objectFuncDirFunc = objectFunc['DirFunc']
+    
+    objVarInGlobalVT = globalVarsTable.getVariableByName(p[-4])
+    objVarInGlobalVT['DirFunc'] = vt.DirFunc()
+    
+
+    objVarDirFunc = objVarInGlobalVT['DirFunc']
+
+    objVarDirFunc.insert({"name":'','type':'global','table': None})
+
+    for index in range(objectFuncDirFunc.length()):
+        if index != 0:
+            objVarDirFunc.insert(objectFuncDirFunc.accessIndex(index))
+            print("aahhhh",objVarDirFunc.accessIndex(index))
+
+    #reemplazar esto por linea por linea
+    # objVarDirFunc = objectFuncDirFunc
+    referenceVarsTable = objectFuncDirFunc.getGlobalVarsTable()
+    
+    objVarDirFunc.printDirFunc()
+    referenceVarsTable.printVars()
+    # exit(-1)
+    
+
+    objVarVarsTable = objVarDirFunc.getGlobalVarsTable()
+    
+    objVarVarsTable = vt.Vars()
+    
+    for index in range(referenceVarsTable.length()):
+        var = referenceVarsTable.accessIndex(index)
+        address = mh.addVariable(programName,None,var['type'],None,programName,None)
+        objVarVarsTable.insert({'name':var['name'],'type':var['type'],'address':address})
+        objVarVarsTable.printVars()
+        
+    objVarDirFunc.dirFuncData[0]['name'] = p[-4]
+    objVarDirFunc.dirFuncData[0]['table'] = objVarVarsTable
+
+    
 #--------------------------------
 
 #--------------------------------
@@ -807,21 +846,63 @@ def p_np_CheckForVariableInClassVarTable(p):
     global globalVarsTable
     global dirFunc
 
-    objectInDirFunc = globalVarsTable.getVariableByName(p[-3])
-    # if (var != None):
-    objectDirFunc = objectInDirFunc['DirFunc']
-
-    # objectGlobalFunc = objectDirFunc[-1]
-    type = objectInDirFunc['type']
-    print("type",type)
-    objectGlobalFunc = objectDirFunc.getFunctionByName(type)
-    varsTable = objectGlobalFunc['table']
-    var = varsTable.getVariableByName(p[-1])
+    globalVarsTable.printVars()
+    dirFunc.printDirFunc()
+    objVar = globalVarsTable.getVariableByName(p[-3])
+    print(globalVarsTable.getVariableByName(p[-3]))
+    objVarDirFunc = objVar['DirFunc']
+    objVarDirFunc.printDirFunc()
+    objVarGlobalFunc = objVarDirFunc.dirFuncData[0]
+    objVarVarsTable = objVarGlobalFunc['table']
+    objVarVarsTable.printVars()
+    var = objVarVarsTable.getVariableByName(p[-1])
     if (var != None):
         qg.operand(var['address'], var['type'])
         print("testnmil",var['address'], var['type'])
     else:
         raise Exception("could not find var"+p[-1]+"in class"+p[-3])
+    print(objVarDirFunc)
+    # exit(-1)
+
+    # objVarInGlobalVarsTable = globalVarsTable.getVariableByName(p[-3])
+    # # objVarDirFunc = objVarInGlobalVarsTable['DirFunc']
+    # # objVarDirFunc.printDirFunc()
+    # # objVarGlobalVarsTable = objVarDirFunc.getGlobalVarsTable()
+    # # # print("test2393")
+    # # # objVarGlobalVarsTable.printVars()
+    # # # print(objVarInGlobalVarsTable)
+    # # exit(-1)
+
+    # objVarDirFunc = objVarInGlobalVarsTable['DirFunc']
+    # print("test333")
+    # print(objVarDirFunc)
+    # objVarDirFunc.printDirFunc()
+    # # exit(-1)
+
+
+
+
+    # objectInDirFunc = globalVarsTable.getVariableByName(p[-3])
+
+
+
+    # # if (var != None):
+    # objectDirFunc = objectInDirFunc['DirFunc']
+
+    # # objectGlobalFunc = objectDirFunc[-1]
+    # type = objectInDirFunc['type']
+    # # print("type",type)
+    # # print(type)
+    # # exit(-1)
+    # objectGlobalFunc = objectDirFunc.getFunctionByName(type)
+    # varsTable = objectGlobalFunc['table']
+    # var = varsTable.getVariableByName(p[-1])
+    # if (var != None):
+    #     qg.operand(var['address'], var['type'])
+    #     print("testnmil",var['address'], var['type'])
+    # else:
+    #     raise Exception("could not find var"+p[-1]+"in class"+p[-3])
+    # # exit(-1)
 
 #--------------------------------
 
