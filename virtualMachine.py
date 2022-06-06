@@ -359,11 +359,14 @@ class virtualMachine():
                     insertInMemory(addressTemp, 'false')
             
             if (currentQuad[0] == 'PRINT'):
-                val = getFromMemory(int(currentQuad[3]))
-                if (type(val) == str):
-                    pass
-                print(val)
-            
+                if (currentQuad[3] == 'JUMP'):
+                    print("\n")
+                else:
+                    val = getFromMemory(int(currentQuad[3]))
+                    if (type(val) == str):
+                        pass
+                    print(val, end=" ")
+                
             if (currentQuad[0] == 'READ'): # Missing semantic check
                 varToBeAssigned = int(currentQuad[3])
                 val = input()
@@ -445,7 +448,7 @@ class virtualMachine():
         
             self.ip = self.ip + 1
             currentQuad = self.quadruples[self.ip]
-        self.globalMemory.printMemory()
-        self.tempGlobalMemory.printMemory()
+        # self.globalMemory.printMemory()
+        # self.tempGlobalMemory.printMemory()
         print('Lu∞')
 

@@ -442,11 +442,16 @@ def p_create_goto_for_while(p):
     quadruplesOutput.append(('GOTO','empty','empty',migaja))
 
 def p_print_val(p):
-    '''print_val : qnp13 ID qnp14 print_exp'''
+    '''print_val : qnp13 ID qnp14 print_exp
+                 | empty jumpLine'''
 
 def p_print_exp(p):
-    '''print_exp : COMMA  print_val
+    '''print_exp : COMMA print_val
                  | empty'''
+
+def p_jump_line(p):
+    '''jumpLine : empty''' 
+    quadruplesOutput.append(('PRINT', '', '', 'JUMP'))
 
 def p_read_val(p):
     '''read_val : qnp15 ID qnp16 read_exp'''
@@ -1305,7 +1310,7 @@ try:
     # print(qg.operandStack  )
     # print(qg.operatorStack)
     # print(qg.typeStack)
-    print(ct.constantTable)
+    # print(ct.constantTable)
     file = open("objCode.txt", "w")
     temp = 0
     for quad in quadruplesOutput:
@@ -1325,7 +1330,7 @@ try:
     # dirFunc.printDirFunc()
     # print('---') 
     # print('---GLOBAL VARS TABLE---') 
-    globalVarsTable.printVars()
+    # globalVarsTable.printVars()
     # print('---') 
     # tempClass = dirFunc.getFunctionByName('persona2')
     # classDirFunc = tempClass['DirFunc']
