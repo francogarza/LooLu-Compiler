@@ -2,7 +2,7 @@ LooLu miPrograma;
 
 VARS:
   var int : myArr[10], myMat[3][3]; 
-  var int : myInt, i, j;
+  var int : myInt, i, j, cont;
 
 FUNCS:
   
@@ -11,19 +11,31 @@ CLASSES:
 Loo() {
 
   i = 0;
+  cont = 0;
   j = 0;
 
-  myMat[i][j] = 1;
-  j = j + 1;
-  myMat[0][j] = 2;
-  j = j + 1;
-  myMat[0][j] = 3;
+  while (i < 3) {
+    j = 0;
+    while (j < 3) {
+      myMat[i][j] = cont;
+      j = j + 1;
+      cont = cont + 1;
+    }
+    i = i + 1;
+  }
 
-  myInt = myMat[0][0];
-  print(myInt);
-  myInt = myMat[0][1];
-  print(myInt);
-  myInt = myMat[0][2];
-  print(myInt);
+  i = 0;
+  cont = 0;
+  j = 0;
+
+  while (i < 3) {
+    j = 0;
+    while (j < 3) {
+      myInt = myMat[i][j];
+      print(myInt);
+      j = j + 1;
+    }
+    i = i + 1;
+  }
 
 } Lu;
