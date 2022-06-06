@@ -21,12 +21,13 @@ class memoryHandler:
     constAddressCHAR = None
     constAddressBOOL = None
 
+    classCounter = None
+
     def __init__(self):
         self.globalInt = [2000, 2000]
         self.globalFloat = [3000, 3000]
         self.globalChar = [4000, 4000]
         self.globalBool = [5000, 5000]
-        self.globalClass = [1800, 1800]
 
         self.localInt = [6000, 6000]
         self.localFloat = [7000, 7000]
@@ -42,6 +43,7 @@ class memoryHandler:
         self.constAddressBOOL = [17000, 17000]
 
         self.tempPointer = [21000, 21000]
+        self.globalClass = [22000, 22000]
     
     def resetLocalTempMemory(self):
         self.localInt = [6000, 6000]
@@ -125,11 +127,6 @@ class memoryHandler:
                 self.localBool[1] += size
                 return address
 
-        if varType == 'class':
-            address = self.globalClass[1]
-            print('var: ', varName, 'assigned at: ', address)
-            self.globalClass[1] += 1
-            return address
 
         if  varType == 'CTEINT':
             address = self.constAddressINT[1]
@@ -188,4 +185,11 @@ class memoryHandler:
             address = self.tempPointer[1]
             print('var: ', varName, 'assigned at: ', address)
             self.tempPointer[1] += 1
+            return address
+
+        
+        if varType == 'class':
+            address = self.globalClass[1]
+            print('var: ', varName, 'assigned at: ', address)
+            self.globalClass[1] += 1
             return address

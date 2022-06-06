@@ -553,21 +553,18 @@ def p_np_addObjectToGlobalVarsTable(p):
     global dirFunc
     var = globalVarsTable.getVariableByName(p[-1])
     if (var == None):
-        address = mh.addVariable(programName, p[-1], 'class', None, programName, None)
+        address = mh.addVariable(programName, p[-1], None, None, programName, None)
         globalVarsTable.insert({"name": p[-1], "type": 'class', "address": address, 'DirFunc': None})
     else:
         raise Exception("ERROR: Redeclaration of variable ID = " + p[-1])
-    globalVarsTable.printVars()
 def p_np_FillDirFuncForObject(p):
     '''np_FillDirFuncForObject : empty'''
     global globalVarsTable
     global dirFunc
     object = dirFunc.getFunctionByName(p[-1])
     var = globalVarsTable.getVariableByName(p[-4])
-    var['DirFunc'] = object['DirFunc'] 
-    varDirFunc = var['DirFunc']
-    print("lets go",var)
-    varDirFunc.printDirFunc()
+    var['DirFunc'] = object['DirFunc']
+    var['type'] = p[-1]
 #--------------------------------
 
 #--------------------------------
@@ -717,7 +714,7 @@ def p_var_cte(p):
                | CTECHAR qnp_cte_char
                | TRUE qnp_cte_bool
                | FALSE qnp_cte_bool
-               | access_class_atribute
+               | access_class_atribute 
                | function_call np_FillStacksWithReturnValue
                | class_function_call 
                | arr_access'''
@@ -794,19 +791,15 @@ def p_np_verify_arr_access(p):
     global globalVarsTable
 
     print(p[-4])
-
     arr = currentVarTable.getVariableByName(p[-4])
     if (arr == None):
         arr = globalVarsTable.getVariableByName(p[-4])
         print(globalVarsTable.getVariableByName(p[-4]))
         if (arr == None):
             raise Exception("The array you are trying to access with name" + p[-4] +"has not been declared")
-
     type = qg.typeStack.pop()
     if(type != 'int'):
         raise Exception("An in is required to access an array. You are trying to access with")
-
-
     s1 = qg.operandStack.pop()
     dirBase = arr["address"]
     quadruplesOutput.append(('VER',s1,'',arr['size']))
@@ -814,6 +807,31 @@ def p_np_verify_arr_access(p):
     quadruplesOutput.append(('+dirBase',dirBase,s1,pointer))
     qg.operandStack.append(pointer)
     qg.typeStack.append(type)
+# - access class atribute
+def p_access_class_atribute(p):
+    '''access_class_atribute : ID DOT ID np_CheckForVariableInClassVarTable'''
+
+def p_np_CheckForVariableInClassVarTable(p):
+    '''np_CheckForVariableInClassVarTable : empty'''
+    global globalVarsTable
+    global dirFunc
+
+    objectInDirFunc = globalVarsTable.getVariableByName(p[-3])
+    # if (var != None):
+    objectDirFunc = objectInDirFunc['DirFunc']
+
+    # objectGlobalFunc = objectDirFunc[-1]
+    type = objectInDirFunc['type']
+    print("type",type)
+    objectGlobalFunc = objectDirFunc.getFunctionByName(type)
+    varsTable = objectGlobalFunc['table']
+    var = varsTable.getVariableByName(p[-1])
+    if (var != None):
+        qg.operand(var['address'], var['type'])
+        print("testnmil",var['address'], var['type'])
+    else:
+        raise Exception("could not find var"+p[-1]+"in class"+p[-3])
+
 #--------------------------------
 
 #--------------------------------
@@ -930,7 +948,7 @@ def p_np_add_var_to_current_table_class(p):
     if (id == None):
         id = currentClassGlobalVarsTable.getVariableByName(p[-1])
         if (id == None):
-            address = mh.addVariable(currentClassFunc, p[-1], currentType, None, currentClass, None)
+            address = mh.addVariable(currentClassFunc, p[-1], 'class', None, currentClass, None)
             print("heloooooo",address)
             currentClassFuncVarTable.insert({"name": p[-1], "type": currentType, 'address': address})
         else:
@@ -1092,7 +1110,7 @@ def p_np_create_end_func_quadClass(p):
 # CLASSES - FUNCS CALL
 #--------------------------------
 def p_class_function_call(p):
-    '''class_function_call : ID DOT function_call'''
+    '''class_function_call : ID DOT ID LEFTPAREN RIGHTPAREN'''
 #--------------------------------
 
 #--------------------------------
@@ -1224,9 +1242,6 @@ def p_np_CreateReadQuadClass(p):
 # - while class
 def p_while_statementClass(p):
     '''while_statementClass : WHILE LEFTPAREN np_SaveJumpForWhile expressionClass np_CreateGotofForWhile RIGHTPAREN blockClass np_FillGotofForWhile np_CreateGotoForWhile'''
-
-def p_access_class_atribute(p):
-    '''access_class_atribute : ID DOT ID '''
 #--------------------------------
 
 #--------------------------------

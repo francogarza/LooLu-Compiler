@@ -130,6 +130,6 @@ CLASSES:
     }
 
 Loo() {
-    var franco = persona();
-
+    var franco = persona2();
+    myInt2 = franco.myInt;
 } Lu;
