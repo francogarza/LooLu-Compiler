@@ -24,18 +24,50 @@ func bool binarySearch(left : int, right : int, target : int) {
     var int : mid;
 
     START:
-    while (left <= right) {
-        mid = (left + right) / 2;
-        if (myArr[mid] == target) {
-            return(true);
+        while (left <= right) {
+            mid = (left + right) / 2;
+            if (myArr[mid] == target) {
+                return(true);
+            }
+            if (myArr[mid] < target) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
         }
-        if (myArr[mid] < target) {
-            left = mid + 1;
-        } else {
-            right = mid - 1;
+        return(false);
+}
+
+func void fillMat(s1 : int, s2 : int) {
+    VARS:
+      var int : i, j, cont, act;
+    START:
+        i = 0;
+        cont = 0;
+
+      while (i < s1) {
+        j = 0;
+        while (j < s2) {
+          myMat[i][j] = cont;
+          cont = cont + 1;
+          j = j + 1;
         }
-    }
-    return(false);
+        i = i + 1;
+      }
+
+      i = 0;
+
+      while (i < s1) {
+        j = 0;
+        while (j < s2) {
+          act = myMat[i][j];
+          print(act);
+          j = j + 1;
+        }
+        print();
+        i = i + 1;
+      }
+     
 }
   
 CLASSES:
@@ -45,5 +77,7 @@ Loo() {
     fillArr(10);
     myBool = binarySearch(0, 9, 7);
     print(myBool);
+
+    fillMat(10, 10);
 
 } Lu;

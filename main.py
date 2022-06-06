@@ -351,10 +351,6 @@ def p_assignment(p):
                   | access_class_atribute EQUAL expression'''
 
 
-# def p_assignment_var_all(p):
-#     '''assignmentAll : ID np16isOnCurrentVarsTable natureCheck'''
-
-
 def p_assignment_variable(p):
     '''assignmentVariable : ID np16isOnCurrentVarsTable qnp1sendToQuadruples EQUAL qnp2insertOperator
                           | ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET assignmentMatrix'''
@@ -525,8 +521,19 @@ def p_np_verify_mat_access(p):
     '''np_VerifyMatAccess : empty'''
     global currentVarTable
     global tempCounter
+    global globalVarsTable
 
+
+    print('entra verify mat')
+    
     mat = currentVarTable.getVariableByName(p[-8])
+
+
+    if (mat == None):
+        mat = globalVarsTable.getVariableByName(p[-8])
+        print(globalVarsTable.getVariableByName(p[-8]))
+        if (mat == None):
+            raise Exception("The matrix you are trying to access with name" + p[-8] +"has not been declared")
 
     type = qg.typeStack.pop()
     if(type != 'int'):
@@ -534,10 +541,11 @@ def p_np_verify_mat_access(p):
     s2 = qg.operandStack.pop()
 
     type = qg.typeStack.pop()
-    if(type != 'int'):
+    if (type != 'int'):
         raise Exception("An in is required to access an array. You are trying to access with")
     s1 = qg.operandStack.pop()
     print('s1', s1, 's2', s2)
+    print(mat)
 
     dirBase = mat["address"]
     d1 = ct.constantTable[mat['dimensiones'][0]]
@@ -568,17 +576,20 @@ def p_np_verify_arr_access(p):
     '''np_VerifyArrAccess : empty'''
     global currentVarTable
     global globalVarsTable
+
+    print('entra verify arr', p[-4])
     
     arr = currentVarTable.getVariableByName(p[-4])
 
-    if (arr['dimension'] == 2): # exit the function if you encounter a matrix
-        return
 
     if (arr == None):
         arr = globalVarsTable.getVariableByName(p[-4])
         print(globalVarsTable.getVariableByName(p[-4]))
         if (arr == None):
             raise Exception("The array you are trying to access with name" + p[-4] +"has not been declared")
+
+    if (arr['dimension'] == 2): # exit the function if you encounter a matrix
+        return
 
     type = qg.typeStack.pop()
     if(type != 'int'):
@@ -814,6 +825,7 @@ def p_qnp1_send_to_quadruplesARR(p):
     '''qnp1sendToQuadruplesARR : empty'''
     global currentVarTable
     global globalVarsTable
+    print('entra ARR')
 
     variable = currentVarTable.getVariableByName(p[-6])
     if (variable == None):

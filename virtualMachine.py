@@ -375,12 +375,7 @@ class virtualMachine():
                 if val == 'true' or val == 'false':
                     # print('entra')
                     insertInMemory(varToBeAssigned, val)
-                elif isalpha(val):
-                    insertInMemory(varToBeAssigned, val)
-                elif type(val) == int:
-                    insertInMemory(varToBeAssigned, val)
-                else:
-                    insertInMemory(varToBeAssigned, val)
+                insertInMemory(varToBeAssigned, val)
             
             if (currentQuad[0] == 'GOTO'): # GOTO id found
                 self.ip = int(currentQuad[3]) - 1# -2 Because quads start at index 0 and add one more iteration
@@ -448,7 +443,7 @@ class virtualMachine():
         
             self.ip = self.ip + 1
             currentQuad = self.quadruples[self.ip]
-        # self.globalMemory.printMemory()
+        self.globalMemory.printMemory()
         # self.tempGlobalMemory.printMemory()
         print('Lu∞')
 
