@@ -103,7 +103,22 @@ def p_var_id_2(p):
                 | COMMA arr_id var_id_2
                 | empty'''
 def p_arr_id(p):
-    '''arr_id : ID  LEFTSQUAREBRACKET CTEINT qnp_cte_int np_addArrayToCurrentTable RIGHTSQUAREBRACKET'''
+    '''arr_id : ID LEFTSQUAREBRACKET CTEINT qnp_cte_int np_addArrayToCurrentTable RIGHTSQUAREBRACKET matrix'''
+
+def p_matrix(p):
+    '''matrix : LEFTSQUAREBRACKET CTEINT qnp_cte_int RIGHTSQUAREBRACKET np_matrix
+              | empty'''
+
+def p_np_matrix(p):
+    '''np_matrix : empty'''
+    global currentFunc
+    global currentVarTable
+    global currentType
+    mat = currentVarTable.getVariableByName(p[-10])
+    mat['dimension'] += 1
+    mat['dimensiones'] = [p[-3], p[-8]]
+    dirBase = mat['address']
+    mh.updateVariable(currentFunc, p[-10], currentType, programName, p[-3], p[-8], dirBase)
 # - declare vars: nps
 def p_type(p):
     '''type : type_simple'''
@@ -133,6 +148,25 @@ def p_np_add_var_to_current_table(p):
         raise Exception("ERROR: Redeclaration of variable ID = " + p[-1])
 def p_np_add_array_to_current_table(p):
     '''np_addArrayToCurrentTable : empty'''
+    # agrega la variable que acaba de leer a la tabla de variables actual.
+    # utiliza el memory handler para asignarle una posicion en la memoria virtual.
+    global currentFunc
+    global currentVarTable
+    global currentTypei
+    id = currentVarTable.getVariableByName(p[-9])
+    if (id == None):
+        address = mh.addVariable(currentFunc, p[-4], currentType, None, programName, p[-2])
+        size = qg.operandStack.pop()
+        qg.typeStack.pop()
+        currentVarTable.insert({"name": p[-4], "type": currentType, "address": address, "size": size,"dimension": 1})
+        vm.initializeArray(address, p[-2])
+    elif (currentVarTable.getVariableByName(p[-9]) != None):
+        print(p[-2], p[-7])
+    else:
+        raise Exception("ERROR: Redeclaration of variable ID = " + p[-4])
+
+def p_np_add_mat_to_current_table(p):
+    '''np_addMatToCurrentTable : empty'''
     # agrega la variable que acaba de leer a la tabla de variables actual.
     # utiliza el memory handler para asignarle una posicion en la memoria virtual.
     global currentFunc
@@ -376,8 +410,16 @@ def p_assignment(p):
     '''assignment : assignmentVariable super_expression np_CheckOperStackForEqual
                   | access_class_atribute EQUAL qnp2insertOperator expression np_CheckOperStackForEqual'''
 def p_assignment_variable(p):
-    '''assignmentVariable : ID np16isOnCurrentVarsTable qnp1sendToQuadruples EQUAL qnp2insertOperator
-                          | ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET qnp1sendToQuadruplesARR EQUAL qnp2insertOperator'''
+    '''assignmentVariable : ID np16isOnCurrentVarsTable qnp1sendToQuadruples EQUAL qnp2insertOperator 
+    | ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET assignmentMatrix'''
+
+def p_assignment_matrix(p):
+    '''assignmentMatrix : LEFTSQUAREBRACKET expression np_VerifyMatAccess RIGHTSQUAREBRACKET qnp1sendToQuadruplesMat EQUAL qnp2insertOperator
+                        | qnp1sendToQuadruplesARR EQUAL qnp2insertOperator'''
+
+# def p_assignment_variable(p):
+#     '''assignmentVariable : ID np16isOnCurrentVarsTable qnp1sendToQuadruples EQUAL qnp2insertOperator
+#                           | ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET qnp1sendToQuadruplesARR EQUAL qnp2insertOperator'''
 # - assignment: nps    
 def p_qnp1_send_to_quadruples(p):
     '''qnp1sendToQuadruples : empty'''
@@ -465,7 +507,13 @@ def p_ifnp2(p):
 def p_writing(p):
     '''writing : PRINT LEFTPAREN print_val RIGHTPAREN SEMICOLON'''
 def p_print_val(p):
-    '''print_val : expression np_CreatePrintQuad print_exp'''
+    '''print_val : expression np_CreatePrintQuad print_exp
+                 | empty jumpLine'''
+
+def p_jump_line(p):
+    '''jumpLine : empty''' 
+    quadruplesOutput.append(('PRINT', '', '', 'JUMP'))
+
 def p_print_exp(p):
     '''print_exp : COMMA print_val
                  | empty'''
@@ -745,7 +793,8 @@ def p_var_cte(p):
                | access_class_atribute 
                | class_function_call np_FillStacksWithReturnValue
                | function_call np_FillStacksWithReturnValue
-               | arr_access'''
+               | arr_access
+               | mat_access'''
 # - vars and constants: nps
 def p_np_AddOperandToStack(p):
     '''np_AddOperandToStack : empty'''
@@ -812,6 +861,8 @@ def p_FillStacksWithReturnValue(p):
 # - array access               
 def p_arr_access(p):
     '''arr_access : ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET'''
+def p_mat_access(p):
+    '''mat_access : ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET LEFTSQUAREBRACKET expression np_VerifyMatAccess RIGHTSQUAREBRACKET'''
 # - array acces: nps
 def p_np_verify_arr_access(p):
     '''np_VerifyArrAccess : empty'''
@@ -825,6 +876,8 @@ def p_np_verify_arr_access(p):
         print(globalVarsTable.getVariableByName(p[-4]))
         if (arr == None):
             raise Exception("The array you are trying to access with name" + p[-4] +"has not been declared")
+    if (arr['dimension'] == 2): # exit the function if you encounter a matrix
+        return
     type = qg.typeStack.pop()
     if(type != 'int'):
         raise Exception("An in is required to access an array. You are trying to access with")
@@ -835,6 +888,60 @@ def p_np_verify_arr_access(p):
     quadruplesOutput.append(('+dirBase',dirBase,s1,pointer))
     qg.operandStack.append(pointer)
     qg.typeStack.append(type)
+def p_np_verify_mat_access(p):
+    '''np_VerifyMatAccess : empty'''
+    global currentVarTable
+    global tempCounter
+    global globalVarsTable
+
+
+    print('entra verify mat')
+
+    mat = currentVarTable.getVariableByName(p[-8])
+    if (mat == None):
+        mat = globalVarsTable.getVariableByName(p[-8])
+        print(globalVarsTable.getVariableByName(p[-8]))
+        if (mat == None):
+            raise Exception("The matrix you are trying to access with name" + p[-8] +"has not been declared")
+
+    type = qg.typeStack.pop()
+    if(type != 'int'):
+        raise Exception("An in is required to access an array. You are trying to access with")
+    s2 = qg.operandStack.pop()
+
+    type = qg.typeStack.pop()
+    if(type != 'int'):
+        raise Exception("An in is required to access an array. You are trying to access with")
+    s1 = qg.operandStack.pop()
+    print('s1', s1, 's2', s2)
+
+    dirBase = mat["address"]
+    d1 = ct.constantTable[mat['dimensiones'][0]]
+    d2 = ct.constantTable[mat['dimensiones'][1]]
+
+    result = 'T'+str(tempCounter)
+    tempCounter = tempCounter + 1
+    address1 = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName,None)
+
+    result = 'T'+str(tempCounter)
+    tempCounter = tempCounter + 1
+    address2 = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName,None)
+
+    pointer = mh.addVariable(None,None,'POINTER',None,None,None)
+
+    quadruplesOutput.append(('VER',s1,'', d1))
+    quadruplesOutput.append(('VER',s2,'', d2))
+
+    quadruplesOutput.append(('*', s1, d2, address1)) # s1 * d2
+    
+    quadruplesOutput.append(('+', address1, s2, address2)) # s1 * d2 + s2
+    
+    quadruplesOutput.append(('+dirBase', dirBase, address2, pointer)) # dirBase + s1 * d2 + s2
+    qg.operandStack.append(pointer)
+    qg.typeStack.append(type)
+def p_qnp1_send_to_quadruplesMat(p):
+    '''qnp1sendToQuadruplesMat : empty'''
+    print('WIP')
 # - access class atribute
 def p_access_class_atribute(p):
     '''access_class_atribute : ID DOT ID np_CheckForVariableInClassVarTable'''
