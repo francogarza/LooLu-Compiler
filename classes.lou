@@ -1,0 +1,24 @@
+LooLu miPrograma;
+
+VARS:
+    var int : temp;
+FUNCS:
+CLASSES:
+    class persona{
+        VARS:
+        var int : edad;
+        var float : altura;
+        FUNCS:
+        func void returnAge(){
+            VARS: 
+            START:
+                print(edad);
+        }
+    }
+
+Loo() {
+    var franco = persona();
+    franco.edad = 24;
+    franco.altura = 1.78;
+    print(franco.edad, franco.altura);
+} Lu;

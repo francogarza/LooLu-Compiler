@@ -1,0 +1,23 @@
+LooLu miPrograma;
+
+VARS:
+  var int : myInt;
+
+FUNCS:
+
+func int factorial(n: int) {
+    VARS:
+    START:
+     if (n < 2){
+         return(1);
+     } else {
+         return(n * (factorial(n-1)));
+     }
+}
+CLASSES:
+
+Loo() {
+
+    print(factorial(5));
+
+} Lu;
