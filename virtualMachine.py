@@ -11,13 +11,8 @@ class Memory():
     def __init__(self):
         self.data = {}
     def insert(self, address, value):
-        # print('entra insert', address, value)
-        # if address in self.data:
-        #     return
         self.data[address] = value
     def get(self, address):
-        # print("get address:",address, self.data[address])
-
         if (address in self.data):
             return self.data[address]
         else:
@@ -37,9 +32,7 @@ class StackSegment():
         self.data.append({})
         self.tempLocalMemory.append({})
     def insertTop(self, address, val):
-        # print('entraInsert', len(self.data)-1, address, val)
         self.data[-1][address] = val
-        # print(self.data[-1])
     def insertTopTemp(self, address, val):
         self.tempLocalMemory[-1][address] = val
     def get(self, address):
@@ -161,7 +154,6 @@ class virtualMachine():
             elif (address >= 14000 and address <= 17999):
                 return self.constantsMemory.get(address)
             elif (address >= 21000 and address <= 21999):
-                # print(self.globalMemory.get(address), ' cague')
                 self.globalMemory.get(address)
                 return self.globalMemory.get(address)
         
@@ -207,13 +199,9 @@ class virtualMachine():
                 else:
                     newVal = getFromMemory(int(currentQuad[1]))
                     insertInMemory(int(currentQuad[3]), newVal)
-                    # self.globalMemory.printMemory()
-
-
             if (currentQuad[0] == '+'): # addition is founds
                 valLeft = getFromMemory(int(currentQuad[1]))
                 valRight = getFromMemory(int(currentQuad[2]))
-                # print(int(currentQuad[1]), int(currentQuad[2]))
                 addressTemp = int(currentQuad[3])
                 insertInMemory(addressTemp, valLeft + valRight)
 
@@ -221,14 +209,12 @@ class virtualMachine():
                 valLeft = getFromMemory(int(currentQuad[1]))
                 valRight = getFromMemory(int(currentQuad[2]))
                 addressTemp = int(currentQuad[3])
-                # print(int(currentQuad[2]), valRight)
                 insertInMemory(addressTemp, valLeft - valRight)
             
             if (currentQuad[0] == '*'): # addition is founds
                 valLeft = getFromMemory(int(currentQuad[1]))
                 valRight = getFromMemory(int(currentQuad[2]))
                 addressTemp = int(currentQuad[3])
-                # print(int(currentQuad[1]), int(currentQuad[2]))
                 insertInMemory(addressTemp, valLeft * valRight)
             
             if (currentQuad[0] == '/'): # addition is founds
@@ -364,16 +350,14 @@ class virtualMachine():
                 else:
                     val = getFromMemory(int(currentQuad[3]))
                     if (type(val) == str):
+                        print('hehe')
                         pass
                     print(val, end=" ")
             
-            if (currentQuad[0] == 'READ'): # Missing semantic check
+            if (currentQuad[0] == 'READ'):
                 varToBeAssigned = int(currentQuad[3])
                 val = input()
-                
-                # BOOL
                 if val == 'true' or val == 'false':
-                    # print('entra')
                     insertInMemory(varToBeAssigned, val)
                 insertInMemory(varToBeAssigned, val)
             
@@ -394,24 +378,15 @@ class virtualMachine():
             if (currentQuad[0] == 'PARAMETER'):
                 paramType = currentQuad[2]
                 address = getLocalAddress(paramType)
-                # print(address)
                 val = getFromMemory(int(currentQuad[1]))
-                # print('entra P', val, address)
                 insertInMemory(address, val)
-                # self.localMemory.printMemory()
 
             if (currentQuad[0] == 'GOSUB'):
                 saveQuad = self.ip
                 self.ip = int(currentQuad[3]) - 1
                 self.checkpoints.append(saveQuad)
-                # print(saveQuad)
 
             if (currentQuad[0] == 'ENDFUNC'):
-                # self.localMemory.printMemory()
-                # print('ENTRA ENDFUNC')
-
-                # if (needReturn):
-                #     Error("Runtime Error: The function", currentFunc, "need to be exited by a return statement")
                 if (len(self.checkpoints) > 0):
                     lastIp = self.checkpoints[-1]
                     self.checkpoints.pop()
@@ -419,29 +394,20 @@ class virtualMachine():
                     self.ip = lastIp
 
             # ARRAYS #
-
             if (currentQuad[0] == 'VER'):
                 requestedIndex = getFromMemory(int(currentQuad[1]))
                 limitIndex = getFromMemory(int(currentQuad[3]))
-                # print(currentQuad, requestedIndex, limitIndex)
-                # print(type(limitIndex), type(requestedIndex))
                 if (requestedIndex < 0 or requestedIndex >= limitIndex):
                     raise Exception('Out of bounds: index is not within the array limits.')
-                # else:
-                    # print('good index')
 
 
             if (currentQuad[0] == '+dirBase'):
                 dirBase = int(currentQuad[1]) # 2001
                 requestedIndex = getFromMemory(int(currentQuad[2])) #index
                 pointerAddress = int(currentQuad[3]) #21000s
-                # print(pointerAddress, dirBase + requestedIndex)
                 insertInMemory(pointerAddress, dirBase + requestedIndex)
-                # print(getFromMemory(pointerAddress))
         
             self.ip = self.ip + 1
             currentQuad = self.quadruples[self.ip]
-        self.globalMemory.printMemory()
-        # self.tempGlobalMemory.printMemory()
         print('Lu∞')
 

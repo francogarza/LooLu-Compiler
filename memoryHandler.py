@@ -113,13 +113,10 @@ class memoryHandler:
 
         if funcName == programName and varType == 'int':
             address = self.globalInt[1]
-            # print('var: ', varName, 'assigned at: ', address)
-            # print(size)
             if (size == None):
                 self.globalInt[1] += 1
                 return address
             else:
-                print(self.globalInt[1], '+' , size)
                 self.globalInt[1] += size
                 return address
         elif funcName != programName and varType == 'int':
@@ -132,7 +129,6 @@ class memoryHandler:
                 return address
         if funcName == programName and varType == 'float':
             address = self.globalFloat[1]
-            # print('var: ', varName, 'assigned at: ', address)
             if (size == None):
                 self.globalFloat[1] += 1
                 return address
@@ -150,7 +146,6 @@ class memoryHandler:
         
         if funcName == programName and varType == 'char':
             address = self.globalChar[1]
-            # print('var: ', varName, 'assigned at: ', address)
             if (size == None):
                 self.globalChar[1] += 1
                 return address
@@ -168,7 +163,6 @@ class memoryHandler:
 
         if funcName == programName and varType == 'bool':
             address = self.globalBool[1]
-            # print('var: ', varName, 'assigned at: ', address)
             if (size == None):
                 self.globalBool[1] += 1
                 return address
@@ -187,7 +181,6 @@ class memoryHandler:
 
         if  varType == 'CTEINT':
             address = self.constAddressINT[1]
-            # print('var: ', varName, 'assigned at: ', address)
             if varName in ct.constantTable:
                 return ct.constantTable[varName]
             ct.constantTable[varName] = address
@@ -196,7 +189,6 @@ class memoryHandler:
 
         if  varType == 'CTEFLOAT':
             address = self.constAddressFLOAT[1]
-            # print('var: ', varName, 'assigned at: ', address)
             if varName in ct.constantTable:
                 return ct.constantTable[varName]
             ct.constantTable[varName] = address
@@ -205,7 +197,6 @@ class memoryHandler:
 
         if  varType == 'CTECHAR':
             address = self.constAddressCHAR[1]
-            # print('var: ', varName, 'assigned at: ', address)
             if varName in ct.constantTable:
                 return ct.constantTable[varName]
             ct.constantTable[varName] = address
@@ -214,7 +205,6 @@ class memoryHandler:
 
         if  varType == 'CTEBOOL':
             address = self.constAddressBOOL[1]
-            # print('var: ', varName, 'assigned at: ', address)
             if varName in ct.constantTable:
                 return ct.constantTable[varName]
             ct.constantTable[varName] = address
@@ -223,7 +213,6 @@ class memoryHandler:
 
         if funcName == programName and varType == 'TEMPORAL':
             address = self.tempAddressGlobal[1]
-            # print('var: ', varName, 'assigned at: ', address)
             if (size == None):
                 self.tempAddressGlobal[1] += 1
                 return address
@@ -240,13 +229,11 @@ class memoryHandler:
                 return address
         if varType == 'POINTER':
             address = self.tempPointer[1]
-            print('var: ', varName, 'assigned at: ', address)
             self.tempPointer[1] += 1
             return address
 
         
         if varType == 'class':
             address = self.globalClass[1]
-            print('var: ', varName, 'assigned at: ', address)
             self.globalClass[1] += 1
             return address

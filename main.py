@@ -143,7 +143,6 @@ def p_np_add_var_to_current_table(p):
     if (id == None):
         address = mh.addVariable(currentFunc, p[-1], currentType, None, programName,None)
         currentVarTable.insert({"name": p[-1], "type": currentType, "address": address})
-        # currentVarTable.printVars()
     else:
         raise Exception("ERROR: Redeclaration of variable ID = " + p[-1])
 def p_np_add_array_to_current_table(p):
@@ -160,9 +159,7 @@ def p_np_add_array_to_current_table(p):
         qg.typeStack.pop()
         currentVarTable.insert({"name": p[-4], "type": currentType, "address": address, "size": size,"dimension": 1})
         vm.initializeArray(address, p[-2])
-    elif (currentVarTable.getVariableByName(p[-9]) != None):
-        print(p[-2], p[-7])
-    else:
+    elif (currentVarTable.getVariableByName(p[-9]) == None):
         raise Exception("ERROR: Redeclaration of variable ID = " + p[-4])
 
 def p_np_add_mat_to_current_table(p):
@@ -179,9 +176,7 @@ def p_np_add_mat_to_current_table(p):
         qg.typeStack.pop()
         currentVarTable.insert({"name": p[-4], "type": currentType, "address": address, "size": size, "dimension": 1})
         vm.initializeArray(address, p[-2])
-    elif (currentVarTable.getVariableByName(p[-9]) != None):
-        print(p[-2], p[-7])
-    else:
+    elif (currentVarTable.getVariableByName(p[-9]) == None):
         raise Exception("ERROR: Redeclaration of variable ID = " + p[-4])
 
 def p_np_add_mat_to_current_table(p):
@@ -284,7 +279,6 @@ def p_np14_add_parameter_as_variable_to_func(p):
         raise Exception("   ERROR: Redeclaration of variable ID = " + p[-3])
     else:
         address = mh.addVariable(currentFunc, p[-1], currentType, None, programName,None)
-        # print(currentFunc, p[-1], currentType, None, programName,None)
         currentVarTable.insert({"name": p[-3], "type": currentType, "address" : address})
 def p_addToParameterSignature(p):
     '''addToParameterSignature : empty'''
@@ -385,8 +379,7 @@ def p_check_for_missing_arguments(p):
     '''np_CheckForMissingArguments : empty'''
     global paramCounter
     global currentParamSignature
-    print(currentParamSignature)
-    # print(currentParamSignature,paramCounter)
+
     if (len(currentParamSignature)-1 > paramCounter-1):
         raise Exception('Function call is missing arguments')
     else:
@@ -398,7 +391,7 @@ def p_verify_param_type_with_signature(p):
 
     param = qg.operandStack.pop()
     paramType = qg.typeStack.pop()
-    # print(param, paramType)
+
 
     if (paramType == currentParamSignature[paramCounter]):
         quadruplesOutput.append(("PARAMETER",param,paramType,("ARGUMENT#"+str(paramCounter))))
@@ -436,9 +429,6 @@ def p_assignment_matrix(p):
     '''assignmentMatrix : LEFTSQUAREBRACKET expression np_VerifyMatAccess RIGHTSQUAREBRACKET qnp1sendToQuadruplesMat EQUAL qnp2insertOperator
                         | qnp1sendToQuadruplesARR EQUAL qnp2insertOperator'''
 
-# def p_assignment_variable(p):
-#     '''assignmentVariable : ID np16isOnCurrentVarsTable qnp1sendToQuadruples EQUAL qnp2insertOperator
-#                           | ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET qnp1sendToQuadruplesARR EQUAL qnp2insertOperator'''
 # - assignment: nps    
 def p_qnp1_send_to_quadruples(p):
     '''qnp1sendToQuadruples : empty'''
@@ -466,7 +456,7 @@ def p_qnp1_send_to_quadruplesARR(p):
                 raise Exception("   ERROR: Variable not declared oscope " + p[-6])
         else:
             raise Exception("   ERROR: Variable not declared oscope " + p[-6])
-    print(variable["type"], 'baina', variable['name'], p[-6])
+
     qg.operand(qg.operandStack.pop(), variable["type"])
 def p_qnp2_insertOperator(p):
     '''qnp2insertOperator : empty'''
@@ -474,14 +464,12 @@ def p_qnp2_insertOperator(p):
 def p_np_CheckOperStackForEqual(p):
     '''np_CheckOperStackForEqual : empty'''
     global tempCounter
-    print("hello",qg.operandStack,qg.typeStack,qg.operatorStack)
     if qg.operatorStack and qg.operatorStack[-1] in ['=']:
         right_operand = qg.operandStack.pop() 
         right_type = qg.typeStack.pop()
         left_operand = qg.operandStack.pop()
         left_type = qg.typeStack.pop()
         operator = qg.operatorStack.pop()
-        print(left_type, left_operand, operator, right_type, right_operand)
         result_type = sc.cube(left_type, right_type, operator, None, None)
         if result_type != -1 or right_operand >= 21000 or left_operand >= 21000:
             quadruplesOutput.append((operator, right_operand, '', left_operand))
@@ -635,14 +623,14 @@ def p_np_FillDirFuncForObject(p):
     for index in range(objectFuncDirFunc.length()):
         if index != 0:
             objVarDirFunc.insert(objectFuncDirFunc.accessIndex(index))
-            print("aahhhh",objVarDirFunc.accessIndex(index))
+
 
     #reemplazar esto por linea por linea
     # objVarDirFunc = objectFuncDirFunc
     referenceVarsTable = objectFuncDirFunc.getGlobalVarsTable()
     
-    objVarDirFunc.printDirFunc()
-    referenceVarsTable.printVars()
+
+
     # exit(-1)
     
 
@@ -654,7 +642,7 @@ def p_np_FillDirFuncForObject(p):
         var = referenceVarsTable.accessIndex(index)
         address = mh.addVariable(programName,None,var['type'],None,programName,None)
         objVarVarsTable.insert({'name':var['name'],'type':var['type'],'address':address})
-        objVarVarsTable.printVars()
+
         
     objVarDirFunc.dirFuncData[0]['name'] = p[-4]
     objVarDirFunc.dirFuncData[0]['table'] = objVarVarsTable
@@ -820,7 +808,7 @@ def p_np_AddOperandToStack(p):
     global currentVarTable
     global globalVarsTable
     variable = currentVarTable.getVariableByName(p[-1])
-    # print(variable, variable["type"])
+
     if(variable != None):
         qg.operandStack.append(variable["address"])
         qg.typeStack.append(variable["type"])
@@ -835,13 +823,13 @@ def p_qnp_cte_int(p):
     '''qnp_cte_int : empty'''
     global currentFunc
     global programName
-    # print('entra cte',  p[-1])
+
     address = mh.addVariable(currentFunc, p[-1], 'CTEINT', None, programName,None)
     qg.operandStack.append(address)
     qg.typeStack.append('int')
 def p_qnp_cte_float(p):
     '''qnp_cte_float : empty'''
-    # print('entra FLOAT')
+
     global currentFunc
     global programName
     address = mh.addVariable(currentFunc, p[-1], 'CTEFLOAT', None, programName,None)
@@ -849,7 +837,7 @@ def p_qnp_cte_float(p):
     qg.typeStack.append('float')
 def p_qnp_cte_char(p):
     '''qnp_cte_char : empty'''
-    # print('ENTRA A CHAR',  p[-1][1])
+
     global currentFunc
     global programName
     address = mh.addVariable(currentFunc, p[-1][1], 'CTECHAR', None, programName,None)
@@ -859,7 +847,7 @@ def p_qnp_cte_bool(p):
     '''qnp_cte_bool : empty'''
     global currentFunc
     global programName
-    # print('entra bool')
+
     address = mh.addVariable(currentFunc, p[-1], 'CTEBOOL', None, programName,None)
     qg.operandStack.append(address)
     qg.typeStack.append('bool')
@@ -889,11 +877,11 @@ def p_np_verify_arr_access(p):
     global currentVarTable
     global globalVarsTable
 
-    print(p[-4])
+
     arr = currentVarTable.getVariableByName(p[-4])
     if (arr == None):
         arr = globalVarsTable.getVariableByName(p[-4])
-        print(globalVarsTable.getVariableByName(p[-4]))
+
         if (arr == None):
             raise Exception("The array you are trying to access with name" + p[-4] +"has not been declared")
     if (arr['dimension'] == 2): # exit the function if you encounter a matrix
@@ -915,12 +903,12 @@ def p_np_verify_mat_access(p):
     global globalVarsTable
 
 
-    print('entra verify mat')
+
 
     mat = currentVarTable.getVariableByName(p[-8])
     if (mat == None):
         mat = globalVarsTable.getVariableByName(p[-8])
-        print(globalVarsTable.getVariableByName(p[-8]))
+
         if (mat == None):
             raise Exception("The matrix you are trying to access with name" + p[-8] +"has not been declared")
 
@@ -933,7 +921,7 @@ def p_np_verify_mat_access(p):
     if(type != 'int'):
         raise Exception("An in is required to access an array. You are trying to access with")
     s1 = qg.operandStack.pop()
-    print('s1', s1, 's2', s2)
+
 
     dirBase = mat["address"]
     d1 = ct.constantTable[mat['dimensiones'][0]]
@@ -961,7 +949,7 @@ def p_np_verify_mat_access(p):
     qg.typeStack.append(type)
 def p_qnp1_send_to_quadruplesMat(p):
     '''qnp1sendToQuadruplesMat : empty'''
-    print('WIP')
+
 # - access class atribute
 def p_access_class_atribute(p):
     '''access_class_atribute : ID DOT ID np_CheckForVariableInClassVarTable'''
@@ -970,22 +958,22 @@ def p_np_CheckForVariableInClassVarTable(p):
     '''np_CheckForVariableInClassVarTable : empty'''
     global globalVarsTable
     global dirFunc
-    globalVarsTable.printVars()
-    dirFunc.printDirFunc()
+
+
     objVar = globalVarsTable.getVariableByName(p[-3])
-    print(globalVarsTable.getVariableByName(p[-3]))
+
     objVarDirFunc = objVar['DirFunc']
-    objVarDirFunc.printDirFunc()
+
     objVarGlobalFunc = objVarDirFunc.dirFuncData[0]
     objVarVarsTable = objVarGlobalFunc['table']
-    objVarVarsTable.printVars()
+
     var = objVarVarsTable.getVariableByName(p[-1])
     if (var != None):
         qg.operand(var['address'], var['type'])
-        print("testnmil",var['address'], var['type'])
+
     else:
         raise Exception("could not find var"+p[-1]+"in class"+p[-3])
-    print(objVarDirFunc)
+
 #--------------------------------
 
 #--------------------------------
@@ -1103,7 +1091,7 @@ def p_np_add_var_to_current_table_class(p):
         id = currentClassGlobalVarsTable.getVariableByName(p[-1])
         if (id == None):
             address = mh.addVariable(currentClassFunc, p[-1], 'class', None, currentClass, None)
-            print("heloooooo",address)
+
             currentClassFuncVarTable.insert({"name": p[-1], "type": currentType, 'address': address})
         else:
             raise Exception("   ERROR: Redeclaration of variable ID = " + p[-1])
@@ -1135,7 +1123,7 @@ def p_np_AddFunctionToClass(p):
     if (row != None):
         print("redeclaration of function " + p[-1])
     else:
-        # print("else")
+
         currentClassDirFunc.insert({"name": p[-1], "type": currentType, "table": None, "parameterSignature": [], "memorySize" : 0, "functionQuadStart" : 0})
         currentClassFunc = p[-1]
 def p_np_CreateVarsTableForFuncInClass(p):
@@ -1151,8 +1139,6 @@ def p_np_CreateVarsTableForFuncInClass(p):
         if (row["table"] == None):
             row["table"] = vt.Vars()
             currentClassFuncVarTable = row["table"]
-            print(currentClassFunc,"row = ",row,"table",currentClassFuncVarTable)
-            # currentVarTable.printVars()
         else:
             raise Exception("ERROR: did not create vars table because vars table for funtion(", currentClassFunc, ") already exists.")
     else:
@@ -1201,15 +1187,14 @@ def p_np15_add_parameter_as_variable_to_func_class(p):
     '''np15AddParameterAsVariableToFuncClass : empty'''
     global currentClassFuncVarTable
     global currentType
-    # currentVarTable.printVars()
+
     id = currentClassFuncVarTable.getVariableByName(p[-3])
     if (id != None):
         raise Exception("   ERROR: Redeclaration of variable ID = " + p[-3])
     else:
         address = mh.addVariable(currentClassFunc, p[-1], currentType, None, currentClass, None)
-        print("helooooxoo",address)
         currentClassFuncVarTable.insert({"name": p[-3], "type": currentType, "address": address})
-    print("lol",p[-3])
+
 def p_addToParameterSignatureClass(p):
     '''addToParameterSignatureClass : empty'''
     global currentClassFunc
@@ -1314,13 +1299,10 @@ def p_isOnCurrentVarsTableClass(p):
     global currentClassGlobalVarsTable
     global globalVarsTable
 
-    print("asdfasdfasdf",p[-1])
-    currentClassFuncVarTable.printVars()
-    currentClassGlobalVarsTable.printVars()
     id = currentClassFuncVarTable.getVariableByName(p[-1])
     if (id == None):
         id = currentClassGlobalVarsTable.getVariableByName(p[-1])
-        print(id)
+
         if (id == None):
             id = globalVarsTable.getVariableByName(p[-1])
             if (id == None):
@@ -1460,7 +1442,7 @@ def p_np_AddIDToStacks(p):
             qg.typeStack.append(variable["type"])
         else:
             variable = globalVarsTable.getVariableByName(p[-1])
-            print("global variable", variable)
+
             if (variable != None):
                 qg.operandStack.append(variable["address"])
                 qg.typeStack.append(variable["type"])
@@ -1475,7 +1457,7 @@ def p_np_INTGetAddressAndAddToStacks(p):
     qg.typeStack.append('int')
 def p_np_FLOATGetAddressAndAddToStacks(p):
     '''np_FLOATGetAddressAndAddToStacks : empty'''
-    # print('entra FLOAT')
+
     global currentClassFunc
     global currentClass
     address = mh.addVariable(currentClassFunc, p[-1], 'CTEFLOAT', None, currentClass,None)
@@ -1483,7 +1465,7 @@ def p_np_FLOATGetAddressAndAddToStacks(p):
     qg.typeStack.append('float')
 def p_np_CHARGetAddressAndAddToStacks(p):
     '''np_CHARGetAddressAndAddToStacks : empty'''
-    # print('ENTRA A CHAR',  p[-1][1])
+
     global currentClassFunc
     global currentClass
     address = mh.addVariable(currentClassFunc, p[-1][1], 'CTECHAR', None, currentClass,None)
@@ -1493,7 +1475,7 @@ def p_np_BOOLGetAddressAndAddToStacks(p):
     '''np_BOOLGetAddressAndAddToStacks : empty'''
     global currentClassFunc
     global currentClass
-    # print('entra bool')
+
     address = mh.addVariable(currentClassFunc, p[-1], 'CTEBOOL', None, currentClass,None)
     qg.operandStack.append(address)
     qg.typeStack.append('bool')
@@ -1539,41 +1521,12 @@ lex.input(data)
 try:
     parser.parse(data)
     print('Code passed!')
-    # print(qg.operandStack  )
-    # print(qg.operatorStack)
-    # print(qg.typeStack)
-    # print(ct.constantTable)
     file = open("objCode.txt", "w")
     temp = 0
     for quad in quadruplesOutput:
-        print(temp, "-", quad)
         file.write(' '.join(str(s) for s in quad) + '\n')
         temp += 1
     file.write('END' + '\n')
-    # for item in ct.constantTable:
-    #     print(item)
-    # globalVarsTable.printVars()
-    # print(qg.operandStack)
-    # dirFunc.printDirFunc()
-    # currentVarTable.printVars()
-    # globalVarsTable.printVars()
-    # print(ct.constantTable)
-    # print('---GLOBAL DIRFUNC---') 
-    # dirFunc.printDirFunc()
-    # print('---') 
-    # print('---GLOBAL VARS TABLE---') 
-    # globalVarsTable.printVars()
-    # print('---') 
-    # tempClass = dirFunc.getFunctionByName('persona2')
-    # classDirFunc = tempClass['DirFunc']
-    # print('---CLASS DIRFUNC---') 
-    # classDirFunc.printDirFunc()
-    # classFuncInDirFunc = classDirFunc.getFunctionByName('persona2')
-    # classVarTable = classFuncInDirFunc['table']
-    # print('----')
-    # print('----CLASS GLOBAL VAR TABLE---') 
-    # classVarTable.printVars()
-    # print('-----')
     file.close()
     vm.startMachine(dirFunc, mh)
     vm.runMachine(dirFunc, mh)

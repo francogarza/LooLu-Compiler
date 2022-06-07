@@ -105,10 +105,10 @@ CLASSES:
         var float : myFloat, myFloat2;
         var bool : myBool, myBool2;
         FUNCS:
-        func int returnNum(n : int){
+        func void returnNum(n : int){
             VARS: 
             START:
-                return(n);
+                print(n);
         }
         func int myFunc3(n : int){
             VARS: 
@@ -129,6 +129,7 @@ CLASSES:
 
 Loo() {
     var franco = persona2();
-    franco.returnNum(4);
-
+    franco.myInt = 4;
+    print(franco.myInt);
+    print(5);
 } Lu;
