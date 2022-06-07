@@ -350,7 +350,6 @@ class virtualMachine():
                 else:
                     val = getFromMemory(int(currentQuad[3]))
                     if (type(val) == str):
-                        print('hehe')
                         pass
                     print(val, end=" ")
             

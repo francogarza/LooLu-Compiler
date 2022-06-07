@@ -95,6 +95,14 @@ def p_vars(p):
 def p_vars_block(p):
     '''vars_block : VAR type COLON var_id SEMICOLON vars_block
                   | empty'''
+def p_type(p):
+    '''type : type_simple'''
+def p_type_simple(p):
+    '''type_simple : INT np4SetCurrentType
+                   | FLOAT np4SetCurrentType
+                   | CHAR np4SetCurrentType
+                   | BOOL np4SetCurrentType
+                   | VOID np4SetCurrentType np_HasReturnedType'''
 def p_var_id(p):
     '''var_id : ID np_AddVarToCurrentTable var_id_2
               | arr_id var_id_2'''
@@ -104,11 +112,10 @@ def p_var_id_2(p):
                 | empty'''
 def p_arr_id(p):
     '''arr_id : ID LEFTSQUAREBRACKET CTEINT qnp_cte_int np_addArrayToCurrentTable RIGHTSQUAREBRACKET matrix'''
-
 def p_matrix(p):
     '''matrix : LEFTSQUAREBRACKET CTEINT qnp_cte_int RIGHTSQUAREBRACKET np_matrix
               | empty'''
-
+# - declare vars: nps
 def p_np_matrix(p):
     '''np_matrix : empty'''
     global currentFunc
@@ -119,15 +126,6 @@ def p_np_matrix(p):
     mat['dimensiones'] = [p[-3], p[-8]]
     dirBase = mat['address']
     mh.updateVariable(currentFunc, p[-10], currentType, programName, p[-3], p[-8], dirBase)
-# - declare vars: nps
-def p_type(p):
-    '''type : type_simple'''
-def p_type_simple(p):
-    '''type_simple : INT np4SetCurrentType
-                   | FLOAT np4SetCurrentType
-                   | CHAR np4SetCurrentType
-                   | BOOL np4SetCurrentType
-                   | VOID np4SetCurrentType np_HasReturnedType'''
 def p_np4_set_current_type(p):
     '''np4SetCurrentType : empty'''
     global currentType
@@ -161,7 +159,6 @@ def p_np_add_array_to_current_table(p):
         vm.initializeArray(address, p[-2])
     elif (currentVarTable.getVariableByName(p[-9]) == None):
         raise Exception("ERROR: Redeclaration of variable ID = " + p[-4])
-
 def p_np_add_mat_to_current_table(p):
     '''np_addMatToCurrentTable : empty'''
     # agrega la variable que acaba de leer a la tabla de variables actual.
@@ -177,23 +174,6 @@ def p_np_add_mat_to_current_table(p):
         currentVarTable.insert({"name": p[-4], "type": currentType, "address": address, "size": size, "dimension": 1})
         vm.initializeArray(address, p[-2])
     elif (currentVarTable.getVariableByName(p[-9]) == None):
-        raise Exception("ERROR: Redeclaration of variable ID = " + p[-4])
-
-def p_np_add_mat_to_current_table(p):
-    '''np_addMatToCurrentTable : empty'''
-    # agrega la variable que acaba de leer a la tabla de variables actual.
-    # utiliza el memory handler para asignarle una posicion en la memoria virtual.
-    global currentFunc
-    global currentVarTable
-    global currentType
-    id = currentVarTable.getVariableByName(p[-4])
-    if (id == None):
-        address = mh.addVariable(currentFunc, p[-4], currentType, None, programName, p[-2])
-        size = qg.operandStack.pop()
-        qg.typeStack.pop()
-        currentVarTable.insert({"name": p[-4], "type": currentType, "address": address, "size": size})
-        vm.initializeArray(address, p[-2])
-    else:
         raise Exception("ERROR: Redeclaration of variable ID = " + p[-4])
 #--------------------------------
 
@@ -336,71 +316,6 @@ def p_np_ChangeHasReturnedValue(p):
 #--------------------------------
 
 #--------------------------------
-# FUNCS CALL
-#--------------------------------
-# - function call
-def p_function_call(p):
-    '''function_call : ID np_VerifyFuncInDirFunc np_GenerateEraQuad LEFTPAREN function_call_params RIGHTPAREN np_CreateGosubQuad'''
-# - function call: nps
-def p_np_verify_func_in_dirfunc(p):
-    '''np_VerifyFuncInDirFunc : empty'''
-    global dirFunc
-    global currentFunctionCall
-    func = dirFunc.getFunctionByName(p[-1])
-    if (func == None):
-        raise Exception("Could not find (",p[-1],"in the function directory")
-    currentFunctionCall = func
-def p_generate_era_quad(p):
-    '''np_GenerateEraQuad : empty'''
-    global dirFunc
-    global paramCounter
-    global currentParamSignature
-    global currentFunctionCall
-    currentParamSignature = None
-    funcName = currentFunctionCall["name"]
-    quadruplesOutput.append(("ERA",'','',funcName))
-    paramCounter = 0
-    currentParamSignature = currentFunctionCall["parameterSignature"]
-def p_create_gosub_quad(p):
-    '''np_CreateGosubQuad : empty'''
-    global quadruplesOutput
-    global currentFunctionCall
-    jump = currentFunctionCall["functionQuadStart"]
-    quadruplesOutput.append(('GOSUB','','',jump))
-# - function call params
-def p_function_call_params(p):
-    '''function_call_params : super_expression np_VerifyParamTypeWithSignature function_call_params_2
-                            | empty np_CheckForMissingArguments'''
-def p_function_call_params_2(p):
-    '''function_call_params_2 : COMMA function_call_params function_call_params_2
-                              | empty np_CheckForMissingArguments'''
-# - function call params: nps
-def p_check_for_missing_arguments(p):
-    '''np_CheckForMissingArguments : empty'''
-    global paramCounter
-    global currentParamSignature
-
-    if (len(currentParamSignature)-1 > paramCounter-1):
-        raise Exception('Function call is missing arguments')
-    else:
-        pass
-def p_verify_param_type_with_signature(p):
-    '''np_VerifyParamTypeWithSignature : empty'''
-    global currentParamSignature
-    global paramCounter
-
-    param = qg.operandStack.pop()
-    paramType = qg.typeStack.pop()
-
-
-    if (paramType == currentParamSignature[paramCounter]):
-        quadruplesOutput.append(("PARAMETER",param,paramType,("ARGUMENT#"+str(paramCounter))))
-        paramCounter = paramCounter + 1
-    else:
-        raise Exception("Type: '" + paramType + "' does not match excepted type: '" + currentParamSignature[paramCounter] + "' for function call")
-#--------------------------------
-
-#--------------------------------
 # STATEMENTS
 #--------------------------------
 # - statement
@@ -424,11 +339,9 @@ def p_assignment(p):
 def p_assignment_variable(p):
     '''assignmentVariable : ID np16isOnCurrentVarsTable qnp1sendToQuadruples EQUAL qnp2insertOperator 
                           | ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET assignmentMatrix'''
-
 def p_assignment_matrix(p):
     '''assignmentMatrix : LEFTSQUAREBRACKET expression np_VerifyMatAccess RIGHTSQUAREBRACKET qnp1sendToQuadruplesMat EQUAL qnp2insertOperator
                         | qnp1sendToQuadruplesARR EQUAL qnp2insertOperator'''
-
 # - assignment: nps    
 def p_qnp1_send_to_quadruples(p):
     '''qnp1sendToQuadruples : empty'''
@@ -516,11 +429,9 @@ def p_writing(p):
 def p_print_val(p):
     '''print_val : expression np_CreatePrintQuad print_exp
                  | empty jumpLine'''
-
 def p_jump_line(p):
     '''jumpLine : empty''' 
     quadruplesOutput.append(('PRINT', '', '', 'JUMP'))
-
 def p_print_exp(p):
     '''print_exp : COMMA print_val
                  | empty'''
@@ -646,8 +557,71 @@ def p_np_FillDirFuncForObject(p):
         
     objVarDirFunc.dirFuncData[0]['name'] = p[-4]
     objVarDirFunc.dirFuncData[0]['table'] = objVarVarsTable
+#--------------------------------
 
-    
+#--------------------------------
+# FUNCS CALL
+#--------------------------------
+# - function call
+def p_function_call(p):
+    '''function_call : ID np_VerifyFuncInDirFunc np_GenerateEraQuad LEFTPAREN function_call_params RIGHTPAREN np_CreateGosubQuad'''
+# - function call: nps
+def p_np_verify_func_in_dirfunc(p):
+    '''np_VerifyFuncInDirFunc : empty'''
+    global dirFunc
+    global currentFunctionCall
+    func = dirFunc.getFunctionByName(p[-1])
+    if (func == None):
+        raise Exception("Could not find (",p[-1],"in the function directory")
+    currentFunctionCall = func
+def p_generate_era_quad(p):
+    '''np_GenerateEraQuad : empty'''
+    global dirFunc
+    global paramCounter
+    global currentParamSignature
+    global currentFunctionCall
+    currentParamSignature = None
+    funcName = currentFunctionCall["name"]
+    quadruplesOutput.append(("ERA",'','',funcName))
+    paramCounter = 0
+    currentParamSignature = currentFunctionCall["parameterSignature"]
+def p_create_gosub_quad(p):
+    '''np_CreateGosubQuad : empty'''
+    global quadruplesOutput
+    global currentFunctionCall
+    jump = currentFunctionCall["functionQuadStart"]
+    quadruplesOutput.append(('GOSUB','','',jump))
+# - function call params
+def p_function_call_params(p):
+    '''function_call_params : super_expression np_VerifyParamTypeWithSignature function_call_params_2
+                            | empty np_CheckForMissingArguments'''
+def p_function_call_params_2(p):
+    '''function_call_params_2 : COMMA function_call_params function_call_params_2
+                              | empty np_CheckForMissingArguments'''
+# - function call params: nps
+def p_check_for_missing_arguments(p):
+    '''np_CheckForMissingArguments : empty'''
+    global paramCounter
+    global currentParamSignature
+
+    if (len(currentParamSignature)-1 > paramCounter-1):
+        raise Exception('Function call is missing arguments')
+    else:
+        pass
+def p_verify_param_type_with_signature(p):
+    '''np_VerifyParamTypeWithSignature : empty'''
+    global currentParamSignature
+    global paramCounter
+
+    param = qg.operandStack.pop()
+    paramType = qg.typeStack.pop()
+
+
+    if (paramType == currentParamSignature[paramCounter]):
+        quadruplesOutput.append(("PARAMETER",param,paramType,("ARGUMENT#"+str(paramCounter))))
+        paramCounter = paramCounter + 1
+    else:
+        raise Exception("Type: '" + paramType + "' does not match excepted type: '" + currentParamSignature[paramCounter] + "' for function call")
 #--------------------------------
 
 #--------------------------------
@@ -798,7 +772,6 @@ def p_var_cte(p):
                | TRUE qnp_cte_bool
                | FALSE qnp_cte_bool
                | access_class_atribute 
-               | class_function_call np_FillStacksWithReturnValue
                | function_call np_FillStacksWithReturnValue
                | arr_access
                | mat_access'''
@@ -949,7 +922,6 @@ def p_np_verify_mat_access(p):
     qg.typeStack.append(type)
 def p_qnp1_send_to_quadruplesMat(p):
     '''qnp1sendToQuadruplesMat : empty'''
-
 # - access class atribute
 def p_access_class_atribute(p):
     '''access_class_atribute : ID DOT ID np_CheckForVariableInClassVarTable'''
@@ -973,7 +945,6 @@ def p_np_CheckForVariableInClassVarTable(p):
 
     else:
         raise Exception("could not find var"+p[-1]+"in class"+p[-3])
-
 #--------------------------------
 
 #--------------------------------
@@ -1148,13 +1119,11 @@ def p_np_CheckIfFuncHasReturnedClass(p):
     global currentFuncHasReturnedValue
     global currentClassFunc
     global currentClassDirFunc
-    if currentFuncHasReturnedValue != 1:
-        raise Exception('function: '+currentClassFunc+" is missing return value")
-    else:
-        if currentClassDirFunc.getFunctionByName(currentClassFunc)["type"] == 'void':
-            # mh.resetLocalTempMemory()
-            quadruplesOutput.append(('ENDFUNC','','',''))
-        currentFuncHasReturnedValue = 0
+    if currentClassDirFunc.getFunctionByName(currentClassFunc)["type"] != 'void':
+        raise Exception('Classes can only support void type functions')
+    if currentClassDirFunc.getFunctionByName(currentClassFunc)["type"] == 'void':
+        quadruplesOutput.append(('ENDFUNC','','',''))
+    currentFuncHasReturnedValue = 0
 def p_np_fill_quad_start_parameter_for_func_class(p):
     '''np_FillQuadStartParameterForFuncClass : empty'''
     global currentClassDirFunc
@@ -1194,7 +1163,6 @@ def p_np15_add_parameter_as_variable_to_func_class(p):
     else:
         address = mh.addVariable(currentClassFunc, p[-1], currentType, None, currentClass, None)
         currentClassFuncVarTable.insert({"name": p[-3], "type": currentType, "address": address})
-
 def p_addToParameterSignatureClass(p):
     '''addToParameterSignatureClass : empty'''
     global currentClassFunc
@@ -1265,10 +1233,6 @@ def p_np_VerifyFuncClass(p):
     paramCounter = 0
     currentParamSignature = func["parameterSignature"]
     currentFunctionCall = func
-# - function call params class
-
-
-# - function call params class: nps
 #--------------------------------
 
 #--------------------------------
@@ -1501,11 +1465,6 @@ def p_FillStacksWithReturnValue_class(p):
 #--------------------------------
 def p_blockClass(p):
     '''blockClass : LEFTBRACKET statement_blockClass RIGHTBRACKET'''
-#--------------------------------
-
-#--------------------------------
-# CLASSES - PUNTOS NEURALGICOS
-#--------------------------------
 #--------------------------------
 
 #--------------------------------
