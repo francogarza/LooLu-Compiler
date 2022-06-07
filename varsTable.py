@@ -27,7 +27,7 @@ class DirFunc:
             if (item["name"] == name):
                 return item
         return None
-    def addVarsTable(self, name, data): # funcName, varsTableName
+    def addVarsTable(self, name, data):
         for item in self.dirFuncData:
             if (item["name"] == name):
                 item["table"] = data
