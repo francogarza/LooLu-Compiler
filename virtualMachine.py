@@ -11,26 +11,12 @@ class Memory():
     def __init__(self):
         self.data = {}
     def insert(self, address, value):
-<<<<<<< HEAD
-        # print('entra insert', address, value)
-        # if address in self.data:
-        #     return
-        self.data[address] = value
-    def get(self, address):
-        # print("get address:",address, self.data[address])
-
-        if (address in self.data):
-            return self.data[address]
-        else:
-            raise Exception('"Runtime error: Variable not found')
-=======
         self.data[address] = value
     def get(self, address):
         if (address in self.data):
             return self.data[address]
         else:
             raise Exception('You are trying to access a variable that does not have a value assigned yet')
->>>>>>> 2c806af402b2ee52dc4909bd9cc17d2d3c792a87
     def setData(self, val):
         self.data = val
     def getData(self):
@@ -46,24 +32,14 @@ class StackSegment():
         self.data.append({})
         self.tempLocalMemory.append({})
     def insertTop(self, address, val):
-<<<<<<< HEAD
-        # print('entraInsert', len(self.data)-1, address, val)
         self.data[-1][address] = val
-        # print(self.data[-1])
-=======
-        self.data[-1][address] = val
->>>>>>> 2c806af402b2ee52dc4909bd9cc17d2d3c792a87
     def insertTopTemp(self, address, val):
         self.tempLocalMemory[-1][address] = val
     def get(self, address):
         if (address in self.data):
             return self.data[address]
         else:
-<<<<<<< HEAD
-            Error("Runtime error: Variable not found")
-=======
             Error("You are trying to access a variable that does not have a value assigned yet")
->>>>>>> 2c806af402b2ee52dc4909bd9cc17d2d3c792a87
     def getPreviousState(self, address):
         if (address in self.data[len(self.data)-2]):
             return self.data[-2][address]
@@ -178,10 +154,6 @@ class virtualMachine():
             elif (address >= 14000 and address <= 17999):
                 return self.constantsMemory.get(address)
             elif (address >= 21000 and address <= 21999):
-<<<<<<< HEAD
-                # print(self.globalMemory.get(address), ' cague')
-=======
->>>>>>> 2c806af402b2ee52dc4909bd9cc17d2d3c792a87
                 self.globalMemory.get(address)
                 return self.globalMemory.get(address)
         
@@ -227,19 +199,9 @@ class virtualMachine():
                 else:
                     newVal = getFromMemory(int(currentQuad[1]))
                     insertInMemory(int(currentQuad[3]), newVal)
-<<<<<<< HEAD
-                    # self.globalMemory.printMemory()
-
-
             if (currentQuad[0] == '+'): # addition is founds
                 valLeft = getFromMemory(int(currentQuad[1]))
                 valRight = getFromMemory(int(currentQuad[2]))
-                # print(int(currentQuad[1]), int(currentQuad[2]))
-=======
-            if (currentQuad[0] == '+'): # addition is founds
-                valLeft = getFromMemory(int(currentQuad[1]))
-                valRight = getFromMemory(int(currentQuad[2]))
->>>>>>> 2c806af402b2ee52dc4909bd9cc17d2d3c792a87
                 addressTemp = int(currentQuad[3])
                 insertInMemory(addressTemp, valLeft + valRight)
 
@@ -247,20 +209,12 @@ class virtualMachine():
                 valLeft = getFromMemory(int(currentQuad[1]))
                 valRight = getFromMemory(int(currentQuad[2]))
                 addressTemp = int(currentQuad[3])
-<<<<<<< HEAD
-                # print(int(currentQuad[2]), valRight)
-=======
->>>>>>> 2c806af402b2ee52dc4909bd9cc17d2d3c792a87
                 insertInMemory(addressTemp, valLeft - valRight)
             
             if (currentQuad[0] == '*'): # addition is founds
                 valLeft = getFromMemory(int(currentQuad[1]))
                 valRight = getFromMemory(int(currentQuad[2]))
                 addressTemp = int(currentQuad[3])
-<<<<<<< HEAD
-                # print(int(currentQuad[1]), int(currentQuad[2]))
-=======
->>>>>>> 2c806af402b2ee52dc4909bd9cc17d2d3c792a87
                 insertInMemory(addressTemp, valLeft * valRight)
             
             if (currentQuad[0] == '/'): # addition is founds
@@ -398,15 +352,11 @@ class virtualMachine():
                     if (type(val) == str):
                         pass
                     print(val, end=" ")
-<<<<<<< HEAD
-                
-            if (currentQuad[0] == 'READ'): # Missing semantic check
+            
+            if (currentQuad[0] == 'READ'):
                 varToBeAssigned = int(currentQuad[3])
                 val = input()
-
-                print(val, type(val))
-                
-                # BOOL
+                 # BOOL
                 if val == 'true' or val == 'false':
                     # print('entra')
                     insertInMemory(varToBeAssigned, val)
@@ -418,16 +368,6 @@ class virtualMachine():
                 else:
                     val = int(val)
                     insertInMemory(varToBeAssigned, val)
-
-=======
-            
-            if (currentQuad[0] == 'READ'):
-                varToBeAssigned = int(currentQuad[3])
-                val = input()
-                if val == 'true' or val == 'false':
-                    insertInMemory(varToBeAssigned, val)
-                insertInMemory(varToBeAssigned, val)
->>>>>>> 2c806af402b2ee52dc4909bd9cc17d2d3c792a87
             
             if (currentQuad[0] == 'GOTO'): # GOTO id found
                 self.ip = int(currentQuad[3]) - 1# -2 Because quads start at index 0 and add one more iteration
@@ -440,45 +380,21 @@ class virtualMachine():
 
             if (currentQuad[0] == 'ERA'):
                 #Validate space
-<<<<<<< HEAD
-                func = self.dirFunc.getFunctionByName(currentQuad[3])
-                parameteresCheck = func["parameterSignature"]
-=======
->>>>>>> 2c806af402b2ee52dc4909bd9cc17d2d3c792a87
                 self.localMemory.insertState()
                 self.mh.resetLocalTempMemory()
 
             if (currentQuad[0] == 'PARAMETER'):
                 paramType = currentQuad[2]
                 address = getLocalAddress(paramType)
-<<<<<<< HEAD
-                # print(address)
-                val = getFromMemory(int(currentQuad[1]))
-                # print('entra P', val, address)
-                insertInMemory(address, val)
-                # self.localMemory.printMemory()
-=======
                 val = getFromMemory(int(currentQuad[1]))
                 insertInMemory(address, val)
->>>>>>> 2c806af402b2ee52dc4909bd9cc17d2d3c792a87
 
             if (currentQuad[0] == 'GOSUB'):
                 saveQuad = self.ip
                 self.ip = int(currentQuad[3]) - 1
                 self.checkpoints.append(saveQuad)
-<<<<<<< HEAD
-                # print(saveQuad)
 
             if (currentQuad[0] == 'ENDFUNC'):
-                # self.localMemory.printMemory()
-                # print('ENTRA ENDFUNC')
-
-                # if (needReturn):
-                #     Error("Runtime Error: The function", currentFunc, "need to be exited by a return statement")
-=======
-
-            if (currentQuad[0] == 'ENDFUNC'):
->>>>>>> 2c806af402b2ee52dc4909bd9cc17d2d3c792a87
                 if (len(self.checkpoints) > 0):
                     lastIp = self.checkpoints[-1]
                     self.checkpoints.pop()
@@ -486,44 +402,20 @@ class virtualMachine():
                     self.ip = lastIp
 
             # ARRAYS #
-<<<<<<< HEAD
-
-            if (currentQuad[0] == 'VER'):
-                requestedIndex = getFromMemory(int(currentQuad[1]))
-                limitIndex = getFromMemory(int(currentQuad[3]))
-                # print(currentQuad, requestedIndex, limitIndex)
-                # print(type(limitIndex), type(requestedIndex))
-                if (requestedIndex < 0 or requestedIndex >= limitIndex):
-                    raise Exception('Out of bounds: index is not within the array limits.')
-                # else:
-                    # print('good index')
-=======
             if (currentQuad[0] == 'VER'):
                 requestedIndex = getFromMemory(int(currentQuad[1]))
                 limitIndex = getFromMemory(int(currentQuad[3]))
                 if (requestedIndex < 0 or requestedIndex >= limitIndex):
                     raise Exception('Out of bounds: index is not within the array limits.')
->>>>>>> 2c806af402b2ee52dc4909bd9cc17d2d3c792a87
 
 
             if (currentQuad[0] == '+dirBase'):
                 dirBase = int(currentQuad[1]) # 2001
                 requestedIndex = getFromMemory(int(currentQuad[2])) #index
                 pointerAddress = int(currentQuad[3]) #21000s
-<<<<<<< HEAD
-                # print(pointerAddress, dirBase + requestedIndex)
-                insertInMemory(pointerAddress, dirBase + requestedIndex)
-                # print(getFromMemory(pointerAddress))
-        
-            self.ip = self.ip + 1
-            currentQuad = self.quadruples[self.ip]
-        self.globalMemory.printMemory()
-        # self.tempGlobalMemory.printMemory()
-=======
                 insertInMemory(pointerAddress, dirBase + requestedIndex)
         
             self.ip = self.ip + 1
             currentQuad = self.quadruples[self.ip]
->>>>>>> 2c806af402b2ee52dc4909bd9cc17d2d3c792a87
         print('Lu∞')
 
