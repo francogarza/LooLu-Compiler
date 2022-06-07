@@ -1,0 +1,95 @@
+LooLu miPrograma;
+
+VARS:
+FUNCS:
+CLASSES:
+  class persona{
+    VARS:
+      var int : myInt, myInt2;
+      var float : myFloat, myFloat2;
+      var bool : myBool, myBool2;
+    FUNCS:
+      func void myFunc(n : int, b: bool, xx: float){
+        VARS: 
+          var int : x;
+        START:
+      }
+      func void myFunc3(n : int){
+        VARS: 
+          var int : x;
+        START:
+      }
+
+      func void fillMat(s1 : int, s2 : int) {
+    VARS:
+    var int : i, j, cont;
+    START:
+
+    i = 0;
+    cont = 0;
+
+    while (i < s1) {
+      j = 0;
+      while (j < s2) {
+        myMat[i][j] = cont;
+        cont = cont + 1;
+        j = j + 1;
+      }
+      i = i + 1;
+    }
+
+  }
+
+  func void printMat(s1 : int, s2 : int) {
+    VARS:
+    var int : i, j, act;
+    START:
+
+    i = 0;
+
+    while (i < s1) {
+      j = 0;
+      while (j < s2) {
+        act = myMat[i][j];
+        print(act);
+        j = j + 1;
+      }
+      i = i + 1;
+    }
+
+  }
+  }
+  class persona2{
+    VARS:
+      var int : myInt, myInt2;
+      var float : myFloat, myFloat2;
+      var bool : myBool, myBool2;
+    FUNCS:
+      func void myFunc(n : int){
+        VARS: 
+        START:
+      }
+      func void myFunc2(n : int){
+        VARS: 
+          var int : x;
+        START:
+      }
+  }
+  class persona1{
+    VARS:
+      var int : myInt, myInt2;
+      var float : myFloat, myFloat2;
+      var bool : myBool, myBool2;
+    FUNCS:
+      func void myFunc(n : int){
+        VARS: 
+        START:
+      }
+      func void myFunc1(n : int){
+        VARS: 
+        START:
+      }
+  }
+
+Loo() {
+} Lu;
