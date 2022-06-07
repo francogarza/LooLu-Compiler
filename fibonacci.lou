@@ -1,0 +1,19 @@
+LooLu miPrograma;
+VARS:
+    var int : temp;
+FUNCS:
+    func int fib(n : int) {
+        VARS:
+        START:
+        if (n < 3){
+            return(1);
+        }
+        return((fib(n-1)) + (fib(n-2)));
+    }
+CLASSES:
+
+Loo() {
+    temp = fib(6);
+    print(fib(6));
+    print(temp);
+} Lu;

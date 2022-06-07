@@ -441,7 +441,6 @@ def p_np_AddPrintToStack(p):
     qg.operatorStack.append('PRINT')
 def p_np_CreatePrintQuad(p): 
     '''np_CreatePrintQuad : empty'''
-
     quadruplesOutput.append(('PRINT', '', '', qg.operandStack.pop()))
     qg.typeStack.pop()
 # - reading
@@ -1118,7 +1117,8 @@ def p_np_fill_memory_size_parameter_for_current_func_class(p):
     row["memorySize"] = len(table.items)
 # - parameter function declaration class
 def p_parameter_class(p):
-    '''parameter_class : ID COLON type_parameter_class np15AddParameterAsVariableToFuncClass parameter2_class'''
+    '''parameter_class : ID COLON type_parameter_class np15AddParameterAsVariableToFuncClass parameter2_class
+                       | empty'''
 def p_parameter2_class(p):
     '''parameter2_class : COMMA ID COLON type_parameter_class np15AddParameterAsVariableToFuncClass parameter2_class
                         | empty'''
