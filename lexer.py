@@ -5,8 +5,8 @@ import ply.yacc as yacc
 # Lexer
 # Palabras reservadas
 reserved = {
-    'LooLu': 'LOOLU', #nuestro program
-    'Loo': 'LOO', #nuestro inicio de main
+    'LooLu': 'LOOLU',
+    'Loo': 'LOO',
     'CLASSES': 'CLASSES',
     'class': 'CLASS',
     'VARS': 'VARS',
@@ -30,7 +30,7 @@ reserved = {
     'read': 'READ',
     'return': 'RETURN',
     'START' : 'START',
-    'Lu': "LU" #lo utilizamos para indicar que se acabo el main
+    'Lu': "LU" 
 }
 
 # Tokens
@@ -44,7 +44,6 @@ tokens = [
     'COLON', 'SEMICOLON', 'COMMA', 'EQUAL', 'DOT'
 ] + list(reserved.values())
 
-# Definicion de las RegEx basicas que conforman el lenguaje
 t_LOOLU = r'LooLu'
 t_IF = r'if'
 t_ELSE = r'else'
@@ -96,10 +95,6 @@ def t_CHARACT(t):
     t.type = 'CHARACT'
     return t
 
-# def t_CHARAC(t):
-#     r'\'[A-Za-z_0-9$%&/\(\)\"#=\?\¿\´\+\*\-\.\,\{\}\[\]]\''
-#     t.type = 'CHARAC'
-#     return t
 def t_RELOPER(t):
     r'<= | >= | <> | < | > | =='
     t.type = 'RELOPER'

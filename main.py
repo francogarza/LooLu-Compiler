@@ -373,7 +373,7 @@ def p_qnp1_send_to_quadruplesARR(p):
     qg.operand(qg.operandStack.pop(), variable["type"])
 def p_qnp2_insertOperator(p):
     '''qnp2insertOperator : empty'''
-    qg.operator(p[-1])
+    qg.operatorStack.append(p[-1])
 def p_np_CheckOperStackForEqual(p):
     '''np_CheckOperStackForEqual : empty'''
     global tempCounter
@@ -603,7 +603,6 @@ def p_check_for_missing_arguments(p):
     '''np_CheckForMissingArguments : empty'''
     global paramCounter
     global currentParamSignature
-
     if (len(currentParamSignature)-1 > paramCounter-1):
         raise Exception('Function call is missing arguments')
     else:
@@ -612,11 +611,8 @@ def p_verify_param_type_with_signature(p):
     '''np_VerifyParamTypeWithSignature : empty'''
     global currentParamSignature
     global paramCounter
-
     param = qg.operandStack.pop()
     paramType = qg.typeStack.pop()
-
-
     if (paramType == currentParamSignature[paramCounter]):
         quadruplesOutput.append(("PARAMETER",param,paramType,("ARGUMENT#"+str(paramCounter))))
         paramCounter = paramCounter + 1
@@ -849,8 +845,6 @@ def p_np_verify_arr_access(p):
     '''np_VerifyArrAccess : empty'''
     global currentVarTable
     global globalVarsTable
-
-
     arr = currentVarTable.getVariableByName(p[-4])
     if (arr == None):
         arr = globalVarsTable.getVariableByName(p[-4])
@@ -874,49 +868,34 @@ def p_np_verify_mat_access(p):
     global currentVarTable
     global tempCounter
     global globalVarsTable
-
-
-
-
     mat = currentVarTable.getVariableByName(p[-8])
     if (mat == None):
         mat = globalVarsTable.getVariableByName(p[-8])
 
         if (mat == None):
             raise Exception("The matrix you are trying to access with name" + p[-8] +"has not been declared")
-
     type = qg.typeStack.pop()
     if(type != 'int'):
         raise Exception("An in is required to access an array. You are trying to access with")
     s2 = qg.operandStack.pop()
-
     type = qg.typeStack.pop()
     if(type != 'int'):
         raise Exception("An in is required to access an array. You are trying to access with")
     s1 = qg.operandStack.pop()
-
-
     dirBase = mat["address"]
     d1 = ct.constantTable[mat['dimensiones'][0]]
     d2 = ct.constantTable[mat['dimensiones'][1]]
-
     result = 'T'+str(tempCounter)
     tempCounter = tempCounter + 1
     address1 = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName,None)
-
     result = 'T'+str(tempCounter)
     tempCounter = tempCounter + 1
     address2 = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName,None)
-
     pointer = mh.addVariable(None,None,'POINTER',None,None,None)
-
     quadruplesOutput.append(('VER',s1,'', d1))
     quadruplesOutput.append(('VER',s2,'', d2))
-
     quadruplesOutput.append(('*', s1, d2, address1)) # s1 * d2
-    
     quadruplesOutput.append(('+', address1, s2, address2)) # s1 * d2 + s2
-    
     quadruplesOutput.append(('+dirBase', dirBase, address2, pointer)) # dirBase + s1 * d2 + s2
     qg.operandStack.append(pointer)
     qg.typeStack.append(type)
@@ -1387,7 +1366,6 @@ def p_var_cte_class(p):
                     | CTECHAR np_CHARGetAddressAndAddToStacks
                     | TRUE np_BOOLGetAddressAndAddToStacks
                     | FALSE np_BOOLGetAddressAndAddToStacks
-                    | access_class_atribute
                     | function_call np_FillStacksWithReturnValue'''
 # - vars and constants class: nps
 def p_np_AddIDToStacks(p):
@@ -1443,21 +1421,6 @@ def p_np_BOOLGetAddressAndAddToStacks(p):
     address = mh.addVariable(currentClassFunc, p[-1], 'CTEBOOL', None, currentClass,None)
     qg.operandStack.append(address)
     qg.typeStack.append('bool')
-def p_FillStacksWithReturnValue_class(p):
-    '''np_FillStacksWithReturnValueClass : empty'''
-    global currentFunctionReturnType
-    global currentFunctionReturnOperand
-    global tempCounter
-    #check if current func is not void 
-    if currentFunctionCall["type"] == 'void':
-        raise Exception("function: "+currentFunctionCall["name"]+" does not return a value")
-    result = 'T'+str(tempCounter)
-    tempCounter = tempCounter + 1
-    address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName,None)
-    test = globalVarsTable.getVariableByName(currentFunctionCall['name'])
-    quadruplesOutput.append(('=',test['address'],'',address))
-    qg.typeStack.append(test['type'])
-    qg.operandStack.append(address)
 #--------------------------------
 
 #--------------------------------
