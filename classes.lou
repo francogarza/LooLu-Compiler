@@ -116,5 +116,4 @@ Loo() {
     var franco = persona2();
     franco.myInt = 4;
     print(franco.myInt);
-    print(5);
 } Lu;

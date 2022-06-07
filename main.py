@@ -1490,5 +1490,5 @@ try:
     vm.startMachine(dirFunc, mh)
     vm.runMachine(dirFunc, mh)
 except Exception as excep:
-    print('Error in code!\n', excep)
+    print('\nError in code!', excep)
 #--------------------------------

@@ -16,7 +16,7 @@ class Memory():
         if (address in self.data):
             return self.data[address]
         else:
-            raise Exception('"Runtime error: Variable not found')
+            raise Exception('You are trying to access a variable that does not have a value assigned yet')
     def setData(self, val):
         self.data = val
     def getData(self):
@@ -39,7 +39,7 @@ class StackSegment():
         if (address in self.data):
             return self.data[address]
         else:
-            Error("Runtime error: Variable not found")
+            Error("You are trying to access a variable that does not have a value assigned yet")
     def getPreviousState(self, address):
         if (address in self.data[len(self.data)-2]):
             return self.data[-2][address]
