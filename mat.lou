@@ -1,0 +1,54 @@
+LooLu miPrograma;
+
+VARS:
+  var int : myArr[10], myMat[10][10]; 
+  var int : myInt, i, j, cont;
+
+FUNCS:
+
+func void fillMat(s1 : int, s2 : int) {
+    VARS:
+      var int : i, j, cont, act, myMat[10][10];
+    START:
+        i = 0;
+        cont = 0;
+
+      while (i < s1) {
+        j = 0;
+        while (j < s2) {
+          myMat[i][j] = cont;
+          cont = cont + 1;
+          j = j + 1;
+        }
+        i = i + 1;
+      }
+
+      i = 0;
+
+      while (i < s1) {
+        j = 0;
+        while (j < s2) {
+          act = myMat[i][j];
+          print(act);
+          j = j + 1;
+        }
+        print();
+        i = i + 1;
+      }
+     
+}
+
+func void printMat(s1 : int, s2 : int) {
+    VARS:
+      var int : i, j, act;
+    START:
+}
+
+
+CLASSES:
+
+Loo() {
+
+  fillMat(10, 10);
+
+} Lu;

@@ -51,6 +51,35 @@ class memoryHandler:
         self.localChar = [8000, 8000]
         self.localBool = [9000,9000]
         self.localTemp = [10000, 10000]
+
+    # This method is called whenever we encounter a matrix, with the base address and the dimensions we update the memory size
+    def updateVariable(self, funcName, varName, varType, programName, s1, s2, dirBase):
+        if funcName == programName and varType == 'int':
+            newSize = dirBase + (s1 * s2)
+            self.globalInt[1] = newSize
+        elif funcName != programName and varType == 'int':
+            newSize = dirBase + (s1 * s2)
+            self.localInt[1] = newSize
+        if funcName == programName and varType == 'float':
+            newSize = dirBase + (s1 * s2)
+            self.globalFloat[1] = newSize
+        elif funcName != programName and varType == 'float':
+            newSize = dirBase + (s1 * s2)
+            self.localFloat[1] = newSize
+        if funcName == programName and varType == 'char':
+            newSize = dirBase + (s1 * s2)
+            self.globalChar[1] = newSize
+        elif funcName != programName and varType == 'char':
+            newSize = dirBase + (s1 * s2)
+            self.localChar[1] = newSize
+        if funcName == programName and varType == 'bool':
+            newSize = dirBase + (s1 * s2)
+            self.globalBool[1] = newSize
+        elif funcName != programName and varType == 'bool':
+            newSize = dirBase + (s1 * s2)
+            self.localBool[1] = newSize
+
+
         
     # This method is called whenever we encounter a matrix, with the base address and the dimensions we update the memory size
     def updateVariable(self, funcName, varName, varType, programName, s1, s2, dirBase):
@@ -58,25 +87,25 @@ class memoryHandler:
             newSize = dirBase + (s1 * s2)
             self.globalInt[1] = newSize
         elif funcName != programName and varType == 'int':
-            newSize = actSize + (s1 * s2)
+            newSize = dirBase + (s1 * s2)
             self.localInt[1] = newSize
         if funcName == programName and varType == 'float':
-            newSize = actSize + (s1 * s2)
+            newSize = dirBase + (s1 * s2)
             self.globalFloat[1] = newSize
         elif funcName != programName and varType == 'float':
-            newSize = actSize + (s1 * s2)
+            newSize = dirBase + (s1 * s2)
             self.localFloat[1] = newSize
         if funcName == programName and varType == 'char':
-            newSize = actSize + (s1 * s2)
+            newSize = dirBase + (s1 * s2)
             self.globalChar[1] = newSize
         elif funcName != programName and varType == 'char':
-            newSize = actSize + (s1 * s2)
+            newSize = dirBase + (s1 * s2)
             self.localChar[1] = newSize
         if funcName == programName and varType == 'bool':
-            newSize = actSize + (s1 * s2)
+            newSize = dirBase + (s1 * s2)
             self.globalBool[1] = newSize
         elif funcName != programName and varType == 'bool':
-            newSize = actSize + (s1 * s2)
+            newSize = dirBase + (s1 * s2)
             self.localBool[1] = newSize
     
     def addVariable(self, funcName, varName, varType, isParameter, programName, size):
@@ -90,12 +119,13 @@ class memoryHandler:
                 self.globalInt[1] += 1
                 return address
             else:
+                print(self.globalInt[1], '+' , size)
                 self.globalInt[1] += size
                 return address
         elif funcName != programName and varType == 'int':
-            self.localInt[1] += 1
+            address = self.localInt[1]
             if (size == None):
-                address = self.localInt[1]
+                self.localInt[1] += 1
                 return address
             else:
                 self.localInt[1] += size

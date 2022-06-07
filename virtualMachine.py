@@ -206,11 +206,9 @@ class virtualMachine():
                     insertInMemory(int(getFromMemory(pointerAddress)), newVal)
                 else:
                     newVal = getFromMemory(int(currentQuad[1]))
-                    # resDir = getTransformmedAddress(currentQuad[3], 3)
                     insertInMemory(int(currentQuad[3]), newVal)
                     # self.globalMemory.printMemory()
 
-            
 
             if (currentQuad[0] == '+'): # addition is founds
                 valLeft = getFromMemory(int(currentQuad[1]))
@@ -230,6 +228,7 @@ class virtualMachine():
                 valLeft = getFromMemory(int(currentQuad[1]))
                 valRight = getFromMemory(int(currentQuad[2]))
                 addressTemp = int(currentQuad[3])
+                # print(int(currentQuad[1]), int(currentQuad[2]))
                 insertInMemory(addressTemp, valLeft * valRight)
             
             if (currentQuad[0] == '/'): # addition is founds
@@ -424,19 +423,25 @@ class virtualMachine():
             if (currentQuad[0] == 'VER'):
                 requestedIndex = getFromMemory(int(currentQuad[1]))
                 limitIndex = getFromMemory(int(currentQuad[3]))
+                # print(currentQuad, requestedIndex, limitIndex)
+                # print(type(limitIndex), type(requestedIndex))
                 if (requestedIndex < 0 or requestedIndex >= limitIndex):
                     raise Exception('Out of bounds: index is not within the array limits.')
+                # else:
+                    # print('good index')
 
 
             if (currentQuad[0] == '+dirBase'):
                 dirBase = int(currentQuad[1]) # 2001
                 requestedIndex = getFromMemory(int(currentQuad[2])) #index
                 pointerAddress = int(currentQuad[3]) #21000s
+                # print(pointerAddress, dirBase + requestedIndex)
                 insertInMemory(pointerAddress, dirBase + requestedIndex)
                 # print(getFromMemory(pointerAddress))
         
             self.ip = self.ip + 1
             currentQuad = self.quadruples[self.ip]
-        # self.localMemory.printMemory()
+        self.globalMemory.printMemory()
+        # self.tempGlobalMemory.printMemory()
         print('Lu∞')
 

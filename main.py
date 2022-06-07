@@ -172,6 +172,25 @@ def p_np_add_mat_to_current_table(p):
     global currentFunc
     global currentVarTable
     global currentType
+    id = currentVarTable.getVariableByName(p[-9])
+    if (id == None):
+        address = mh.addVariable(currentFunc, p[-4], currentType, None, programName, p[-2])
+        size = qg.operandStack.pop()
+        qg.typeStack.pop()
+        currentVarTable.insert({"name": p[-4], "type": currentType, "address": address, "size": size, "dimension": 1})
+        vm.initializeArray(address, p[-2])
+    elif (currentVarTable.getVariableByName(p[-9]) != None):
+        print(p[-2], p[-7])
+    else:
+        raise Exception("ERROR: Redeclaration of variable ID = " + p[-4])
+
+def p_np_add_mat_to_current_table(p):
+    '''np_addMatToCurrentTable : empty'''
+    # agrega la variable que acaba de leer a la tabla de variables actual.
+    # utiliza el memory handler para asignarle una posicion en la memoria virtual.
+    global currentFunc
+    global currentVarTable
+    global currentType
     id = currentVarTable.getVariableByName(p[-4])
     if (id == None):
         address = mh.addVariable(currentFunc, p[-4], currentType, None, programName, p[-2])
@@ -411,7 +430,7 @@ def p_assignment(p):
                   | access_class_atribute EQUAL qnp2insertOperator expression np_CheckOperStackForEqual'''
 def p_assignment_variable(p):
     '''assignmentVariable : ID np16isOnCurrentVarsTable qnp1sendToQuadruples EQUAL qnp2insertOperator 
-    | ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET assignmentMatrix'''
+                          | ID np16isOnCurrentVarsTable LEFTSQUAREBRACKET expression np_VerifyArrAccess RIGHTSQUAREBRACKET assignmentMatrix'''
 
 def p_assignment_matrix(p):
     '''assignmentMatrix : LEFTSQUAREBRACKET expression np_VerifyMatAccess RIGHTSQUAREBRACKET qnp1sendToQuadruplesMat EQUAL qnp2insertOperator
@@ -816,6 +835,7 @@ def p_qnp_cte_int(p):
     '''qnp_cte_int : empty'''
     global currentFunc
     global programName
+    # print('entra cte',  p[-1])
     address = mh.addVariable(currentFunc, p[-1], 'CTEINT', None, programName,None)
     qg.operandStack.append(address)
     qg.typeStack.append('int')
@@ -1512,7 +1532,8 @@ def p_blockClass(p):
 yacc.yacc()
 parser = yacc.yacc()
 print("Yacc has been generated!")
-codeToCompile = open('dummyArr.txt','r')
+codeFile = input('File to run: ')
+codeToCompile = open(codeFile,'r')
 data = str(codeToCompile.read())
 lex.input(data)
 try:
