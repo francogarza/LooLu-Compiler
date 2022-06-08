@@ -1,0 +1,32 @@
+LooLu mergeSort;
+
+
+VARS:
+    var int : a, b, c;
+    var bool : myBool;
+
+FUNCS:
+
+func bool isGreater(a : int, b : int) {
+    VARS:
+    START:
+        if (a > b) {
+            return(true);
+        } else {
+            return(false);
+        }
+}
+
+CLASSES:
+
+Loo() {
+    a = 3;
+    b = 5;
+    c = b - a;
+
+    myBool = isGreater(a + c, b);
+
+    print(myBool);
+    
+} Lu;
+

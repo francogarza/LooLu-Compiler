@@ -1,0 +1,38 @@
+LooLu miPrograma;
+
+VARS:
+  var int : myArr[10], myMat[10][10];
+  var bool : myBool;
+FUNCS:
+
+func void fillArr(size : int) {
+    VARS:
+        var int : i;
+        var int : n;
+    START:
+        i = 0;
+
+        while (i < size) {
+            read(n);
+            myArr[i] = n;
+            i = i + 1;
+        }
+}
+
+func bool binarySearch(left : int, right : int, target : int) {
+    VARS:
+        var int : mid;
+
+    START:
+        return(false);
+}
+  
+CLASSES:
+
+Loo() {
+
+    fillArr(10);
+    myBool = binarySearch(0, 9, 7);
+    print(myBool);
+
+} Lu;

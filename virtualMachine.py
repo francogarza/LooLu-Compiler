@@ -356,9 +356,18 @@ class virtualMachine():
             if (currentQuad[0] == 'READ'):
                 varToBeAssigned = int(currentQuad[3])
                 val = input()
+                 # BOOL
                 if val == 'true' or val == 'false':
+                    # print('entra')
                     insertInMemory(varToBeAssigned, val)
-                insertInMemory(varToBeAssigned, val)
+                elif (len(val) == 1 and isalpha(val)):
+                    insertInMemory(varToBeAssigned, val)
+                elif '.' in val:
+                    val = float(val)
+                    insertInMemory(varToBeAssigned, val)
+                else:
+                    val = int(val)
+                    insertInMemory(varToBeAssigned, val)
             
             if (currentQuad[0] == 'GOTO'): # GOTO id found
                 self.ip = int(currentQuad[3]) - 1# -2 Because quads start at index 0 and add one more iteration
