@@ -18,6 +18,6 @@ CLASSES:
 
 Loo() {
 
-    print(factorial(5));
+    print(factorial(8));
 
 } Lu;

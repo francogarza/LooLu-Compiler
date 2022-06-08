@@ -13,7 +13,5 @@ FUNCS:
 CLASSES:
 
 Loo() {
-    temp = fib(6);
-    print(fib(6));
-    print(temp);
+    print(fib(20));
 } Lu;
