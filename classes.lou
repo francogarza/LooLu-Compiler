@@ -7,19 +7,16 @@ CLASSES:
     class persona{
         VARS:
             var int : edad;
-            var float : altura;
+            var float : altura, altura2;
         FUNCS:
-            func void returnAge(n : int){
+            func int returnAge(n : int, x: int){
                 VARS: 
                 START:
-                    print(n);
+                    return(n);
             }
     }
 
 Loo() {
     var franco = persona();
-    franco.edad = 24;
-    franco.altura = 1.78;
-    print(franco.edad, franco.altura);
-    franco.returnAge(4);
+    var alvaro = persona(); 
 } Lu;
