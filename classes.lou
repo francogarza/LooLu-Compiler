@@ -6,17 +6,22 @@ FUNCS:
 CLASSES:
     class persona{
         VARS:
-            var int : edad;
-            var float : altura, altura2;
+            var int : age;
+            var float : height, altura2;
         FUNCS:
-            func int returnAge(n : int, x: int){
+            func int getAge(){
                 VARS: 
                 START:
-                    return(n);
+                    return(age);
             }
     }
 
 Loo() {
     var franco = persona();
-    var alvaro = persona(); 
+    var alvaro = persona();
+    alvaro.age = 10;
+    franco.age = 5;
+    print(franco.age);
+    print(alvaro.age);
+    print(franco..getAge());
 } Lu;

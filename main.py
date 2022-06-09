@@ -18,7 +18,7 @@ programName = None; dirFunc = vt.DirFunc(); globalVarsTable = None; currentFunc 
 currentFuncHasReturnedValue = None; currentVarTable = None; cparamCounter = 0; currentFunctionCall = None; currentFuncDeclaration = None
 #classes global vars
 currentClassName = None; currentClassDirFunc = None; currentClassGlobalVarsTable = None; currentVarTableClass = None; currentClassFunctionReturnType = None; currentClassFunctionReturnOperand = None
-classesDirFunc = None; stackObjects = vt.Vars()
+classesDirFunc = None; stackObjects = vt.Vars(); currentObject = None
 
 qg = quadrupleGenerator.quadrupleGenerator(); mh = memoryHandler.memoryHandler()
 tempCounter = 1; whileOperand = []; quadruplesOutput = []; vm = virtualMachine.virtualMachine()
@@ -532,7 +532,8 @@ def p_np_FillDirFuncForObject(p):
             newDirFunc.insert(refClassDirFunc.accessIndex(index))
 
     stackObjects.insert({'name': p[-3], 'DirFunc' : newDirFunc })
-    print(stackObjects)
+    print("stackObjects = ")
+    stackObjects.printVars()
 #--------------------------------
 
 #--------------------------------
@@ -743,6 +744,7 @@ def p_var_cte(p):
                | CTECHAR qnp_cte_char
                | TRUE qnp_cte_bool
                | FALSE qnp_cte_bool
+               | class_function_call np_FillStacksWithReturnValueClass
                | access_class_atribute 
                | function_call np_FillStacksWithReturnValue
                | arr_access
@@ -808,6 +810,35 @@ def p_FillStacksWithReturnValue(p):
     tempCounter = tempCounter + 1
     address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName,None, None)
     test = globalVarsTable.getVariableByName(currentFunctionCall['name'])
+
+    # if (int(address) >= 22000):
+    #     quadruplesOutput.append(('=',test['address'],'',address))
+    quadruplesOutput.append(('=',test['address'],'',address))
+    qg.typeStack.append(test['type'])
+    qg.operandStack.append(address)
+
+def p_np_FillStacksWithReturnValueClass(p):
+    '''np_FillStacksWithReturnValueClass : empty'''
+    global currentFunctionReturnType
+    global currentFunctionReturnOperand
+    global tempCounter
+    global currentObject
+
+    object = stackObjects.getVariableByName(currentObject)
+    objVarDirFunc = object['DirFunc']
+    objVarsTable = objVarDirFunc.getGlobalVarsTable()
+
+
+    if currentFunctionCall["type"] == 'void':
+        raise Exception("function: "+currentFunctionCall["name"]+" does not return a value")
+    result = 'T'+str(tempCounter)
+    tempCounter = tempCounter + 1
+    address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName,None, None)
+
+
+
+
+    test = objVarsTable.getVariableByName(currentFunctionCall['name'])
     quadruplesOutput.append(('=',test['address'],'',address))
     qg.typeStack.append(test['type'])
     qg.operandStack.append(address)
@@ -889,13 +920,16 @@ def p_np_CheckForVariableInClassVarTable(p):
 
     object = stackObjects.getVariableByName(p[-3])
 
+
     objectDirFunc = object['DirFunc']
     objectVarsTable = objectDirFunc.getGlobalVarsTable()
     objectVarsTable.printVars()
 
     var = objectVarsTable.getVariableByName(p[-1])
     if (var == None):
-        raise Exception("Could not find variable for object")
+        raise Exception("Could not find variable for object "+p[-1])
+    
+    quadruplesOutput.append(('CURRENTOBJECT','','','',p[-3]))
     qg.operand(var['address'],var['type'])
 #--------------------------------
 
@@ -958,8 +992,6 @@ def p_np_addClassToDirFunc(p):
         classesDirFunc.insert({"name": currentClassName, "type": "class", "DirFunc": None})
     else:
         raise Exception("redeclaration of class " + currentClassName)
-    print("classesDirFunc =")
-    classesDirFunc.printDirFunc()
 def p_np_createGlobalVarsTableForClass(p):
     '''np_CreateGlobalVarsTableForClass : empty'''
     global classesDirFunc
@@ -977,8 +1009,6 @@ def p_np_createGlobalVarsTableForClass(p):
             currentClassFunc = currentClassName
         else:
             raise Exception("ERROR: could not find function with that name in DirFunc")
-    print("currentClassDirFunc =")
-    currentClassDirFunc.printDirFunc()
 def p_np_CreateVarsTableForClass(p):
     '''np_CreateVarsTableForClass : empty'''
     global currentClassDirFunc
@@ -990,8 +1020,6 @@ def p_np_CreateVarsTableForClass(p):
     elif (rowForClassInCurrentClassDirFunc["table"] == None):
         currentVarTableClass = vt.Vars()
         currentClassDirFunc.addVarsTable(currentClassName, currentVarTableClass)
-    print("currentVarTableClass =")
-    currentVarTableClass.printVars()
 def p_np_AssignGlobalVarsTableForClass(p):
     '''np_AssignGlobalVarsTableForClass : empty'''
     global currentClassGlobalVarsTable
@@ -1162,8 +1190,8 @@ def p_np_add_return_to_global_varsClass(p):
     var = currentClassGlobalVarsTable.getVariableByName(currentClassFunc)
     if (funcRow["type"] == expressionType):
         if (var == None):
-            funcAddress = mh.addVariable(currentClassName,currentClassFunc,funcRow['type'],None,currentClassName,None, None)
-            currentClassGlobalVarsTable.insert({"name": currentFunc, "type": expressionType, "address" : funcAddress})
+            funcAddress = mh.addVariable(currentClassName,currentClassFunc,funcRow['type'],None,currentClassName,None, True)
+            currentClassGlobalVarsTable.insert({"name": currentClassFunc, "type": expressionType, "address" : funcAddress})
         else:
             funcAddress = var["address"]
         quadruplesOutput.append(('=',address,'',funcAddress))
@@ -1186,21 +1214,30 @@ def p_np_create_end_func_quadClass(p):
 #--------------------------------
 # - function call class
 def p_function_callClass(p):
-    '''class_function_call : ID DOT ID np_VerifyFuncClass np_GenerateEraQuad LEFTPAREN function_call_params RIGHTPAREN np_CreateGosubQuad'''
+    '''class_function_call : ID DOT DOT ID np_VerifyFuncClass np_GenerateEraQuad LEFTPAREN function_call_params RIGHTPAREN np_CreateGosubQuadClass'''
 # - function call class: nps
 def p_np_VerifyFuncClass(p):
     '''np_VerifyFuncClass : empty'''
     global currentParamSignature
     global paramCounter
     global currentFunctionCall
-    objVarInDirFunc = globalVarsTable.getVariableByName(p[-3])
-    objVarDirFunc = objVarInDirFunc['DirFunc']
+    global currentObject
+
+    object = stackObjects.getVariableByName(p[-4])
+    objVarDirFunc = object['DirFunc']
+
     func = objVarDirFunc.getFunctionByName(p[-1])
     funcName = func["name"]
     quadruplesOutput.append(("ERA",'','',funcName))
     paramCounter = 0
     currentParamSignature = func["parameterSignature"]
     currentFunctionCall = func
+    currentObject = p[-4]
+
+def p_np_CreateGosubQuadClass(p):
+    '''np_CreateGosubQuadClass : empty'''
+    jump = currentFunctionCall["functionQuadStart"]
+    quadruplesOutput.append(('GOSUB','','',jump,p[-9]))
 #--------------------------------
 
 #--------------------------------

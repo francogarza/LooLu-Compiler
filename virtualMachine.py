@@ -6,6 +6,8 @@ import constantTable as ct
 import semanticCube as sc   
 import math
 
+currentObject = None
+
 # Memory definition
 class Memory():
     def __init__(self):
@@ -129,10 +131,9 @@ class virtualMachine():
 
             # CLASSES
             if (address >= 22000 and address <= 26000):
-                object = self.classesMemory.getVariableByName(name)
+                object = self.classesMemory.getVariableByName(currentObject)
                 objectMemory = object['memory']
                 objectMemory.insert(address,value)
-                objectMemory.printMemory()
 
 
             
@@ -148,12 +149,15 @@ class virtualMachine():
                 self.constantsMemory.insert(address, value)
             elif (address >= 21000 and address <= 21999):
                 self.globalMemory.insert(address, value)
+
         def getFromMemory(address):
 
 
             # CLASSES
             if (address >= 22000 and address <= 26000):
-                return self.classMemory.get(address)
+                object = self.classesMemory.getVariableByName(currentObject)
+                objectMemory = object['memory']
+                return objectMemory.get(address)
 
 
 
@@ -230,16 +234,17 @@ class virtualMachine():
             # TEST FOR CLASSES
 
             if (len(currentQuad) > 4):
-                print("Found a quad for classes", currentQuad)
-
+                if (currentQuad[0] == 'CURRENTOBJECT'):
+                    currentObject = currentQuad[4]
                 if (currentQuad[0] == 'ERACLASS'):
                     self.classesMemory.insert({'name':currentQuad[4],'memory':Memory()})
-                    self.classesMemory.printVars()
+                    currentObject = currentQuad[4]
                 if (currentQuad[0] == 'ADDVAR'):
                     paramType = currentQuad[2]
                     address = int(currentQuad[3])
                     insertInMemory(address, None, currentQuad[4])
-                    self.classesMemory.printVars()
+                if (currentQuad[0] == 'GOSUB'):
+                    currentObject = currentQuad[4]
                     
 
 
@@ -248,11 +253,11 @@ class virtualMachine():
                 self.ip = int(currentQuad[3]) - 1
 
             if (currentQuad[0] == '='): # Assignation is found
-                if (int(currentQuad[1]) >= 21000):
+                if ((int(currentQuad[1]) >= 21000) & (int(currentQuad[1]) < 22000)):
                     pointingAddress = getFromMemory(int(currentQuad[1]))
                     newVal = getFromMemory(pointingAddress)
                     insertInMemory(int(currentQuad[3]), newVal, None)
-                elif (int(currentQuad[3]) >= 21000):
+                elif ((int(currentQuad[3]) >= 21000) & (int(currentQuad[3]) < 22000)):
                     pointingAddress = getFromMemory(int(currentQuad[3]))
                     newVal = getFromMemory(int(currentQuad[1]))
                     insertInMemory(int(getFromMemory(pointerAddress)), newVal, None)
@@ -460,6 +465,7 @@ class virtualMachine():
                     self.checkpoints.pop()
                     self.localMemory.popStack()
                     self.ip = lastIp
+                    currentObject = None
 
             # ARRAYS #
             if (currentQuad[0] == 'VER'):
