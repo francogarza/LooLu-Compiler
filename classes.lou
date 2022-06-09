@@ -31,4 +31,5 @@ Loo() {
     print(franco..getAge());
     print(alvaro..getAge());
     print(alvaro..multAge(3));
+    print(alvaro..getAge());
 } Lu;
