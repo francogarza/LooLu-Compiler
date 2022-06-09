@@ -835,9 +835,6 @@ def p_np_FillStacksWithReturnValueClass(p):
     tempCounter = tempCounter + 1
     address = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName,None, None)
 
-
-
-
     test = objVarsTable.getVariableByName(currentFunctionCall['name'])
     quadruplesOutput.append(('=',test['address'],'',address))
     qg.typeStack.append(test['type'])
@@ -1233,7 +1230,7 @@ def p_np_VerifyFuncClass(p):
     currentParamSignature = func["parameterSignature"]
     currentFunctionCall = func
     currentObject = p[-4]
-
+    quadruplesOutput.append(('CURRENTOBJECT','','','',p[-3]))
 def p_np_CreateGosubQuadClass(p):
     '''np_CreateGosubQuadClass : empty'''
     jump = currentFunctionCall["functionQuadStart"]

@@ -465,7 +465,6 @@ class virtualMachine():
                     self.checkpoints.pop()
                     self.localMemory.popStack()
                     self.ip = lastIp
-                    currentObject = None
 
             # ARRAYS #
             if (currentQuad[0] == 'VER'):

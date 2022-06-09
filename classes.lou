@@ -14,6 +14,11 @@ CLASSES:
                 START:
                     return(age);
             }
+            func int multAge(by: int){
+                VARS:
+                START:
+                    return(age * by);
+            }
     }
 
 Loo() {
@@ -24,4 +29,6 @@ Loo() {
     print(franco.age);
     print(alvaro.age);
     print(franco..getAge());
+    print(alvaro..getAge());
+    print(alvaro..multAge(3));
 } Lu;
