@@ -1097,11 +1097,14 @@ def p_np_CheckIfFuncHasReturnedClass(p):
     global currentFuncHasReturnedValue
     global currentClassFunc
     global currentClassDirFunc
-    if currentClassDirFunc.getFunctionByName(currentClassFunc)["type"] != 'void':
-        raise Exception('Classes can only support void type functions')
-    if currentClassDirFunc.getFunctionByName(currentClassFunc)["type"] == 'void':
-        quadruplesOutput.append(('ENDFUNC','','',''))
-    currentFuncHasReturnedValue = 0
+    if currentFuncHasReturnedValue != 1:
+        if dirFunc.getFunctionByName(currentFunc)["type"] == 'void':
+            # mh.resetLocalTempMemory()
+            quadruplesOutput.append(('ENDFUNC','','',''))
+        else:
+            raise Exception('function: '+currentFunc+" is missing return value")
+    else:
+        currentFuncHasReturnedValue = 0
 def p_np_fill_quad_start_parameter_for_func_class(p):
     '''np_FillQuadStartParameterForFuncClass : empty'''
     global currentClassDirFunc
