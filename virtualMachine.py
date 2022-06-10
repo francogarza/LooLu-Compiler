@@ -6,6 +6,8 @@ import constantTable as ct
 import semanticCube as sc   
 import math
 
+currentObject = None
+
 # Memory definition
 class Memory():
     def __init__(self):
@@ -85,6 +87,7 @@ class virtualMachine():
     # Memory initialization
     globalMemory = Memory()
     localMemory = StackSegment()
+    classesMemory = vt.Vars()
     checkpoints = []
     #tempLocalMemory = Memory()
     tempGlobalMemory = Memory()
@@ -123,7 +126,17 @@ class virtualMachine():
     def runMachine(self, dirFunc, mh):
         self.mh = mh
         print('∞Loo')
-        def insertInMemory(address, value):
+        def insertInMemory(address, value, name):
+
+
+            # CLASSES
+            if (address >= 22000 and address <= 26000):
+                object = self.classesMemory.getVariableByName(currentObject)
+                objectMemory = object['memory']
+                objectMemory.insert(address,value)
+
+
+            
             if (address >= 2000 and address <= 5999):
                 self.globalMemory.insert(address, value)
             elif (address >= 6000 and address <= 9999):
@@ -136,7 +149,18 @@ class virtualMachine():
                 self.constantsMemory.insert(address, value)
             elif (address >= 21000 and address <= 21999):
                 self.globalMemory.insert(address, value)
+
         def getFromMemory(address):
+
+
+            # CLASSES
+            if (address >= 22000 and address <= 26000):
+                object = self.classesMemory.getVariableByName(currentObject)
+                objectMemory = object['memory']
+                return objectMemory.get(address)
+
+
+
             if (address >= 2000 and address <= 5999):
                 return self.globalMemory.get(address)
             elif (address >= 6000 and address <= 9999):
@@ -179,103 +203,145 @@ class virtualMachine():
                 self.mh.localTemp[1] += 1
                 return address
 
+        def getClassAddress(type):
+            if type == 'int':
+                address = self.mh.localInt[1]
+                self.mh.classInt[1] += 1
+                return address
+            if type == 'float':
+                address = self.mh.localFloat[1]
+                self.mh.classFloat[1] += 1
+                return address
+            if type == 'char':
+                address = self.mh.localChar[1]
+                self.mh.localChar[1] += 1
+                return address
+            if type == 'bool':
+                address = self.mh.localBool[1]
+                self.mh.localBool[1] += 1
+                return address
+            if type == 'temp':
+                address = self.mh.localTemp[1]
+                self.mh.localTemp[1] += 1
+                return address
+
+
 
         currentQuad = self.quadruples[self.ip]
 
         while(currentQuad[0] != 'END'): # Ends program when a END is found
-             # Big switch case
+
+            # TEST FOR CLASSES
+
+            if (len(currentQuad) > 4):
+                if (currentQuad[0] == 'CURRENTOBJECT'):
+                    currentObject = currentQuad[4]
+                if (currentQuad[0] == 'ERACLASS'):
+                    self.classesMemory.insert({'name':currentQuad[4],'memory':Memory()})
+                    currentObject = currentQuad[4]
+                if (currentQuad[0] == 'ADDVAR'):
+                    paramType = currentQuad[2]
+                    address = int(currentQuad[3])
+                    insertInMemory(address, None, currentQuad[4])
+                if (currentQuad[0] == 'GOSUB'):
+                    currentObject = currentQuad[4]
+                    
+
+
+            # Big switch case
             if (currentQuad[0] == 'GOTOMAIN'):
                 self.ip = int(currentQuad[3]) - 1
 
             if (currentQuad[0] == '='): # Assignation is found
-                if (int(currentQuad[1]) >= 21000):
+                if ((int(currentQuad[1]) >= 21000) & (int(currentQuad[1]) < 22000)):
                     pointingAddress = getFromMemory(int(currentQuad[1]))
                     newVal = getFromMemory(pointingAddress)
-                    insertInMemory(int(currentQuad[3]), newVal)
-                elif (int(currentQuad[3]) >= 21000):
+                    insertInMemory(int(currentQuad[3]), newVal, None)
+                elif ((int(currentQuad[3]) >= 21000) & (int(currentQuad[3]) < 22000)):
                     pointingAddress = getFromMemory(int(currentQuad[3]))
                     newVal = getFromMemory(int(currentQuad[1]))
-                    insertInMemory(int(getFromMemory(pointerAddress)), newVal)
+                    insertInMemory(int(getFromMemory(pointerAddress)), newVal, None)
                 else:
                     newVal = getFromMemory(int(currentQuad[1]))
-                    insertInMemory(int(currentQuad[3]), newVal)
+                    insertInMemory(int(currentQuad[3]), newVal, None)
             if (currentQuad[0] == '+'): # addition is founds
                 pointerLeft = int(currentQuad[1])
                 pointerRight = int(currentQuad[2])
 
-                if int(currentQuad[1]) >= 21000:
+                if (int(currentQuad[1]) >= 21000) & (int(currentQuad[1]) < 22000):
                     pointerLeft = getFromMemory(int(currentQuad[1]))
-                if int(currentQuad[2]) >= 21000:
+                if (int(currentQuad[2]) >= 21000) & (int(currentQuad[2]) < 22000):
                     pointerRight = getFromMemory(int(currentQuad[2]))
 
                 valLeft = int(getFromMemory(pointerLeft))
                 valRight = int(getFromMemory(pointerRight))
                 addressTemp = int(currentQuad[3])
-                insertInMemory(addressTemp, valLeft + valRight)
+                insertInMemory(addressTemp, valLeft + valRight, None)
 
             if (currentQuad[0] == '-'): # addition is founds
                 pointerLeft = int(currentQuad[1])
                 pointerRight = int(currentQuad[2])
 
-                if int(currentQuad[1]) >= 21000:
+                if (int(currentQuad[1]) >= 21000) & (int(currentQuad[1]) < 22000):
                     pointerLeft = getFromMemory(int(currentQuad[1]))
-                if int(currentQuad[2]) >= 21000:
+                if (int(currentQuad[2]) >= 21000) & (int(currentQuad[2]) < 22000):
                     pointerRight = getFromMemory(int(currentQuad[2]))
 
                 valLeft = int(getFromMemory(pointerLeft))
                 valRight = int(getFromMemory(pointerRight))
                 addressTemp = int(currentQuad[3])
-                insertInMemory(addressTemp, valLeft - valRight)
+                insertInMemory(addressTemp, valLeft - valRight, None)
             
             if (currentQuad[0] == '*'): # addition is founds
                 pointerLeft = int(currentQuad[1])
                 pointerRight = int(currentQuad[2])
 
-                if int(currentQuad[1]) >= 21000:
+                if ((int(currentQuad[1]) >= 21000)) & (int(currentQuad[1]) < 22000):
                     pointerLeft = getFromMemory(int(currentQuad[1]))
-                if int(currentQuad[2]) >= 21000:
+                    exit(-1)
+                if (int(currentQuad[2]) >= 21000) & (int(currentQuad[2]) < 22000):
                     pointerRight = getFromMemory(int(currentQuad[2]))
 
                 valLeft = int(getFromMemory(pointerLeft))
                 valRight = int(getFromMemory(pointerRight))
                 addressTemp = int(currentQuad[3])
-                insertInMemory(addressTemp, valLeft * valRight)
+                insertInMemory(addressTemp, valLeft * valRight, None)
             
             if (currentQuad[0] == '/'): # addition is founds
                 pointerLeft = int(currentQuad[1])
                 pointerRight = int(currentQuad[2])
 
-                if int(currentQuad[1]) >= 21000:
+                if (int(currentQuad[1]) >= 21000) & (int(currentQuad[1]) < 22000):
                     pointerLeft = getFromMemory(int(currentQuad[1]))
-                if int(currentQuad[2]) >= 21000:
+                if (int(currentQuad[2]) >= 21000) & (int(currentQuad[2]) < 22000):
                     pointerRight = getFromMemory(int(currentQuad[2]))
 
                 valLeft = int(getFromMemory(pointerLeft))
                 valRight = int(getFromMemory(pointerRight))
                 addressTemp = int(currentQuad[3])
-                insertInMemory(addressTemp, math.floor(valLeft / valRight))
+                insertInMemory(addressTemp, math.floor(valLeft / valRight), None)
             
             if (currentQuad[0] == '%'): # addition is founds
                 pointerLeft = int(currentQuad[1])
                 pointerRight = int(currentQuad[2])
 
-                if int(currentQuad[1]) >= 21000:
+                if (int(currentQuad[1]) >= 21000) & (int(currentQuad[1]) < 22000):
                     pointerLeft = getFromMemory(int(currentQuad[1]))
-                if int(currentQuad[2]) >= 21000:
+                if (int(currentQuad[2]) >= 21000) & (int(currentQuad[2]) < 22000):
                     pointerRight = getFromMemory(int(currentQuad[2]))
 
                 valLeft = int(getFromMemory(pointerLeft))
                 valRight = int(getFromMemory(pointerRight))
                 addressTemp = int(currentQuad[3])
-                insertInMemory(addressTemp, valLeft % valRight)
+                insertInMemory(addressTemp, valLeft % valRight, None)
 
             if (currentQuad[0] == '<'):# Less than id found
                 pointerLeft = int(currentQuad[1])
                 pointerRight = int(currentQuad[2])
 
-                if int(currentQuad[1]) >= 21000:
+                if (int(currentQuad[1]) >= 21000) & (int(currentQuad[1]) < 22000):
                     pointerLeft = getFromMemory(int(currentQuad[1]))
-                if int(currentQuad[2]) >= 21000:
+                if (int(currentQuad[2]) >= 21000) & (int(currentQuad[2]) < 22000):
                     pointerRight = getFromMemory(int(currentQuad[2]))
 
                 valLeft = int(getFromMemory(pointerLeft))
@@ -283,25 +349,25 @@ class virtualMachine():
                 addressTemp = int(currentQuad[3])
 
                 if (valLeft < valRight):
-                    insertInMemory(addressTemp, 'true')
+                    insertInMemory(addressTemp, 'true', None)
                 else:
-                    insertInMemory(addressTemp, 'false')
+                    insertInMemory(addressTemp, 'false', None)
 
             if (currentQuad[0] == '>'): # Greater than is found
                 valLeft = getFromMemory(int(currentQuad[1]))
                 valRight = getFromMemory(int(currentQuad[2]))
                 addressTemp = int(currentQuad[3])
                 if (valLeft > valRight):
-                    insertInMemory(addressTemp, 'true')
+                    insertInMemory(addressTemp, 'true', None)
                 else:
-                    insertInMemory(addressTemp, 'false')
+                    insertInMemory(addressTemp, 'false', None)
             if (currentQuad[0] == '>='):
                 pointerLeft = int(currentQuad[1])
                 pointerRight = int(currentQuad[2])
 
-                if int(currentQuad[1]) >= 21000:
+                if (int(currentQuad[1]) >= 21000) & (int(currentQuad[1]) < 22000):
                     pointerLeft = getFromMemory(int(currentQuad[1]))
-                if int(currentQuad[2]) >= 21000:
+                if (int(currentQuad[2]) >= 21000) & (int(currentQuad[2]) < 22000):
                     pointerRight = getFromMemory(int(currentQuad[2]))
 
                 valLeft = int(getFromMemory(pointerLeft))
@@ -309,26 +375,26 @@ class virtualMachine():
                 addressTemp = int(currentQuad[3])
 
                 if (valLeft >= valRight):
-                    insertInMemory(addressTemp, 'true')
+                    insertInMemory(addressTemp, 'true', None)
                 else:
-                    insertInMemory(addressTemp, 'false')
+                    insertInMemory(addressTemp, 'false', None)
 
             if (currentQuad[0] == '<='):
                 valLeft = getFromMemory(int(currentQuad[1]))
                 valRight = getFromMemory(int(currentQuad[2]))
                 addressTemp = int(currentQuad[3])
                 if (valLeft <= valRight):
-                    insertInMemory(addressTemp, 'true')
+                    insertInMemory(addressTemp, 'true', None)
                 else:
-                    insertInMemory(addressTemp, 'false')
+                    insertInMemory(addressTemp, 'false', None)
 
             if (currentQuad[0] == '!='):
                 pointerLeft = int(currentQuad[1])
                 pointerRight = int(currentQuad[2])
 
-                if int(currentQuad[1]) >= 21000:
+                if (int(currentQuad[1]) >= 21000) & (int(currentQuad[1]) < 22000):
                     pointerLeft = getFromMemory(int(currentQuad[1]))
-                if int(currentQuad[2]) >= 21000:
+                if (int(currentQuad[2]) >= 21000) & (int(currentQuad[2]) < 22000):
                     pointerRight = getFromMemory(int(currentQuad[2]))
 
                 valLeft = int(getFromMemory(pointerLeft))
@@ -336,17 +402,17 @@ class virtualMachine():
                 addressTemp = int(currentQuad[3])
 
                 if (valLeft != valRight):
-                    insertInMemory(addressTemp, 'true')
+                    insertInMemory(addressTemp, 'true', None)
                 else:
-                    insertInMemory(addressTemp, 'false')
+                    insertInMemory(addressTemp, 'false', None)
 
             if (currentQuad[0] == '=='):
                 pointerLeft = int(currentQuad[1])
                 pointerRight = int(currentQuad[2])
 
-                if int(currentQuad[1]) >= 21000:
+                if (int(currentQuad[1]) >= 21000) & (int(currentQuad[1]) < 22000):
                     pointerLeft = getFromMemory(int(currentQuad[1]))
-                if int(currentQuad[2]) >= 21000:
+                if (int(currentQuad[2]) >= 21000) & (int(currentQuad[2]) < 22000):
                     pointerRight = getFromMemory(int(currentQuad[2]))
 
                 valLeft = int(getFromMemory(pointerLeft))
@@ -354,17 +420,17 @@ class virtualMachine():
                 addressTemp = int(currentQuad[3])
                 
                 if (valLeft == valRight):
-                    insertInMemory(addressTemp, 'true')
+                    insertInMemory(addressTemp, 'true', None)
                 else:
-                    insertInMemory(addressTemp, 'false')
+                    insertInMemory(addressTemp, 'false', None)
 
             if (currentQuad[0] == '&&'):
                 pointerLeft = int(currentQuad[1])
                 pointerRight = int(currentQuad[2])
 
-                if int(currentQuad[1]) >= 21000:
+                if (int(currentQuad[1]) >= 21000) & (int(currentQuad[1]) < 22000):
                     pointerLeft = getFromMemory(int(currentQuad[1]))
-                if int(currentQuad[2]) >= 21000:
+                if (int(currentQuad[2]) >= 21000) & (int(currentQuad[2]) < 22000):
                     pointerRight = getFromMemory(int(currentQuad[2]))
 
                 valLeft = int(getFromMemory(pointerLeft))
@@ -372,17 +438,17 @@ class virtualMachine():
                 addressTemp = int(currentQuad[3])
 
                 if (valLeft == 'true' and valRight == 'true'):
-                    insertInMemory(addressTemp, 'true')
+                    insertInMemory(addressTemp, 'true', None)
                 else:
-                    insertInMemory(addressTemp, 'false')
+                    insertInMemory(addressTemp, 'false', None)
             if (currentQuad[0] == '||'):
                 valLeft = getFromMemory(int(currentQuad[1]))
                 valRight = getFromMemory(int(currentQuad[2]))
                 addressTemp = int(currentQuad[3])
                 if (valLeft == 'true' or valRight == 'true'):
-                    insertInMemory(addressTemp, 'true')
+                    insertInMemory(addressTemp, 'true', None)
                 else:
-                    insertInMemory(addressTemp, 'false')
+                    insertInMemory(addressTemp, 'false', None)
             
             if (currentQuad[0] == 'PRINT'):
                 if (currentQuad[3] == 'JUMP'):
@@ -399,15 +465,15 @@ class virtualMachine():
                  # BOOL
                 if val == 'true' or val == 'false':
                     # print('entra')
-                    insertInMemory(varToBeAssigned, val)
+                    insertInMemory(varToBeAssigned, val, None)
                 elif (len(val) == 1 and isalpha(val)):
-                    insertInMemory(varToBeAssigned, val)
+                    insertInMemory(varToBeAssigned, val, None)
                 elif '.' in val:
                     val = float(val)
-                    insertInMemory(varToBeAssigned, val)
+                    insertInMemory(varToBeAssigned, val, None)
                 else:
                     val = int(val)
-                    insertInMemory(varToBeAssigned, val)
+                    insertInMemory(varToBeAssigned, val, None)
             
             if (currentQuad[0] == 'GOTO'): # GOTO id found
                 self.ip = int(currentQuad[3]) - 1# -2 Because quads start at index 0 and add one more iteration
@@ -427,7 +493,7 @@ class virtualMachine():
                 paramType = currentQuad[2]
                 address = getLocalAddress(paramType)
                 val = getFromMemory(int(currentQuad[1]))
-                insertInMemory(address, val)
+                insertInMemory(address, val, None)
 
             if (currentQuad[0] == 'GOSUB'):
                 saveQuad = self.ip
@@ -454,7 +520,7 @@ class virtualMachine():
                 dirBase = int(currentQuad[1]) # 2001
                 requestedIndex = getFromMemory(int(currentQuad[2])) #index
                 pointerAddress = int(currentQuad[3]) #21000s
-                insertInMemory(pointerAddress, dirBase + requestedIndex)
+                insertInMemory(pointerAddress, dirBase + requestedIndex, None)
         
             self.ip = self.ip + 1
             currentQuad = self.quadruples[self.ip]

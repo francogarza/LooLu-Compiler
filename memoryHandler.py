@@ -11,6 +11,15 @@ class memoryHandler:
     globalChar = None
     globalBool = None
     globalClass = None
+
+
+    # CLASSES
+    classInt = None
+    classFloat = None
+    classChar = None
+    classBool = None
+
+
     localInt = None
     localFloat = None
     localChar = None
@@ -29,6 +38,12 @@ class memoryHandler:
         self.globalChar = [4000, 4000]
         self.globalBool = [5000, 5000]
 
+        # CLASSES INIT MEMORY
+        self.classInt = [22000, 22000]
+        self.classFloat = [23000, 23000]
+        self.classChar = [24000, 24000]
+        self.classBool = [25000,25000]
+
         self.localInt = [6000, 6000]
         self.localFloat = [7000, 7000]
         self.localChar = [8000, 8000]
@@ -44,13 +59,22 @@ class memoryHandler:
 
         self.tempPointer = [21000, 21000]
         self.globalClass = [18000, 18000]
-    
+
+
     def resetLocalTempMemory(self):
         self.localInt = [6000, 6000]
         self.localFloat = [7000, 7000]
         self.localChar = [8000, 8000]
         self.localBool = [9000,9000]
         self.localTemp = [10000, 10000]
+
+
+    # RESET CLASSES MEMORY
+    def resetClassMemory(self):
+        self.classInt = [22000, 22000]
+        self.classFloat = [23000, 23000]
+        self.classChar = [24000, 24000]
+        self.classBool = [25000,25000]
 
     # This method is called whenever we encounter a matrix, with the base address and the dimensions we update the memory size
     def updateVariable(self, funcName, varName, varType, programName, s1, s2, dirBase):
@@ -108,8 +132,27 @@ class memoryHandler:
             newSize = dirBase + (s1 * s2)
             self.localBool[1] = newSize
     
-    def addVariable(self, funcName, varName, varType, isParameter, programName, size):
+    def addVariable(self, funcName, varName, varType, isParameter, programName, size, isClass):
         address = None
+
+        # CLASSES
+        if isClass:
+            if varType == 'int':
+                address = self.classInt[1]
+                self.classInt[1] += 1
+                return address
+            if varType == 'float':
+                address = self.classFloat[1]
+                self.classFloat[1] += 1
+                return address
+            if varType == 'char':
+                address = self.classChar[1]
+                self.classChar[1] += 1
+                return address
+            if varType == 'bool':
+                address = self.classBool[1]
+                self.classBool[1] += 1
+                return address
 
         if funcName == programName and varType == 'int':
             address = self.globalInt[1]
