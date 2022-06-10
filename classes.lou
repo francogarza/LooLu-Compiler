@@ -24,8 +24,8 @@ CLASSES:
 Loo() {
     var franco = persona();
     var alvaro = persona();
-    alvaro.age = 10;
-    franco.age = 5;
+    alvaro.age = 23;
+    franco.age = 24;
     print(franco.age);
     print(alvaro.age);
     print(franco..getAge());
