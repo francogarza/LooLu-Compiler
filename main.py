@@ -537,8 +537,6 @@ def p_np_FillDirFuncForObject(p):
             newDirFunc.insert(refClassDirFunc.accessIndex(index))
 
     stackObjects.insert({'name': p[-3], 'DirFunc' : newDirFunc })
-    print("stackObjects = ")
-    stackObjects.printVars()
 #--------------------------------
 
 #--------------------------------
@@ -1036,7 +1034,6 @@ def p_np_CheckForVariableInClassVarTable(p):
 
     objectDirFunc = object['DirFunc']
     objectVarsTable = objectDirFunc.getGlobalVarsTable()
-    objectVarsTable.printVars()
 
     var = objectVarsTable.getVariableByName(p[-1])
     if (var == None):
@@ -1171,8 +1168,6 @@ def p_np_add_var_to_current_table_class(p):
             raise Exception("   ERROR: Redeclaration of variable ID = " + p[-1])
     else:
         raise Exception("   ERROR: Redeclaration of variable ID = " + p[-1])
-    print("assigned id =")
-    currentClassGlobalVarsTable.printVars()
 #--------------------------------
 
 #--------------------------------

@@ -253,11 +253,11 @@ class virtualMachine():
                 self.ip = int(currentQuad[3]) - 1
 
             if (currentQuad[0] == '='): # Assignation is found
-                if ((int(currentQuad[1]) >= 21000) & (int(currentQuad[1]) < 22000)):
+                if (int(currentQuad[1]) >= 21000 and int(currentQuad[1]) < 22000):
                     pointingAddress = getFromMemory(int(currentQuad[1]))
                     newVal = getFromMemory(pointingAddress)
                     insertInMemory(int(currentQuad[3]), newVal, None)
-                elif ((int(currentQuad[3]) >= 21000) & (int(currentQuad[3]) < 22000)):
+                elif (int(currentQuad[3]) >= 21000 and int(currentQuad[3]) < 22000):
                     pointingAddress = getFromMemory(int(currentQuad[3]))
                     newVal = getFromMemory(int(currentQuad[1]))
                     insertInMemory(int(getFromMemory(pointerAddress)), newVal, None)
@@ -268,9 +268,9 @@ class virtualMachine():
                 pointerLeft = int(currentQuad[1])
                 pointerRight = int(currentQuad[2])
 
-                if (int(currentQuad[1]) >= 21000) & (int(currentQuad[1]) < 22000):
+                if (int(currentQuad[1]) >= 21000 and int(currentQuad[1]) < 22000):
                     pointerLeft = getFromMemory(int(currentQuad[1]))
-                if (int(currentQuad[2]) >= 21000) & (int(currentQuad[2]) < 22000):
+                if (int(currentQuad[2]) >= 21000 and int(currentQuad[2]) < 22000):
                     pointerRight = getFromMemory(int(currentQuad[2]))
 
                 valLeft = int(getFromMemory(pointerLeft))
@@ -282,9 +282,9 @@ class virtualMachine():
                 pointerLeft = int(currentQuad[1])
                 pointerRight = int(currentQuad[2])
 
-                if (int(currentQuad[1]) >= 21000) & (int(currentQuad[1]) < 22000):
+                if (int(currentQuad[1]) >= 21000 and int(currentQuad[1]) < 22000):
                     pointerLeft = getFromMemory(int(currentQuad[1]))
-                if (int(currentQuad[2]) >= 21000) & (int(currentQuad[2]) < 22000):
+                if (int(currentQuad[2]) >= 21000 and int(currentQuad[2]) < 22000):
                     pointerRight = getFromMemory(int(currentQuad[2]))
 
                 valLeft = int(getFromMemory(pointerLeft))
@@ -298,8 +298,7 @@ class virtualMachine():
 
                 if ((int(currentQuad[1]) >= 21000)) & (int(currentQuad[1]) < 22000):
                     pointerLeft = getFromMemory(int(currentQuad[1]))
-                    exit(-1)
-                if (int(currentQuad[2]) >= 21000) & (int(currentQuad[2]) < 22000):
+                if (int(currentQuad[2]) >= 21000 and int(currentQuad[2]) < 22000):
                     pointerRight = getFromMemory(int(currentQuad[2]))
 
                 valLeft = int(getFromMemory(pointerLeft))
@@ -311,9 +310,9 @@ class virtualMachine():
                 pointerLeft = int(currentQuad[1])
                 pointerRight = int(currentQuad[2])
 
-                if (int(currentQuad[1]) >= 21000) & (int(currentQuad[1]) < 22000):
+                if (int(currentQuad[1]) >= 21000 and int(currentQuad[1]) < 22000):
                     pointerLeft = getFromMemory(int(currentQuad[1]))
-                if (int(currentQuad[2]) >= 21000) & (int(currentQuad[2]) < 22000):
+                if (int(currentQuad[2]) >= 21000 and int(currentQuad[2]) < 22000):
                     pointerRight = getFromMemory(int(currentQuad[2]))
 
                 valLeft = int(getFromMemory(pointerLeft))
@@ -325,9 +324,9 @@ class virtualMachine():
                 pointerLeft = int(currentQuad[1])
                 pointerRight = int(currentQuad[2])
 
-                if (int(currentQuad[1]) >= 21000) & (int(currentQuad[1]) < 22000):
+                if (int(currentQuad[1]) >= 21000 and int(currentQuad[1]) < 22000):
                     pointerLeft = getFromMemory(int(currentQuad[1]))
-                if (int(currentQuad[2]) >= 21000) & (int(currentQuad[2]) < 22000):
+                if (int(currentQuad[2]) >= 21000 and int(currentQuad[2]) < 22000):
                     pointerRight = getFromMemory(int(currentQuad[2]))
 
                 valLeft = int(getFromMemory(pointerLeft))
@@ -339,9 +338,9 @@ class virtualMachine():
                 pointerLeft = int(currentQuad[1])
                 pointerRight = int(currentQuad[2])
 
-                if (int(currentQuad[1]) >= 21000) & (int(currentQuad[1]) < 22000):
+                if (int(currentQuad[1]) >= 21000 and int(currentQuad[1]) < 22000):
                     pointerLeft = getFromMemory(int(currentQuad[1]))
-                if (int(currentQuad[2]) >= 21000) & (int(currentQuad[2]) < 22000):
+                if (int(currentQuad[2]) >= 21000 and int(currentQuad[2]) < 22000):
                     pointerRight = getFromMemory(int(currentQuad[2]))
 
                 valLeft = int(getFromMemory(pointerLeft))
@@ -365,9 +364,9 @@ class virtualMachine():
                 pointerLeft = int(currentQuad[1])
                 pointerRight = int(currentQuad[2])
 
-                if (int(currentQuad[1]) >= 21000) & (int(currentQuad[1]) < 22000):
+                if (int(currentQuad[1]) >= 21000 and int(currentQuad[1]) < 22000):
                     pointerLeft = getFromMemory(int(currentQuad[1]))
-                if (int(currentQuad[2]) >= 21000) & (int(currentQuad[2]) < 22000):
+                if (int(currentQuad[2]) >= 21000 and int(currentQuad[2]) < 22000):
                     pointerRight = getFromMemory(int(currentQuad[2]))
 
                 valLeft = int(getFromMemory(pointerLeft))
@@ -392,9 +391,9 @@ class virtualMachine():
                 pointerLeft = int(currentQuad[1])
                 pointerRight = int(currentQuad[2])
 
-                if (int(currentQuad[1]) >= 21000) & (int(currentQuad[1]) < 22000):
+                if (int(currentQuad[1]) >= 21000 and int(currentQuad[1]) < 22000):
                     pointerLeft = getFromMemory(int(currentQuad[1]))
-                if (int(currentQuad[2]) >= 21000) & (int(currentQuad[2]) < 22000):
+                if (int(currentQuad[2]) >= 21000 and int(currentQuad[2]) < 22000):
                     pointerRight = getFromMemory(int(currentQuad[2]))
 
                 valLeft = int(getFromMemory(pointerLeft))
@@ -410,9 +409,9 @@ class virtualMachine():
                 pointerLeft = int(currentQuad[1])
                 pointerRight = int(currentQuad[2])
 
-                if (int(currentQuad[1]) >= 21000) & (int(currentQuad[1]) < 22000):
+                if (int(currentQuad[1]) >= 21000 and int(currentQuad[1]) < 22000):
                     pointerLeft = getFromMemory(int(currentQuad[1]))
-                if (int(currentQuad[2]) >= 21000) & (int(currentQuad[2]) < 22000):
+                if (int(currentQuad[2]) >= 21000 and int(currentQuad[2]) < 22000):
                     pointerRight = getFromMemory(int(currentQuad[2]))
 
                 valLeft = int(getFromMemory(pointerLeft))
@@ -428,9 +427,9 @@ class virtualMachine():
                 pointerLeft = int(currentQuad[1])
                 pointerRight = int(currentQuad[2])
 
-                if (int(currentQuad[1]) >= 21000) & (int(currentQuad[1]) < 22000):
+                if (int(currentQuad[1]) >= 21000 and int(currentQuad[1]) < 22000):
                     pointerLeft = getFromMemory(int(currentQuad[1]))
-                if (int(currentQuad[2]) >= 21000) & (int(currentQuad[2]) < 22000):
+                if (int(currentQuad[2]) >= 21000 and int(currentQuad[2]) < 22000):
                     pointerRight = getFromMemory(int(currentQuad[2]))
 
                 valLeft = int(getFromMemory(pointerLeft))
