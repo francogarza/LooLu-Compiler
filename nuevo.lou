@@ -1,0 +1,26 @@
+LooLu miPrograma;
+
+VARS:
+  var int : myInt;
+
+FUNCS:
+
+    func int funcZ(n: int) {
+        VARS:
+        START:
+            return(n*2);
+    }
+
+    func int funcW(n: int, m: int) {
+        VARS:
+        START:
+            return((funcZ(n + m)) * 2);
+    }
+
+CLASSES:
+
+Loo() {
+
+    print(funcW(2,3));
+
+} Lu;
