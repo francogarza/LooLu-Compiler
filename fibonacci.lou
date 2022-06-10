@@ -8,12 +8,10 @@ FUNCS:
         if (n < 3){
             return(1);
         }
-        return((fib(n-1)) + (fib(n-2)));
+        return((fib(n - 1)) + (fib(n - 2)));
     }
 CLASSES:
 
 Loo() {
-    temp = fib(6);
-    print(fib(6));
-    print(temp);
+    print(fib(13));
 } Lu;

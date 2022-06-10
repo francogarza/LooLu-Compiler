@@ -41,7 +41,7 @@ tokens = [
     'OPERTYPE1', 'OPERTYPE2', 'LOGICOPERATOR',
     'ID', 'CTEINT', 'CTEFLOAT', 'CTECHAR', 'CHARACT',
     'RELOPER',
-    'COLON', 'SEMICOLON', 'COMMA', 'EQUAL', 'DOT'
+    'COLON', 'SEMICOLON', 'COMMA', 'EQUAL', 'DOT', 'CURRENCY'
 ] + list(reserved.values())
 
 t_LOOLU = r'LooLu'
@@ -67,6 +67,7 @@ t_SEMICOLON = r'\;'
 t_COMMA = r'\,'
 t_EQUAL = r'\='
 t_DOT = r'\.'
+t_CURRENCY = r'\$'
 t_ignore = " \t"
 
 #Definicion regex
@@ -76,12 +77,12 @@ def t_ID(t):
     return t
 
 def t_CTEFLOAT(t):
-    r'\d+\.\d+'
+    r'[-+]?([0-9]+[.])[0-9]+'
     t.value = float(t.value)
     return t
-
+    
 def t_CTEINT(t):
-    r'\d+'
+    r'[-+]?[0-9][0-9]*'
     t.value = int(t.value)
     return t
 

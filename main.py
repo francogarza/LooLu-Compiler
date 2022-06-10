@@ -123,7 +123,7 @@ def p_np_matrix(p):
     global currentType
     mat = currentVarTable.getVariableByName(p[-10])
     mat['dimension'] += 1
-    mat['dimensiones'] = [p[-3], p[-8]]
+    mat['dimensiones'] = [p[-8], p[-3]]
     dirBase = mat['address']
     mh.updateVariable(currentFunc, p[-10], currentType, programName, p[-3], p[-8], dirBase)
 def p_np4_set_current_type(p):
@@ -355,6 +355,11 @@ def p_qnp1_send_to_quadruples(p):
                 raise Exception("   ERROR: Variable not declared oscope " + p[-2])
         else:
             raise Exception("   ERROR: Variable not declared oscope " + p[-2])
+    address = variable["address"]
+    typ = variable["type"]
+    if "dimension" in variable:
+        if (variable["dimension"] == 2):
+            qg.dimensionStack.append(variable["dimensiones"])
     qg.operand(variable["address"], variable["type"])
 def p_qnp1_send_to_quadruplesARR(p):
     '''qnp1sendToQuadruplesARR : empty'''
@@ -693,6 +698,7 @@ def p_np_CheckOperatorStackForReloper(p):
 # - exp
 def p_exp(p):
     '''exp : term np_CheckOperStackForOperType1 operator'''
+
 def p_operator(p):
     '''operator : OPERTYPE1 np_AddOperatorToStack term np_CheckOperStackForOperType1 operator
                 | empty'''
@@ -700,6 +706,7 @@ def p_term(p):
     '''term : factor np_CheckOperStackForOperType2 term_operator'''
 def p_term_operator(p):
     '''term_operator : OPERTYPE2 np_AddOperatorToStack factor np_CheckOperStackForOperType2 term_operator
+                     | CURRENCY np_AddOperatorToStack factor np_CheckOperStackForCURRENCY term_operator
                      | empty'''
 def p_factor(p):
     '''factor : LEFTPAREN np_AddFakeBottomToOperStack expression RIGHTPAREN np_CheckOperStackForFakeBottom
@@ -708,6 +715,7 @@ def p_factor(p):
 def p_np_AddOperatorToStack(p):
     '''np_AddOperatorToStack : empty'''
     qg.operatorStack.append(p[-1])
+
 def p_np_CheckOperStackForOperType1(p):
     '''np_CheckOperStackForOperType1 : empty'''
     global tempCounter
@@ -748,7 +756,108 @@ def p_np_CheckOperStackForOperType2(p):
             qg.operandStack.append(address)
             qg.typeStack.append(sc.intToType(result_type))
         else:
-            raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type)  
+            raise Exception("Semantic Error -> No baila mija con el senior." + "Mija: " + left_type + ".Senior: " + right_type)
+def p_np_CheckOperStackForCURRENCY(p):
+    '''np_CheckOperStackForCURRENCY : empty'''  
+    global globalVarsTable
+    global tempCounter
+    global globalCurrentFunc
+    dim2 = qg.dimensionStack.pop() # A
+    dim1 = qg.dimensionStack.pop() # B
+    dimRes = qg.dimensionStack.pop()  # C  
+    if (dim1[1] != dim2[0]):
+        raise Exception("Can not perfom the $ operation with dimensions " + str(dim1) + " " + str(dim2))
+    if (dim1[0] != dimRes[0] or dimRes[1] != dim2[1]):
+        raise Exception("Can not assign the $ result to matrix with dimensions" + str(dimRes))
+    else:
+        B = qg.operandStack.pop()
+        A = qg.operandStack.pop()
+        C = qg.operandStack.pop()
+        
+        for i in range(dim1[0]):
+            for j in range(dim2[1]):
+                # suma = 0
+                result = 'T'+str(tempCounter)
+                tempCounter = tempCounter + 1
+                addressSuma = mh.addVariable(programName, result, 'TEMPORAL', None, programName,None)
+                zeroSuma = mh.addVariable(programName, 0, 'CTEINT', None, programName,None)
+                quadruplesOutput.append(('=', zeroSuma,'', addressSuma))
+                for k in range(dim1[1]):
+                    # suma += A[i,k] * B[k,j]
+
+                    # A[i,k] = pointer1
+                    d1 = mh.addVariable(programName, dim1[0], 'CTEINT', None, programName,None)
+                    d2 = mh.addVariable(programName, dim1[1], 'CTEINT', None, programName,None)
+                    s1 = mh.addVariable(programName, i, 'CTEINT', None, programName,None)
+                    s2 = mh.addVariable(programName, k, 'CTEINT', None, programName,None)
+
+                    address1 = mh.addVariable(programName, result, 'TEMPORAL', None, programName,None)
+                    result = 'T'+str(tempCounter)
+                    tempCounter = tempCounter + 1
+
+                    address2 = mh.addVariable(programName, result, 'TEMPORAL', None, programName,None)
+                    pointer1 = mh.addVariable(None,None,'POINTER',None,None,None)
+
+                    quadruplesOutput.append(('VER',s1,'A', d1))
+                    quadruplesOutput.append(('VER',s2,'A', d2))
+
+
+                    quadruplesOutput.append(('*', s1, d2, address1)) # s1 * d2
+                    quadruplesOutput.append(('+', address1, s2, address2)) # s1 * d2 + s2
+                    quadruplesOutput.append(('+dirBase', A, address2, pointer1)) # dirBase + s1 * d2 + s2
+
+                    # B[k,j] = pointer2
+                    d1 = mh.addVariable(programName, dim2[0], 'CTEINT', None, programName,None)
+                    d2 = mh.addVariable(programName, dim2[1], 'CTEINT', None, programName,None)
+                    s1 = mh.addVariable(programName, k, 'CTEINT', None, programName,None)
+                    s2 = mh.addVariable(programName, j, 'CTEINT', None, programName,None)
+
+                    address1 = mh.addVariable(programName, result, 'TEMPORAL', None, programName,None)
+                    result = 'T'+str(tempCounter)
+                    tempCounter = tempCounter + 1
+
+                    address2 = mh.addVariable(programName, result, 'TEMPORAL', None, programName,None)
+                    pointer2 = mh.addVariable(None,None,'POINTER',None,None,None)
+
+                    quadruplesOutput.append(('VER',s1,'B', d1))
+                    quadruplesOutput.append(('VER',s2,'B', d2))
+
+                    quadruplesOutput.append(('*', s1, d2, address1)) # s1 * d2
+                    quadruplesOutput.append(('+', address1, s2, address2)) # s1 * d2 + s2
+                    quadruplesOutput.append(('+dirBase', B, address2, pointer2)) # dirBase + s1 * d2 + s2
+
+                    # A[i,k] * B[k,j]
+                    product = mh.addVariable(programName, result, 'TEMPORAL', None, programName,None)
+                    result = 'T'+str(tempCounter)
+                    tempCounter = tempCounter + 1
+                    quadruplesOutput.append(('*', pointer1, pointer2, product))
+
+                    # suma += A[i,k] * B[k,j]
+                    quadruplesOutput.append(('+', addressSuma, product, addressSuma))
+
+                # C[i,j] = suma
+                d1 = mh.addVariable(programName, dimRes[0], 'CTEINT', None, programName,None)
+                d2 = mh.addVariable(programName, dimRes[1], 'CTEINT', None, programName,None)
+                s1 = mh.addVariable(programName, i, 'CTEINT', None, programName,None)
+                s2 = mh.addVariable(programName, j, 'CTEINT', None, programName,None)
+
+                address1 = mh.addVariable(programName, result, 'TEMPORAL', None, programName,None)
+                result = 'T'+str(tempCounter)
+                tempCounter = tempCounter + 1
+
+                address2 = mh.addVariable(programName, result, 'TEMPORAL', None, programName,None)
+                pointer3 = mh.addVariable(None,None,'POINTER',None,None,None)
+
+                quadruplesOutput.append(('VER',s1,'C', d1))
+                quadruplesOutput.append(('VER',s2,'C', d2))
+
+                quadruplesOutput.append(('*', s1, d2, address1)) # s1 * d2
+                quadruplesOutput.append(('+', address1, s2, address2)) # s1 * d2 + s2
+                quadruplesOutput.append(('+dirBase', C, address2, pointer3)) # dirBase + s1 * d2 + s2
+
+                # suma += A[i,k] * B[k,j]
+                quadruplesOutput.append(('=', addressSuma, '', pointer3))
+
 def p_np_AddFakeBottomToOperStack(p):
     '''np_AddFakeBottomToOperStack : empty'''
     if qg.operatorStack:
@@ -780,6 +889,8 @@ def p_np_AddOperandToStack(p):
     if(variable != None):
         qg.operandStack.append(variable["address"])
         qg.typeStack.append(variable["type"])
+        if "dimensiones" in variable:
+            qg.dimensionStack.append(variable["dimensiones"])
     else:
         variable = globalVarsTable.getVariableByName(p[-1])
         if(variable != None):
@@ -881,21 +992,29 @@ def p_np_verify_mat_access(p):
     if(type != 'int'):
         raise Exception("An in is required to access an array. You are trying to access with")
     s1 = qg.operandStack.pop()
+
     dirBase = mat["address"]
     d1 = ct.constantTable[mat['dimensiones'][0]]
     d2 = ct.constantTable[mat['dimensiones'][1]]
+
+
     result = 'T'+str(tempCounter)
     tempCounter = tempCounter + 1
+
     address1 = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName,None)
     result = 'T'+str(tempCounter)
     tempCounter = tempCounter + 1
+
     address2 = mh.addVariable(currentFunc, result, 'TEMPORAL', None, programName,None)
     pointer = mh.addVariable(None,None,'POINTER',None,None,None)
+
     quadruplesOutput.append(('VER',s1,'', d1))
     quadruplesOutput.append(('VER',s2,'', d2))
+
     quadruplesOutput.append(('*', s1, d2, address1)) # s1 * d2
     quadruplesOutput.append(('+', address1, s2, address2)) # s1 * d2 + s2
     quadruplesOutput.append(('+dirBase', dirBase, address2, pointer)) # dirBase + s1 * d2 + s2
+    
     qg.operandStack.append(pointer)
     qg.typeStack.append(type)
 def p_qnp1_send_to_quadruplesMat(p):

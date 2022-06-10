@@ -8,14 +8,18 @@ FUNCS:
 func void bSort(n : int) {
     VARS:
     	var int : i, j, h1, h2;
+    	var bool : swapped;
     START:
     	i = 0;
+
 
         while (i < n - 1) {
         	j = 0;
         	while (j < n - i - 1) {
+        	
         		h1 = myArr[j];
         		h2 = myArr[j + 1];
+
         		if (h1 > h2) {
         			myArr[j] = h2;
         			myArr[j + 1] = h1;

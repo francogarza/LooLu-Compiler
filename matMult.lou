@@ -1,0 +1,90 @@
+LooLu miPrograma;
+
+VARS:
+  var int : myMat[2][3], myMat2[3][2], matRes[2][2], dummy[1][3];
+
+FUNCS:
+
+func void fillMat(s1 : int, s2 : int) {
+    VARS:
+    	var int : i, j, cont;
+    START:
+        i = 0;
+        cont = 0;
+        while (i < s1) {
+            j = 0;
+            while (j < s2) {
+            	read(cont);
+	            myMat[i][j] = cont;
+	            j = j + 1;
+            }
+            i = i + 1;
+        }
+}
+
+func void fillMat2(s1 : int, s2 : int) {
+    VARS:
+    	var int : i, j, cont;
+    START:
+        i = 0;
+        cont = 0;
+        while (i < s1) {
+            j = 0;
+            while (j < s2) {
+            	read(cont);
+	            myMat2[i][j] = cont;
+	            j = j + 1;
+            }
+            i = i + 1;
+        }
+}
+
+func void printRes(s1 : int, s2 : int) {
+	VARS:
+    	var int : i, j, cont;
+    START:
+    	i = 0;
+        cont = 0;
+        while (i < s1) {
+            j = 0;
+            while (j < s2) {
+	            cont = matRes[i][j];
+	            print(cont);
+	            j = j + 1;
+            }
+            print();
+            i = i + 1;
+        }
+}
+
+func void fillMat3(s1 : int, s2 : int) {
+    VARS:
+    	var int : i, j, cont;
+    START:
+        i = 0;
+        cont = 0;
+        while (i < s1) {
+            j = 0;
+            while (j < s2) {
+	            matRes[i][j] = cont;
+	            j = j + 1;
+            }
+            i = i + 1;
+        }
+}
+
+
+CLASSES:
+
+Loo() {
+
+  fillMat(2, 3);
+  fillMat2(3,2);
+  fillMat3(2,2);
+
+  
+  matRes = myMat $ myMat2;
+
+  printRes(2,2);
+
+} Lu;
