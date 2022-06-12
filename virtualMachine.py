@@ -127,16 +127,11 @@ class virtualMachine():
         self.mh = mh
         print('∞Loo')
         def insertInMemory(address, value, name):
-
-
             # CLASSES
             if (address >= 22000 and address <= 26000):
                 object = self.classesMemory.getVariableByName(currentObject)
                 objectMemory = object['memory']
                 objectMemory.insert(address,value)
-
-
-            
             if (address >= 2000 and address <= 5999):
                 self.globalMemory.insert(address, value)
             elif (address >= 6000 and address <= 9999):
@@ -151,16 +146,11 @@ class virtualMachine():
                 self.globalMemory.insert(address, value)
 
         def getFromMemory(address):
-
-
             # CLASSES
             if (address >= 22000 and address <= 26000):
                 object = self.classesMemory.getVariableByName(currentObject)
                 objectMemory = object['memory']
                 return objectMemory.get(address)
-
-
-
             if (address >= 2000 and address <= 5999):
                 return self.globalMemory.get(address)
             elif (address >= 6000 and address <= 9999):
@@ -180,7 +170,6 @@ class virtualMachine():
             elif (address >= 21000 and address <= 21999):
                 self.globalMemory.get(address)
                 return self.globalMemory.get(address)
-        
         def getLocalAddress(type):
             if type == 'int':
                 address = self.mh.localInt[1]
@@ -202,37 +191,10 @@ class virtualMachine():
                 address = self.mh.localTemp[1]
                 self.mh.localTemp[1] += 1
                 return address
-
-        def getClassAddress(type):
-            if type == 'int':
-                address = self.mh.localInt[1]
-                self.mh.classInt[1] += 1
-                return address
-            if type == 'float':
-                address = self.mh.localFloat[1]
-                self.mh.classFloat[1] += 1
-                return address
-            if type == 'char':
-                address = self.mh.localChar[1]
-                self.mh.localChar[1] += 1
-                return address
-            if type == 'bool':
-                address = self.mh.localBool[1]
-                self.mh.localBool[1] += 1
-                return address
-            if type == 'temp':
-                address = self.mh.localTemp[1]
-                self.mh.localTemp[1] += 1
-                return address
-
-
-
         currentQuad = self.quadruples[self.ip]
 
         while(currentQuad[0] != 'END'): # Ends program when a END is found
-
-            # TEST FOR CLASSES
-
+            # CLASSES
             if (len(currentQuad) > 4):
                 if (currentQuad[0] == 'CURRENTOBJECT'):
                     currentObject = currentQuad[4]
@@ -245,9 +207,6 @@ class virtualMachine():
                     insertInMemory(address, None, currentQuad[4])
                 if (currentQuad[0] == 'GOSUB'):
                     currentObject = currentQuad[4]
-                    
-
-
             # Big switch case
             if (currentQuad[0] == 'GOTOMAIN'):
                 self.ip = int(currentQuad[3]) - 1

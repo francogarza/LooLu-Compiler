@@ -514,28 +514,22 @@ def p_np_FillDirFuncForObject(p):
     global dirFunc
     global classesDirFunc
     global stackObjects
-
     refClass = classesDirFunc.getFunctionByName(p[-1])
     if refClass == None:
         raise Exception("Could not find class in classdirfunc")
-
     refClassDirFunc = refClass['DirFunc']
     refClassVarsTable = refClassDirFunc.getGlobalVarsTable()
     newDirFunc = vt.DirFunc()
     newDirFunc.insert({'name':p[-3],'type':'g;lobal','table':vt.Vars()})
     newVarsTable = newDirFunc.getGlobalVarsTable()
-    
     quadruplesOutput.append(('ERACLASS','','','',p[-3]))
-
     for index in range(refClassVarsTable.length()):
         var = refClassVarsTable.accessIndex(index)
         newVarsTable.insert({'name':var['name'],'type':var['type'],'address':var['address']})
         quadruplesOutput.append(('ADDVAR',var['name'],var['type'],var['address'],p[-3]))
-
     for index in range(refClassDirFunc.length()):
         if index != 0:
             newDirFunc.insert(refClassDirFunc.accessIndex(index))
-
     stackObjects.insert({'name': p[-3], 'DirFunc' : newDirFunc })
 #--------------------------------
 

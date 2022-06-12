@@ -18,9 +18,6 @@ CLASSES:
 
 Loo() {
 
-    myInt = -1;
-    print(myInt);
-
     print(factorial(5));
 
 } Lu;
